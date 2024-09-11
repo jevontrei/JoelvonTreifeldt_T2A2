@@ -11,8 +11,8 @@ class Patient(db.Model):
 
 
 class PatientSchema(ma.Schema):
-    email = fields.String(required=True, validate=Regexp(
-        "^\S+@\S+\.\S+$", error="Invalid email format"))
+    # email = fields.String(required=True, validate=Regexp(
+    #     "^\S+@\S+\.\S+$", error="Invalid email format"))
 
     class Meta:
         fields = ("patient_id", "name", "email", "password", "is_admin")
