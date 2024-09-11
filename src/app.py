@@ -5,7 +5,6 @@ from init import db, ma, bcrypt, jwt
 # export FLASK_APP=src/<your_application_file_name>.py
 
 
-# def create_app():
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://joelvontreifeldt:123456@localhost:5432/trello_db"
