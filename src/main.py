@@ -4,11 +4,6 @@ from models.patient import Patient, patient_schema, patients_schema
 # from controllers.patient_controller import welcome
 # from controllers.cli_controller import welcome
 
-
-# put this in terminal to save having to cd into src every time?:
-# export FLASK_APP=src/<your_application_file_name>.py
-
-
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://joelvontreifeldt:password@localhost:5432/medical"
@@ -68,5 +63,5 @@ def get_all_patients():
 
 
 # delet this?:
-if __name__ == "__main__":
-    app.run(debug=True)
+# if __name__ == "__main__":
+#     app.run(debug=True)
