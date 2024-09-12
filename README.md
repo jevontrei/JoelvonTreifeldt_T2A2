@@ -3,6 +3,8 @@
 Joel von Treifeldt
 #15517
 
+# do i need to grant permissions?
+
 Note:
 
 - All links to online material should have corresponding screenshots included in submission.
@@ -11,6 +13,7 @@ Note:
 MAKE A TABLE OF CONTENTS
 
 - [Title](#title)
+- [do i need to grant permissions?](#do-i-need-to-grant-permissions)
 - [R1](#r1)
 - [R2](#r2)
 - [R3](#r3)
