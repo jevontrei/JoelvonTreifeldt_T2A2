@@ -1,5 +1,6 @@
 from init import db, bcrypt
 from models.patient import Patient
+from models.doctor import Doctor
 from main import app
 
 
@@ -16,16 +17,38 @@ def seed_tables():
             name="Joel von Treifeldt",
             email="joel@email.com",
             password="password",
+            dob="1900-01-01",
+            sex="male",
             is_admin=True
         ),
         Patient(
             name="Sue",
             email="sue@email.com",
             password="password",
+            dob="1900-01-01",
+            sex="female",
+            diagnoses="ADHD"
         )
     ]
+    
     db.session.add_all(patients)
+    
+    doctors = [
+        Doctor(
+            name="Jane Smyth",
+            email="jane@email.com",
+            password="password",
+        ),
+        Doctor(
+            name="John Smith",
+            email="john@email.com",
+            password="password",
+        )
+    ]
+    db.session.add_all(doctors)
+    
     db.session.commit()
+    
     print("Tables seeded.")
 
 

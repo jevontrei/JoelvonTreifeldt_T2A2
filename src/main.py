@@ -10,8 +10,9 @@ import os
 
 from controllers.cli_controller import *
 from init import db, ma, bcrypt, jwt
-from models.patient import Patient, patient_schema, patients_schema
+# from models.patient import Patient, patient_schema, patients_schema
 from controllers.patient_controller import *
+from controllers.doctor_controller import *
 
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URI")
@@ -22,6 +23,10 @@ ma.init_app(app)
 bcrypt.init_app(app)
 jwt.init_app(app)
 
+
+@app.route("/")
+def welcome():
+    return "Welcome. Let's get healthy."
 
 
 # if __name__ == "__main__":
