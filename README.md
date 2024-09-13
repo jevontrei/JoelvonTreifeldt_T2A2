@@ -3,7 +3,7 @@
 Joel von Treifeldt
 #15517
 
-# do i need to grant permissions?
+# do i need to grant permissions in psql?
 
 Note:
 
@@ -13,7 +13,7 @@ Note:
 MAKE A TABLE OF CONTENTS
 
 - [Title](#title)
-- [do i need to grant permissions?](#do-i-need-to-grant-permissions)
+- [do i need to grant permissions in psql?](#do-i-need-to-grant-permissions-in-psql)
 - [R1](#r1)
 - [R2](#r2)
 - [R3](#r3)

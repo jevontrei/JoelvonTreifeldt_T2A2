@@ -1,10 +1,12 @@
-# app definition must be before controllers import
+# ----------------------------------------------------
+# app definition must be before controllers import!
 
 # // prettier-ignore {from flask import Flask}
 # // prettier-ignore {app = Flask(__name__)}
 
 from flask import Flask 
 app = Flask(__name__)
+# ----------------------------------------------------
 
 import os
 

@@ -1,6 +1,6 @@
 from init import db, bcrypt
-from models.patient import Patient
-from models.doctor import Doctor
+from models.models import Patient, Doctor, auth, Appointment
+# from models.doctor import Doctor
 from main import app
 
 
@@ -30,9 +30,9 @@ def seed_tables():
             diagnoses="ADHD"
         )
     ]
-    
+
     db.session.add_all(patients)
-    
+
     doctors = [
         Doctor(
             name="Jane Smyth",
@@ -45,10 +45,35 @@ def seed_tables():
             password="password",
         )
     ]
+
     db.session.add_all(doctors)
-    
+    # db.session.add_all([patients, doctors])
+    doctors[0].patients.append(patients[1])
+    doctors[0].patients.append(patients[0])
+    doctors[1].patients.append(patients[1])
+    # or
+    # doctors[0].patients = patients
+    # or
+    # patients[0].doctors = doctors
+
     db.session.commit()
     
+    stmt = db.session.query(auth).filter_by(
+        patient_id = patients[0].patient_id,
+        doc_id = doctors[0].doc_id
+    )
+    
+    print(stmt)
+    
+    print(db.session.scalar(stmt), patients[0].patient_id, doctors[0].doc_id)
+    
+    appointments = db.session.query(Appointment).join(auth).filter(
+        Appointment.auth_id == auth.c.auth_id,
+        auth.c.patient_id == patients[0].patient_id
+    ).all()
+    
+    print(len(appointments))
+
     print("Tables seeded.")
 
 
