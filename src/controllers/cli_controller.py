@@ -1,5 +1,5 @@
 from init import db, bcrypt
-from models.models import Patient, Doctor, auth, Appointment
+from models.models import Patient, Doctor, treat, Appointment
 # from models.doctor import Doctor
 from main import app
 
@@ -54,7 +54,7 @@ def seed_tables():
 
 ##########################################################
 
-    # seed auth table? via doctor OR equivalently patients?
+    # seed treat table? via doctor OR equivalently patients?
 
     doctors[0].patients.append(patients[1])
     doctors[0].patients.append(patients[0])
@@ -68,7 +68,7 @@ def seed_tables():
 
 ##########################################################
 
-    stmt = db.session.query(auth).filter_by(
+    stmt = db.session.query(treat).filter_by(
         patient_id=patients[0].patient_id,
         doc_id=doctors[0].doc_id
     )
@@ -84,7 +84,7 @@ def seed_tables():
 
 ##########################################################
 
-#     print(auth, type(auth))
+#     print(treat, type(treat))
 #   Session.
 
     # seed =
@@ -95,28 +95,28 @@ def seed_tables():
             place="Frog's Hollow Medical Centre",
             cost="100",
             status="Completed",
-            auth_id=2  # should change this so that i'm querying auth for a particular patient and doctor combo
+            treat_id=2  # should change this so that i'm querying treat for a particular patient and doctor combo
         ),
         Appointment(
             datetime="1999-6-13",
             place="Spring Hill Medical Centre",
             cost="206",
             status="Completed",
-            auth_id=2  # should change this so that i'm querying auth for a particular patient and doctor combo
+            treat_id=2  # should change this so that i'm querying treat for a particular patient and doctor combo
         ),
         Appointment(
             datetime="2024-10-1",
             place="UQ Medical Centre",
             cost="58",
             status="Scheduled",
-            auth_id=1  # should change this so that i'm querying auth for a particular patient and doctor combo
+            treat_id=1  # should change this so that i'm querying treat for a particular patient and doctor combo
         ),
         Appointment(
             datetime="2023-10-1",
             place="UQ Medical Centre",
             cost="77",
             status="Completed",
-            auth_id=1  # should change this so that i'm querying auth for a particular patient and doctor combo
+            treat_id=1  # should change this so that i'm querying treat for a particular patient and doctor combo
         )
     ]
 
@@ -127,9 +127,9 @@ def seed_tables():
 ##########################################################
 
     # understand this (and delete?). Is this just Luis investigating querying and that the list is empty so far? AND QUERYING FOR ALL APPTS FOR A PARTICULAR PATIENT?!:
-    appointments = db.session.query(Appointment).join(auth).filter(
-        Appointment.auth_id == auth.c.auth_id,
-        auth.c.patient_id == patients[0].patient_id
+    appointments = db.session.query(Appointment).join(treat).filter(
+        Appointment.treat_id == treat.c.treat_id,
+        treat.c.patient_id == patients[0].patient_id
     ).all()
 
     print(appointments, type(appointments))

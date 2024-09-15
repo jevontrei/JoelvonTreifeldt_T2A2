@@ -1,5 +1,5 @@
 from init import db
-from models.models import Appointment, appointment_schema, appointments_schema, auth
+from models.models import Appointment, appointment_schema, appointments_schema, treat
 from main import app
 
 
@@ -26,14 +26,14 @@ def get_appointments(appt_id):
 
 # GOAL: get all appointments for a particular patient
 
-# this is complicated maybe? becuase it's not patient_id, it's auth_id. how to query auth using patient_id?
+# this is complicated maybe? becuase it's not patient_id, it's treat_id. how to query treat using patient_id?
 
 
 @app.route("/appointments/patients/<int:patient_id>")
 def get_someones_appointments(patient_id):
-    stmt = db.session.query(Appointment).join(auth).filter(
-        Appointment.auth_id == auth.c.auth_id,
-        auth.c.patient_id == patient_id
+    stmt = db.session.query(Appointment).join(treat).filter(
+        Appointment.treat_id == treat.c.treat_id,
+        treat.c.patient_id == patient_id
     ).all()
 
     # print(f"stmt = {stmt}, type = {type(stmt)}")

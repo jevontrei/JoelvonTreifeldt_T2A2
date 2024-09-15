@@ -8,9 +8,9 @@ from marshmallow.validate import OneOf
 VALID_STATUSES = ("Scheduled", "Completed", "Cancelled")
 
 # on delete cascade?
-auth = db.Table(
-    "auth",
-    db.Column('auth_id', db.Integer, primary_key=True),
+treat = db.Table(
+    "treat",
+    db.Column('treat_id', db.Integer, primary_key=True),
     db.Column(
         "patient_id",
         db.Integer,
@@ -24,7 +24,9 @@ auth = db.Table(
         nullable=False
     )
 )
-# auth.columns
+# treat.columns
+
+# TreatSchema?!?!
 
 #########################################
 
@@ -41,7 +43,7 @@ class Patient(db.Model):
     diagnoses = db.Column(db.String)
     is_admin = db.Column(db.Boolean, default=False)
 
-    doctors = db.relationship("Doctor", secondary=auth,
+    doctors = db.relationship("Doctor", secondary=treat,
                               back_populates="patients")
 
 
@@ -70,7 +72,7 @@ class Doctor(db.Model):
     password = db.Column(db.String, nullable=False)
 
     patients = db.relationship(
-        "Patient", secondary=auth, back_populates="doctors")
+        "Patient", secondary=treat, back_populates="doctors")
 
 
 class DoctorSchema(ma.Schema):
@@ -98,15 +100,15 @@ class Appointment(db.Model):
     cost = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String, nullable=False)
 
-    auth_id = db.Column(db.Integer, db.ForeignKey(
-        "auth.auth_id"), nullable=False)
+    treat_id = db.Column(db.Integer, db.ForeignKey(
+        "treat.treat_id"), nullable=False)
 
 
 class AppointmentSchema(ma.Schema):
     status = fields.String(validate=OneOf(VALID_STATUSES))
 
     class Meta:
-        fields = ("appt_id", "datetime", "place", "cost", "status", "auth_id")
+        fields = ("appt_id", "datetime", "place", "cost", "status", "treat_id")
 
 appointment_schema = AppointmentSchema()
 appointments_schema = AppointmentSchema(many=True)
