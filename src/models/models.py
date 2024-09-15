@@ -26,7 +26,7 @@ treat = db.Table(
 )
 # treat.columns
 
-# TreatSchema?!?!
+# TreatSchema?!?! do i need it?
 
 #########################################
 

@@ -15,7 +15,8 @@ from init import db, ma, bcrypt, jwt
 # from models.patient import Patient, patient_schema, patients_schema
 from controllers.patient_controller import *
 from controllers.doctor_controller import *
-from controllers.appointment_controller import *
+from controllers.appt_controller import *
+from controllers.treat_controller import *
 
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URI")

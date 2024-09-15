@@ -16,7 +16,7 @@ def get_all_appointments():
 
 
 @app.route("/appointments/<int:appt_id>")
-def get_appointments(appt_id):
+def get_appointment(appt_id):
     stmt = db.select(Appointment).filter_by(appt_id=appt_id)
     print(stmt, type(stmt))
     appointment = db.session.scalar(stmt)
@@ -28,13 +28,27 @@ def get_appointments(appt_id):
 
 # this is complicated maybe? becuase it's not patient_id, it's treat_id. how to query treat using patient_id?
 
+# this was working but not anymore since i renamed auth to treat?:
 
 @app.route("/appointments/patients/<int:patient_id>")
-def get_someones_appointments(patient_id):
+def get_patient_appointments(patient_id):
     stmt = db.session.query(Appointment).join(treat).filter(
         Appointment.treat_id == treat.c.treat_id,
         treat.c.patient_id == patient_id
     ).all()
+
+    # print(f"stmt = {stmt}, type = {type(stmt)}")
+
+    return appointments_schema.dump(stmt)
+
+##################################################
+
+@app.route("/appointments/doctors/<int:doc_id>")
+def get_doctor_appointments(doc_id):
+    stmt = db.session.query(Appointment).join(treat).filter(
+        Appointment.treat_id == treat.c.treat_id,
+        treat.c.doc_id == doc_id
+    )  # .all()
 
     # print(f"stmt = {stmt}, type = {type(stmt)}")
 
