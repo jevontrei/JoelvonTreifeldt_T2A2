@@ -1,5 +1,5 @@
 from init import db
-from models.models import Appointment, appointment_schema, appointments_schema
+from models.models import Appointment, appointment_schema, appointments_schema, auth
 from main import app
 
 
@@ -14,20 +14,28 @@ def get_all_appointments():
 
 ##################################################
 
-# @app.route("/appointments/<int:appt_id>")
-# def get_appointments(appt_id):
-#     stmt = db.select(Appointment).filter_by(appt_id=appt_id)
-#     appointment = db.session.scalar(stmt)
-#     return appointment_schema.dump(appointment)
+
+@app.route("/appointments/<int:appt_id>")
+def get_appointments(appt_id):
+    stmt = db.select(Appointment).filter_by(appt_id=appt_id)
+    print(stmt, type(stmt))
+    appointment = db.session.scalar(stmt)
+    return appointment_schema.dump(appointment)
 
 ##################################################
 
 # GOAL: get all appointments for a particular patient
 
-# this is complicated becuase it's not patient_id, it's auth_id. how to query auth using patient_id?
+# this is complicated maybe? becuase it's not patient_id, it's auth_id. how to query auth using patient_id?
 
-# @app.route("/appointments/patients/<int:patient_id>")
-# def get_someones_appointments(patient_id):
-#     stmt = db.select(Appointment).filter_by(patient_id=patient_id)
-#     appointments = db.session.scalars(stmt)
-#     return appointments_schema.dump(appointments)
+
+@app.route("/appointments/patients/<int:patient_id>")
+def get_someones_appointments(patient_id):
+    stmt = db.session.query(Appointment).join(auth).filter(
+        Appointment.auth_id == auth.c.auth_id,
+        auth.c.patient_id == patient_id
+    ).all()
+
+    # print(f"stmt = {stmt}, type = {type(stmt)}")
+
+    return appointments_schema.dump(stmt)

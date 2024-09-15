@@ -98,10 +98,24 @@ def seed_tables():
             auth_id=2  # should change this so that i'm querying auth for a particular patient and doctor combo
         ),
         Appointment(
+            datetime="1999-6-13",
+            place="Spring Hill Medical Centre",
+            cost="206",
+            status="Completed",
+            auth_id=2  # should change this so that i'm querying auth for a particular patient and doctor combo
+        ),
+        Appointment(
             datetime="2024-10-1",
             place="UQ Medical Centre",
             cost="58",
             status="Scheduled",
+            auth_id=1  # should change this so that i'm querying auth for a particular patient and doctor combo
+        ),
+        Appointment(
+            datetime="2023-10-1",
+            place="UQ Medical Centre",
+            cost="77",
+            status="Completed",
             auth_id=1  # should change this so that i'm querying auth for a particular patient and doctor combo
         )
     ]
@@ -112,7 +126,7 @@ def seed_tables():
 
 ##########################################################
 
-    # understand this (and delete?). Is this just Luis investigating querying and that the list is empty so far?:
+    # understand this (and delete?). Is this just Luis investigating querying and that the list is empty so far? AND QUERYING FOR ALL APPTS FOR A PARTICULAR PATIENT?!:
     appointments = db.session.query(Appointment).join(auth).filter(
         Appointment.auth_id == auth.c.auth_id,
         auth.c.patient_id == patients[0].patient_id
