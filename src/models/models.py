@@ -1,6 +1,11 @@
 from init import db, ma
 
+from marshmallow import fields
+from marshmallow.validate import OneOf
+
 # rename to patient.py if i move classes etc to their own files
+
+VALID_STATUSES = ("Scheduled", "Completed", "Cancelled")
 
 # on delete cascade?
 auth = db.Table(
@@ -20,6 +25,8 @@ auth = db.Table(
     )
 )
 # auth.columns
+
+#########################################
 
 
 class Patient(db.Model):
@@ -51,6 +58,8 @@ class PatientSchema(ma.Schema):
 patient_schema = PatientSchema(exclude=["password"])
 patients_schema = PatientSchema(many=True, exclude=["password"])
 
+#########################################
+
 
 class Doctor(db.Model):
     __tablename__ = "doctors"
@@ -77,13 +86,29 @@ doctor_schema = DoctorSchema(exclude=["password"])
 doctors_schema = DoctorSchema(many=True, exclude=["password"])
 
 
+#########################################
+
+
 class Appointment(db.Model):
     __tablename__ = "appointments"
 
-    appointment_id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date, nullable=False)
+    appt_id = db.Column(db.Integer, primary_key=True)
+    datetime = db.Column(db.Date, nullable=False)  # change to datetime, and remember to change seed values etc
     place = db.Column(db.String(50), nullable=False)
     cost = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.String, nullable=False)
 
     auth_id = db.Column(db.Integer, db.ForeignKey(
         "auth.auth_id"), nullable=False)
+
+
+class AppointmentSchema(ma.Schema):
+    status = fields.String(validate=OneOf(VALID_STATUSES))
+
+    class Meta:
+        fields = ("appt_id", "datetime", "place", "cost", "status", "auth_id")
+
+appointment_schema = AppointmentSchema()
+appointments_schema = AppointmentSchema(many=True)
+
+#########################################
