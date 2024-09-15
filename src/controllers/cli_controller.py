@@ -51,7 +51,11 @@ def seed_tables():
     ]
 
     db.session.add_all(doctors)
-    # db.session.add_all([patients, doctors])
+
+##########################################################
+
+    # seed auth table? via doctor OR equivalently patients?
+
     doctors[0].patients.append(patients[1])
     doctors[0].patients.append(patients[0])
     doctors[1].patients.append(patients[1])
@@ -61,6 +65,8 @@ def seed_tables():
     # patients[0].doctors = doctors
 
     db.session.commit()
+
+##########################################################
 
     stmt = db.session.query(auth).filter_by(
         patient_id=patients[0].patient_id,
@@ -81,7 +87,7 @@ def seed_tables():
 #     print(auth, type(auth))
 #   Session.
 
-    # seed = 
+    # seed =
 
     appointments = [
         Appointment(
@@ -99,9 +105,6 @@ def seed_tables():
             auth_id=1  # should change this so that i'm querying auth for a particular patient and doctor combo
         )
     ]
-
-    # with db.engine.connect() as connection:
-    #     connection.execute(insert(a))
 
     # do i need to add and commit appointments?
     db.session.add_all(appointments)
