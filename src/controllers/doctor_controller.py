@@ -14,7 +14,7 @@ def get_all_doctors():
 ##################################################
 
 @app.route("/doctors/<int:doc_id>")
-def get_doctor(doc_id):
+def get_a_doctor(doc_id):
     stmt = db.select(Doctor).filter_by(doc_id=doc_id)
     doctor = db.session.scalar(stmt)
     return doctor_schema.dump(doctor)

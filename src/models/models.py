@@ -7,20 +7,22 @@ from marshmallow.validate import OneOf
 
 VALID_STATUSES = ("Scheduled", "Completed", "Cancelled")
 
-# on delete cascade?
+#########################################
+
+# on delete cascade? also so that flask drop doesn't freak out
 treat = db.Table(
     "treat",
     db.Column('treat_id', db.Integer, primary_key=True),
     db.Column(
         "patient_id",
         db.Integer,
-        db.ForeignKey("patients.patient_id"),
+        db.ForeignKey("patients.patient_id"),  # or cascade="all, delete"?
         nullable=False
     ),
     db.Column(
         "doc_id",
         db.Integer,
-        db.ForeignKey("doctors.doc_id"),
+        db.ForeignKey("doctors.doc_id"),  # or cascade="all, delete"?
         nullable=False
     )
 )
@@ -43,8 +45,11 @@ class Patient(db.Model):
     diagnoses = db.Column(db.String)
     is_admin = db.Column(db.Boolean, default=False)
 
+    logs = db.relationship("Log", back_populates="patient", cascade="all, delete") # or just cascade="delete"?
+
     doctors = db.relationship("Doctor", secondary=treat,
                               back_populates="patients")
+    
 
 
 class PatientSchema(ma.Schema):
@@ -114,3 +119,25 @@ appointment_schema = AppointmentSchema()
 appointments_schema = AppointmentSchema(many=True)
 
 #########################################
+
+class Log(db.Model):
+    __tablename__ = "logs"
+
+    log_id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date, nullable=False)
+    symptom = db.Column(db.String, nullable=False)
+    # duration is a str, not int, to facilitate multiple timescales
+    duration = db.Column(db.String)  
+    severity = db.Column(db.String)
+    
+    # FK from patient (1 to many)
+    patient_id = db.Column(db.Integer, db.ForeignKey("patients.patient_id", ondelete="CASCADE"), nullable=False)
+    
+    patient = db.relationship("Patient", back_populates="logs")
+    
+class LogSchema(ma.Schema):
+    class Meta:
+        fields = ("log_id", "date", "symptom", "duration", "severity", "patient_id")
+
+log_schema = LogSchema()
+logs_schema = LogSchema(many=True)

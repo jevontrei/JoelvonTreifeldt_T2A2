@@ -1,5 +1,5 @@
 from init import db, bcrypt
-from models.models import Patient, Doctor, treat, Appointment
+from models.models import Patient, Doctor, treat, Appointment, Log
 # from models.doctor import Doctor
 from main import app
 
@@ -73,14 +73,14 @@ def seed_tables():
         doc_id=doctors[0].doc_id
     )
 
-    print()
-    print(stmt)
-    print(type(stmt))
-    print()
-    print(db.session.scalar(stmt), patients[0].patient_id, doctors[0].doc_id)
-    print(type(db.session.scalar(stmt)), type(
-        patients[0].patient_id), type(doctors[0].doc_id))
-    print()
+    # print()
+    # print(stmt)
+    # print(type(stmt))
+    # print()
+    # print(db.session.scalar(stmt), patients[0].patient_id, doctors[0].doc_id)
+    # print(type(db.session.scalar(stmt)), type(
+    #     patients[0].patient_id), type(doctors[0].doc_id))
+    # print()
 
 ##########################################################
 
@@ -126,15 +126,33 @@ def seed_tables():
 
 ##########################################################
 
+    logs = [
+        Log(
+            date = "2024-09-16",
+            symptom = "API-induced headache",
+            patient_id = 1
+        ),
+        Log(
+            date = "2023-12-3",
+            symptom = "Sore spirit",
+            patient_id = 2
+        )
+    ]
+    
+    db.session.add_all(logs)
+    db.session.commit()
+
+##########################################################
+
     # understand this (and delete?). Is this just Luis investigating querying and that the list is empty so far? AND QUERYING FOR ALL APPTS FOR A PARTICULAR PATIENT?!:
     appointments = db.session.query(Appointment).join(treat).filter(
         Appointment.treat_id == treat.c.treat_id,
         treat.c.patient_id == patients[0].patient_id
     ).all()
 
-    print(appointments, type(appointments))
-    print(f"len(appointments) = {len(appointments)}")
-    print()
+    # print(appointments, type(appointments))
+    # print(f"len(appointments) = {len(appointments)}")
+    # print()
 
     print("Tables seeded.")
 

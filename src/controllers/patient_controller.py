@@ -13,7 +13,7 @@ def get_all_patients():
 ##################################################
 
 @app.route("/patients/<int:patient_id>")
-def get_patient(patient_id):
+def get_a_patient(patient_id):
     stmt = db.select(Patient).filter_by(patient_id=patient_id)
     patient = db.session.scalar(stmt)
     return patient_schema.dump(patient)

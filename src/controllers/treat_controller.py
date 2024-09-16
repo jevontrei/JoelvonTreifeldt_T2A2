@@ -29,6 +29,12 @@ def get_all_treatments():
     
 #####################################################
     
+@app.route("/treatments/<int:treat_id>")
+def get_a_treat(treat_id):
+    ...
+    
+#####################################################
+    
 # @app.route("/treatments/patients/<patient_id>")
 # def get_patient_treatments():
     

@@ -17,6 +17,9 @@ from controllers.patient_controller import *
 from controllers.doctor_controller import *
 from controllers.appt_controller import *
 from controllers.treat_controller import *
+from controllers.log_controller import *
+# delet?:
+# from models.models import *
 
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URI")

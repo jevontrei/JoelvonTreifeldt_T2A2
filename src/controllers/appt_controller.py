@@ -8,7 +8,7 @@ from main import app
 @app.route("/appointments/")
 def get_all_appointments():
     stmt = db.select(Appointment)  # .order_by(Appointment.datetime)
-    print(f"stmt = {stmt}")
+    # print(f"stmt = {stmt}")
     appointments = db.session.scalars(stmt)
     return appointments_schema.dump(appointments)
 
@@ -16,9 +16,9 @@ def get_all_appointments():
 
 
 @app.route("/appointments/<int:appt_id>")
-def get_appointment(appt_id):
+def get_an_appointment(appt_id):
     stmt = db.select(Appointment).filter_by(appt_id=appt_id)
-    print(stmt, type(stmt))
+    # print(stmt, type(stmt))
     appointment = db.session.scalar(stmt)
     return appointment_schema.dump(appointment)
 
