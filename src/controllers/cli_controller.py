@@ -26,7 +26,21 @@ def seed_tables():
             is_admin=True
         ),
         Patient(
-            name="Sue",
+            name="Marie Curie",
+            email="Marie@email.com",
+            password="password",
+            dob="1867-11-07",
+            sex="female"
+        ),
+        Patient(
+            name="Erwin Schrodinger",
+            email="erwin@schromail.com",
+            password="password",
+            dob="1887-08-12",
+            sex="male"
+        ),
+        Patient(
+            name="Sue Jackson",
             email="sue@email.com",
             password="password",
             dob="1900-01-01",
@@ -44,6 +58,16 @@ def seed_tables():
             password="password",
         ),
         Doctor(
+            name="Fred Hollows",
+            email="fred@email.com",
+            password="password",
+        ),
+        Doctor(
+            name="Cleopatra",
+            email="cleo@email.com",
+            password="password",
+        ),
+        Doctor(
             name="John Smith",
             email="john@email.com",
             password="password",
@@ -56,9 +80,11 @@ def seed_tables():
 
     # seed treat table? via doctor OR equivalently patients?
 
-    doctors[0].patients.append(patients[1])
     doctors[0].patients.append(patients[0])
-    doctors[1].patients.append(patients[1])
+    # doctors[0].patients.append(patients[0])  # this should raise a UniqueViolation error
+    doctors[0].patients.append(patients[1])
+    doctors[1].patients.append(patients[2])
+    doctors[2].patients.append(patients[1])
     # or
     # doctors[0].patients = patients
     # or
@@ -98,25 +124,32 @@ def seed_tables():
             treat_id=2  # should change this so that i'm querying treat for a particular patient and doctor combo
         ),
         Appointment(
-            datetime="1999-6-13",
+            datetime="1999-06-13",
             place="Spring Hill Medical Centre",
             cost="206",
             status="Completed",
             treat_id=2  # should change this so that i'm querying treat for a particular patient and doctor combo
         ),
         Appointment(
-            datetime="2024-10-1",
+            datetime="2024-10-01",
             place="UQ Medical Centre",
             cost="58",
             status="Scheduled",
             treat_id=1  # should change this so that i'm querying treat for a particular patient and doctor combo
         ),
         Appointment(
-            datetime="2023-10-1",
+            datetime="2023-10-01",
             place="UQ Medical Centre",
             cost="77",
             status="Completed",
             treat_id=1  # should change this so that i'm querying treat for a particular patient and doctor combo
+        ),
+        Appointment(
+            datetime="1463-09-02",
+            place="London Medical Centre",
+            cost="2",
+            status="Completed",
+            treat_id=3  # should change this so that i'm querying treat for a particular patient and doctor combo
         )
     ]
 
@@ -131,6 +164,16 @@ def seed_tables():
             date = "2024-09-16",
             symptom = "API-induced headache",
             patient_id = 1
+        ),
+        Log(
+            date = "1724-09-16",
+            symptom = "tuberculosis",
+            patient_id = 3
+        ),
+        Log(
+            date = "1111-11-11",
+            symptom = "death",
+            patient_id = 2
         ),
         Log(
             date = "2023-12-3",

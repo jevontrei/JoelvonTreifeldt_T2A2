@@ -4,8 +4,6 @@ from models.models import Doctor, doctor_schema, doctors_schema
 from main import app
 from flask import request
 
-# check i didn't accidentally replace a "patient" with a "doctor" etc. 2024-9-16, 12:45pm. i think its' fine tho
-
 
 ##################################################
 
@@ -30,8 +28,6 @@ def get_a_doctor(doc_id):
 @app.route("/doctors/", methods=["POST"])
 def create_doctor():
     body_data = request.get_json()
-    # stmt = db.select(Doctor)
-    # doctor = db.session.scalar(stmt)
     # remember to validate input!
     doctor = Doctor(
         name=body_data.get("name"),
@@ -65,8 +61,6 @@ def update_doctor(doc_id):
 
 ##################################################
 
-
-# do i need to CASCADE here?
 
 @app.route("/doctors/<int:doc_id>", methods=["DELETE"])
 def delete_doctor(doc_id):

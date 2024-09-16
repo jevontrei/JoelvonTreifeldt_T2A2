@@ -9,8 +9,9 @@ VALID_STATUSES = ("Scheduled", "Completed", "Cancelled")
 
 #########################################
 
-# on delete cascade? also so that flask drop doesn't freak out
 treat = db.Table(
+    # Aamod: add a start/end date for treat_ids
+    # how to set it to be required unique?
     "treat",
     db.Column('treat_id', db.Integer, primary_key=True),
     db.Column(
@@ -24,12 +25,13 @@ treat = db.Table(
         db.Integer,
         db.ForeignKey("doctors.doc_id"),
         nullable=False
-    )
+    ),
+    db.UniqueConstraint('patient_id', 'doc_id', name='uix_patient_doctor')
 )
 
 # treat.columns
 
-# TreatSchema?!?! do i need it? seems like no
+# TreatSchema? Seems like don't need one for db.Table()
 
 #########################################
 
@@ -131,8 +133,8 @@ class Log(db.Model):
     log_id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=False)  # add default of today
     symptom = db.Column(db.String, nullable=False)
-    # str, not int, to facilitate multiple timescales
-    duration = db.Column(db.String)
+    duration = db.Column(db.String)  # str, not int, to facilitate multiple timescales
+
     severity = db.Column(db.String)
 
     # FK from patient (1 to many)

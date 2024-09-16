@@ -27,8 +27,6 @@ def get_a_patient(patient_id):
 @app.route("/patients/", methods=["POST"])
 def create_patient():
     body_data = request.get_json()
-    # stmt = db.select(Patient)
-    # patient = db.session.scalar(stmt)
     # remember to validate input!
     patient = Patient(
         name=body_data.get("name"),
@@ -70,8 +68,6 @@ def update_patient(patient_id):
 
 ##################################################
 
-
-# do i need to CASCADE here?
 
 @app.route("/patients/<int:patient_id>", methods=["DELETE"])
 def delete_patient(patient_id):
