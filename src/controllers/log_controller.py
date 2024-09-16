@@ -25,6 +25,8 @@ def get_a_log(log_id):
 
 ############################################
 
+# change route to /patients/<patient_id>/logs/?
+
 
 @app.route("/logs/patients/<int:patient_id>")
 def get_patient_log(patient_id):
@@ -36,6 +38,7 @@ def get_patient_log(patient_id):
 
 ############################################
 
+# change route to /patients/<patient_id>/logs/?
 @app.route("/logs/<int:log_id>", methods=["DELETE"])
 def delete_log(log_id):
     # check for authorisation
@@ -50,20 +53,20 @@ def delete_log(log_id):
 
 ############################################
 
-# @app.route("/logs/", methods=["POST"])
+
 @app.route("/patients/<int:patient_id>/logs/", methods=["POST"])
 def create_log(patient_id):
     body_data = request.get_json()
     stmt = db.select(Log)  # .filter_by(log_id=log_id)
     log = db.session.scalar(stmt)
-    
+
     if log:
         log = Log(
-            date = body_data.get("date") or date.today(),
-            symptom = body_data.get("symptom"),
-            duration = body_data.get("duration"),
-            severity = body_data.get("severity"),
-            patient_id = patient_id
+            date=body_data.get("date") or date.today(),
+            symptom=body_data.get("symptom"),
+            duration=body_data.get("duration"),
+            severity=body_data.get("severity"),
+            patient_id=patient_id
         )
 
         db.session.add(log)
@@ -73,12 +76,14 @@ def create_log(patient_id):
 
     else:
         return {"error": f"Log {log_id} not found."}
-    
+
 ############################################
 
-# not sure if update route should be /logs/ or /logs/log_id
+# change route to /patients/<patient_id>/logs/?
+
+
 @app.route("/logs/<int:log_id>", methods=["PUT", "PATCH"])
-def update_log(log_id): 
+def update_log(log_id):
     body_data = request.get_json()
     stmt = db.select(Log).filter_by(log_id=log_id)
     log = db.session.scalar(stmt)

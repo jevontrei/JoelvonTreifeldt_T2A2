@@ -26,9 +26,10 @@ treat = db.Table(
         nullable=False
     )
 )
+
 # treat.columns
 
-# TreatSchema?!?! do i need it?
+# TreatSchema?!?! do i need it? seems like no
 
 #########################################
 
@@ -45,11 +46,12 @@ class Patient(db.Model):
     diagnoses = db.Column(db.String)
     is_admin = db.Column(db.Boolean, default=False)
 
-    logs = db.relationship("Log", back_populates="patient", cascade="all, delete") # or just cascade="delete"?
+    # or just cascade="delete"?
+    logs = db.relationship(
+        "Log", back_populates="patient", cascade="all, delete")
 
     doctors = db.relationship("Doctor", secondary=treat,
                               back_populates="patients")
-    
 
 
 class PatientSchema(ma.Schema):
@@ -100,7 +102,8 @@ class Appointment(db.Model):
     __tablename__ = "appointments"
 
     appt_id = db.Column(db.Integer, primary_key=True)
-    datetime = db.Column(db.Date, nullable=False)  # change to datetime, and remember to change seed values etc
+    # change to datetime, and remember to change seed values etc
+    datetime = db.Column(db.Date, nullable=False)
     place = db.Column(db.String(50), nullable=False)
     cost = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String, nullable=False)
@@ -115,10 +118,12 @@ class AppointmentSchema(ma.Schema):
     class Meta:
         fields = ("appt_id", "datetime", "place", "cost", "status", "treat_id")
 
+
 appointment_schema = AppointmentSchema()
 appointments_schema = AppointmentSchema(many=True)
 
 #########################################
+
 
 class Log(db.Model):
     __tablename__ = "logs"
@@ -126,18 +131,22 @@ class Log(db.Model):
     log_id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=False)  # add default of today
     symptom = db.Column(db.String, nullable=False)
-    # duration is a str, not int, to facilitate multiple timescales
-    duration = db.Column(db.String)  
+    # str, not int, to facilitate multiple timescales
+    duration = db.Column(db.String)
     severity = db.Column(db.String)
-    
+
     # FK from patient (1 to many)
-    patient_id = db.Column(db.Integer, db.ForeignKey("patients.patient_id", ondelete="CASCADE"), nullable=False)
-    
+    patient_id = db.Column(db.Integer, db.ForeignKey(
+        "patients.patient_id", ondelete="CASCADE"), nullable=False)
+
     patient = db.relationship("Patient", back_populates="logs")
-    
+
+
 class LogSchema(ma.Schema):
     class Meta:
-        fields = ("log_id", "date", "symptom", "duration", "severity", "patient_id")
+        fields = ("log_id", "date", "symptom",
+                  "duration", "severity", "patient_id")
+
 
 log_schema = LogSchema()
 logs_schema = LogSchema(many=True)

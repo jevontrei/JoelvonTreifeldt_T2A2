@@ -40,6 +40,9 @@ def get_a_treat(treat_id):
     
 # @app.route("/treatments/doctors/<doc_id>")
 # def get_doctor_treatments():
+
+# @app.route("/treatments/doctors/<doc_id>")
+# def get_doctor_patients():
     
 # @app.route("/treatments/", methods=["PUT", "PATCH"])
 # def
