@@ -124,7 +124,7 @@ class Log(db.Model):
     __tablename__ = "logs"
 
     log_id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date, nullable=False)
+    date = db.Column(db.Date, nullable=False)  # add default of today
     symptom = db.Column(db.String, nullable=False)
     # duration is a str, not int, to facilitate multiple timescales
     duration = db.Column(db.String)  

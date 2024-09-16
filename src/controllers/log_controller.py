@@ -2,6 +2,8 @@ from init import db
 from main import app
 from models.models import Log, log_schema, logs_schema
 from flask import request
+from datetime import date
+
 
 ############################################
 
@@ -49,23 +51,28 @@ def delete_log(log_id):
 ############################################
 
 # @app.route("/logs/", methods=["POST"])
-# def create_log():
-#     body_data = request.get_json()
-#     stmt = db.select(Log).filter_by(log_id=log_id)
-#     log = db.session.scalar(stmt)
+@app.route("/patients/<int:patient_id>/logs/", methods=["POST"])
+def create_log(patient_id):
+    body_data = request.get_json()
+    stmt = db.select(Log)  # .filter_by(log_id=log_id)
+    log = db.session.scalar(stmt)
     
-#     if log:
-#         log = Log(
-#             ...
-#         )
+    if log:
+        log = Log(
+            date = body_data.get("date") or date.today(),
+            symptom = body_data.get("symptom"),
+            duration = body_data.get("duration"),
+            severity = body_data.get("severity"),
+            patient_id = patient_id
+        )
 
-#         db.session.add(log)
-#         db.session.commit()
+        db.session.add(log)
+        db.session.commit()
 
-#         return log_schema.dump(log)  # , 201
+        return log_schema.dump(log), 201
 
-#     else:
-#         return {"error": f"Log {log_id} not found."}
+    else:
+        return {"error": f"Log {log_id} not found."}
     
 ############################################
 
