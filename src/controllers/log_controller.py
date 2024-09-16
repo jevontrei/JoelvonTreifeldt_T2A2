@@ -86,6 +86,8 @@ def update_log(log_id):
 ############################################
 
 # change route to /patients/<patient_id>/logs/?
+
+
 @app.route("/logs/<int:log_id>", methods=["DELETE"])
 def delete_log(log_id):
     # check for authorisation
@@ -97,3 +99,5 @@ def delete_log(log_id):
         return {"message": f"Log {log_id} deleted."}  # , 200
     else:
         return {"error": f"Sorry, log {log_id} can't be found."}  # , 404?
+
+############################################

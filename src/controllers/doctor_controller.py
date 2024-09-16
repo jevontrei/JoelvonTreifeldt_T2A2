@@ -2,6 +2,10 @@ from init import db
 # from models.doctor import Doctor, doctor_schema, doctors_schema
 from models.models import Doctor, doctor_schema, doctors_schema
 from main import app
+from flask import request
+
+# check i didn't accidentally replace a "patient" with a "doctor" etc. 2024-9-16, 12:45pm. i think its' fine tho
+
 
 ##################################################
 
@@ -13,10 +17,66 @@ def get_all_doctors():
 
 ##################################################
 
+
 @app.route("/doctors/<int:doc_id>")
 def get_a_doctor(doc_id):
     stmt = db.select(Doctor).filter_by(doc_id=doc_id)
     doctor = db.session.scalar(stmt)
     return doctor_schema.dump(doctor)
+
+##################################################
+
+
+@app.route("/doctors/", methods=["POST"])
+def create_doctor():
+    body_data = request.get_json()
+    # stmt = db.select(Doctor)
+    # doctor = db.session.scalar(stmt)
+    # remember to validate input!
+    doctor = Doctor(
+        name=body_data.get("name"),
+        email=body_data.get("email"),
+        password=body_data.get("password")
+    )
+
+    db.session.add(doctor)
+    db.session.commit()
+
+    return doctor_schema.dump(doctor), 201
+
+##################################################
+
+
+@app.route("/doctors/<int:doc_id>", methods=["PUT", "PATCH"])
+def update_doctor(doc_id):
+    body_data = request.get_json()
+    stmt = db.select(Doctor).filter_by(doc_id=doc_id)
+    doctor = db.session.scalar(stmt)
+    if doctor:
+        doctor.name = body_data.get("name") or doctor.name
+        doctor.email = body_data.get("email") or doctor.email
+        doctor.password = body_data.get("password") or doctor.password
+        # patients and appointments? no, do this through treat and appts, respectively?
+
+        db.session.commit()
+        return doctor_schema.dump(doctor)
+    else:
+        return {"error": f"Doctor {doc_id} not found."}  # , 404
+
+##################################################
+
+
+# do i need to CASCADE here?
+
+@app.route("/doctors/<int:doc_id>", methods=["DELETE"])
+def delete_doctor(doc_id):
+    stmt = db.select(Doctor).filter_by(doc_id=doc_id)
+    doctor = db.session.scalar(stmt)
+    if doctor:
+        db.session.delete(doctor)
+        db.session.commit()
+        return {"message": f"Doctor {doc_id} deleted."}  # , 200
+    else:
+        return {"error": f"Sorry, doctor {doc_id} can't be found."}  # , 404?
 
 ##################################################

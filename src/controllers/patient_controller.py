@@ -54,15 +54,15 @@ def update_patient(patient_id):
     stmt = db.select(Patient).filter_by(patient_id=patient_id)
     patient = db.session.scalar(stmt)
     if patient:
-        patient.name=body_data.get("name") or patient.name
-        patient.email=body_data.get("email") or patient.email
-        patient.password=body_data.get("password") or patient.password
-        patient.dob=body_data.get("dob") or patient.dob
-        patient.sex=body_data.get("sex") or patient.sex
-        patient.diagnoses=body_data.get("diagnoses") or patient.diagnoses
-        patient.is_admin=body_data.get("is_admin") or patient.is_admin
+        patient.name = body_data.get("name") or patient.name
+        patient.email = body_data.get("email") or patient.email
+        patient.password = body_data.get("password") or patient.password
+        patient.dob = body_data.get("dob") or patient.dob
+        patient.sex = body_data.get("sex") or patient.sex
+        patient.diagnoses = body_data.get("diagnoses") or patient.diagnoses
+        patient.is_admin = body_data.get("is_admin") or patient.is_admin
         # logs and doctors? no, do this through logs and auth, respectively?
-        
+
         db.session.commit()
         return patient_schema.dump(patient)
     else:
@@ -71,8 +71,7 @@ def update_patient(patient_id):
 ##################################################
 
 
-# DELET A PATIENT
-# CASCADE
+# do i need to CASCADE here?
 
 @app.route("/patients/<int:patient_id>", methods=["DELETE"])
 def delete_patient(patient_id):

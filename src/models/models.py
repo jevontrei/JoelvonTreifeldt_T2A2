@@ -16,13 +16,13 @@ treat = db.Table(
     db.Column(
         "patient_id",
         db.Integer,
-        db.ForeignKey("patients.patient_id"),  # or cascade="all, delete"?
+        db.ForeignKey("patients.patient_id"),
         nullable=False
     ),
     db.Column(
         "doc_id",
         db.Integer,
-        db.ForeignKey("doctors.doc_id"),  # or cascade="all, delete"?
+        db.ForeignKey("doctors.doc_id"),
         nullable=False
     )
 )
@@ -48,7 +48,7 @@ class Patient(db.Model):
 
     # or just cascade="delete"?
     logs = db.relationship(
-        "Log", back_populates="patient", cascade="all, delete")
+        "Log", back_populates="patient", cascade="all, delete")  # all, delete or just delete? fix the others too
 
     doctors = db.relationship("Doctor", secondary=treat,
                               back_populates="patients")
@@ -109,7 +109,7 @@ class Appointment(db.Model):
     status = db.Column(db.String, nullable=False)
 
     treat_id = db.Column(db.Integer, db.ForeignKey(
-        "treat.treat_id"), nullable=False)
+        "treat.treat_id", ondelete="CASCADE"), nullable=False)
 
 
 class AppointmentSchema(ma.Schema):
