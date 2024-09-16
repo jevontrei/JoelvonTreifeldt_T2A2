@@ -30,3 +30,18 @@ def get_patient_log(patient_id):
     logs = db.session.scalars(stmt)
     return logs_schema.dump(logs)
 
+
+
+############################################
+
+@app.route("/logs/<int:log_id>", methods=["DELETE"])
+def delete_log(log_id):
+    # check for authorisation
+    stmt = db.select(Log).filter_by(log_id=log_id)
+    log = db.session.scalar(stmt)
+    if log:
+        db.session.delete(log)
+        db.session.commit()
+        return {"message": "Log {log_id} deleted."}  # , 200
+    else:
+        return {"error": "Sorry, log {log_id} can't be found."}  # , 404?
