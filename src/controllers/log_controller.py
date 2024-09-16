@@ -38,21 +38,6 @@ def get_patient_log(patient_id):
 
 ############################################
 
-# change route to /patients/<patient_id>/logs/?
-@app.route("/logs/<int:log_id>", methods=["DELETE"])
-def delete_log(log_id):
-    # check for authorisation
-    stmt = db.select(Log).filter_by(log_id=log_id)
-    log = db.session.scalar(stmt)
-    if log:
-        db.session.delete(log)
-        db.session.commit()
-        return {"message": f"Log {log_id} deleted."}  # , 200
-    else:
-        return {"error": f"Sorry, log {log_id} can't be found."}  # , 404?
-
-############################################
-
 
 @app.route("/patients/<int:patient_id>/logs/", methods=["POST"])
 def create_log(patient_id):
@@ -97,3 +82,18 @@ def update_log(log_id):
         return log_schema.dump(log)
     else:
         return {"error": f"Log {log_id} not found."}, 404
+
+############################################
+
+# change route to /patients/<patient_id>/logs/?
+@app.route("/logs/<int:log_id>", methods=["DELETE"])
+def delete_log(log_id):
+    # check for authorisation
+    stmt = db.select(Log).filter_by(log_id=log_id)
+    log = db.session.scalar(stmt)
+    if log:
+        db.session.delete(log)
+        db.session.commit()
+        return {"message": f"Log {log_id} deleted."}  # , 200
+    else:
+        return {"error": f"Sorry, log {log_id} can't be found."}  # , 404?

@@ -74,4 +74,15 @@ def update_patient(patient_id):
 # DELET A PATIENT
 # CASCADE
 
+@app.route("/patients/<int:patient_id>", methods=["DELETE"])
+def delete_patient(patient_id):
+    stmt = db.select(Patient).filter_by(patient_id=patient_id)
+    patient = db.session.scalar(stmt)
+    if patient:
+        db.session.delete(patient)
+        db.session.commit()
+        return {"message": f"Patient {patient_id} deleted."}  # , 200
+    else:
+        return {"error": f"Sorry, patient {patient_id} can't be found."}  # , 404?
+
 ##################################################
