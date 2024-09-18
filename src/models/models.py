@@ -7,36 +7,7 @@ from marshmallow.validate import OneOf
 
 VALID_STATUSES = ("Scheduled", "Completed", "Cancelled")
 
-
 #########################################
-
-# treat = db.Table(
-#     # Aamod: add a start/end date for treat_ids
-#     # how to set it to be required unique?
-#     "treat",
-#     db.Column('treat_id', db.Integer, primary_key=True),
-#     db.Column(
-#         "patient_id",
-#         db.Integer,
-#         db.ForeignKey("patients.patient_id"),
-#         nullable=False
-#     ),
-#     db.Column(
-#         "doc_id",
-#         db.Integer,
-#         db.ForeignKey("doctors.doc_id"),
-#         nullable=False
-#     ),
-#     db.UniqueConstraint('patient_id', 'doc_id', name='uix_patient_doctor')
-# )
-
-# treat.columns
-
-# TreatSchema? Seems like don't need one for db.Table()
-
-#########################################
-
-# rewrite treat Table as a model (Treat) and add start/end date
 
 
 class Treat(db.Model):
@@ -48,13 +19,17 @@ class Treat(db.Model):
     doc_id = db.Column("doc_id", db.Integer, db.ForeignKey(
         "doctors.doc_id"), nullable=False)
     start_date = db.Column(db.Date, nullable=False)
-    # validate that end date is on or after start date:
-    end_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date)
+
+    patient = db.relationship("Patient", back_populates="treat")
+    doctor = db.relationship("Doctor", back_populates="treat")
 
 
 class TreatSchema(ma.Schema):
-    
-    # constrain each entry to be unique
+
+    # remember to constrain each entry to be unique
+    # remember to validate that end date, if it exists, is on or after start date:
+
     class Meta:
         fields = ("treat_id", "patient_id", "doc_id", "start_date", "end_date")
 
@@ -79,10 +54,11 @@ class Patient(db.Model):
 
     # or just cascade="delete"?
     logs = db.relationship(
-        "Log", back_populates="patient", cascade="all, delete")  # all, delete or just delete? fix the others too
+        "Log", back_populates="patient", cascade="all, delete")
 
-    doctors = db.relationship("Doctor", secondary=treat,
-                              back_populates="patients")
+    # check if this makes sense as cascade
+    treat = db.relationship(
+        "Treat", back_populates="patient", cascade="all, delete")
 
 
 class PatientSchema(ma.Schema):
@@ -91,8 +67,7 @@ class PatientSchema(ma.Schema):
 
     class Meta:
         fields = ("patient_id", "name", "email", "password",
-                  "dob", "sex", "diagnoses", "is_admin")
-        # fields = ("patient_id", "name", "email", "password", "dob", "sex", "diagnoses", "is_admin", "doctor")  # or "doctors" plural?
+                  "dob", "sex", "diagnoses", "is_admin", "treat")
 
 
 patient_schema = PatientSchema(exclude=["password"])
@@ -109,8 +84,9 @@ class Doctor(db.Model):
     email = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
 
-    patients = db.relationship(
-        "Patient", secondary=treat, back_populates="doctors")
+    # check if this makes sense as cascade
+    treat = db.relationship(
+        "Treat", back_populates="doctor", cascade="all, delete")
 
 
 class DoctorSchema(ma.Schema):
@@ -118,8 +94,7 @@ class DoctorSchema(ma.Schema):
     #     "^\S+@\S+\.\S+$", error="Invalid email format"))
 
     class Meta:
-        fields = ("doc_id", "name", "email", "password")
-        # fields = ("doc_id", "name", "email", "password", "patient")
+        fields = ("doc_id", "name", "email", "password", "treat")
 
 
 doctor_schema = DoctorSchema(exclude=["password"])

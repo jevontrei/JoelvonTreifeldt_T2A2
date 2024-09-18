@@ -20,6 +20,8 @@ from controllers.log_controller import *
 from controllers.patient_controller import *
 from controllers.treat_controller import *
 
+from marshmallow.exceptions import ValidationError
+
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URI")
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")

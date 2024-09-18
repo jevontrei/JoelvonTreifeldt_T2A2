@@ -1,10 +1,12 @@
 from init import db
-from models.models import treat
+from models.models import Treat
 from main import app
 from flask import jsonify
 
 #####################################################
 
+
+# THESE ALL NEED TO CHANGE BC I AM NOW USING DB.MODEL FOR TREAT. THEY NEED TO BE SERIALISED NOW!
 
 @app.route("/treatments/")
 def get_all_treatments():
