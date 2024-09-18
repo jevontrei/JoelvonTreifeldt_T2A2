@@ -30,8 +30,30 @@ bcrypt.init_app(app)
 jwt.init_app(app)
 
 
+# globally handle errors here (global = main.py) for good practice:
+# generalised:
+@app.errorhandler(ValidationError)
+def validation_error(err):
+    return {"error": err.messages}, 400
+
+
+@app.errorhandler(400)
+def bad_request(err):
+    return {"error": err.messages}, 400
+
+
+@app.errorhandler(401)
+def unauthorised():
+    return {"error": "You are not an authorised user."}, 401
+
+
 @app.route("/")
 def welcome():
+    """_summary_
+
+    Returns:
+        _type_: _description_
+    """
     return "Welcome. Let's get healthy."
 
 

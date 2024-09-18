@@ -8,6 +8,8 @@ from main import app
 
 @app.cli.command("create")
 def create_tables():
+    """_summary_
+    """
     db.create_all()
     print("Tables created.")
 
@@ -16,6 +18,8 @@ def create_tables():
 
 @app.cli.command("seed")
 def seed_tables():
+    """_summary_
+    """
     patients = [
         Patient(
             name="Joel von Treifeldt",
@@ -204,6 +208,8 @@ def seed_tables():
 
 @app.cli.command("drop")
 def drop_tables():
+    """_summary_
+    """
     db.drop_all()
     print("Tables droppped.")
 

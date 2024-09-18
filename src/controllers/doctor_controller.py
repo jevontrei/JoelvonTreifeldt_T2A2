@@ -9,6 +9,7 @@ from flask import request
 
 @app.route("/doctors/")
 def get_all_doctors():
+    # SELECT * FROM doctors ORDER BY ...?;
     stmt = db.select(Doctor).order_by(Doctor.name)
     doctors = db.session.scalars(stmt)
     return doctors_schema.dump(doctors)
@@ -18,6 +19,7 @@ def get_all_doctors():
 
 @app.route("/doctors/<int:doc_id>")
 def get_a_doctor(doc_id):
+    # SELECT * FROM doctos WHERE ... = doc_id?;
     stmt = db.select(Doctor).filter_by(doc_id=doc_id)
     doctor = db.session.scalar(stmt)
     return doctor_schema.dump(doctor)
@@ -46,6 +48,7 @@ def create_doctor():
 @app.route("/doctors/<int:doc_id>", methods=["PUT", "PATCH"])
 def update_doctor(doc_id):
     body_data = request.get_json()
+    # SELECT * FROM doctors WHERE ... = doc_id?;
     stmt = db.select(Doctor).filter_by(doc_id=doc_id)
     doctor = db.session.scalar(stmt)
     if doctor:
@@ -64,6 +67,7 @@ def update_doctor(doc_id):
 
 @app.route("/doctors/<int:doc_id>", methods=["DELETE"])
 def delete_doctor(doc_id):
+    # SELECT * FROM doctors WHERE doc_id = doc_id?;
     stmt = db.select(Doctor).filter_by(doc_id=doc_id)
     doctor = db.session.scalar(stmt)
     if doctor:

@@ -10,6 +10,7 @@ from datetime import date
 
 @app.route("/logs/")
 def get_all_logs():
+    # SELECT * FROM logs ORDER BY ... ?;
     stmt = db.select(Log).order_by(Log.date)
     logs = db.session.scalars(stmt)
     return logs_schema.dump(logs)
@@ -19,6 +20,7 @@ def get_all_logs():
 
 @app.route("/logs/<int:log_id>")
 def get_a_log(log_id):
+    # SELECT * FROM logs WHERE log_id = log_id ... ?;
     stmt = db.select(Log).filter_by(log_id=log_id)
     log = db.session.scalar(stmt)
     return log_schema.dump(log)
@@ -30,6 +32,7 @@ def get_a_log(log_id):
 
 @app.route("/logs/patients/<int:patient_id>")
 def get_patient_log(patient_id):
+    # SELECT * FROM logs WHERE patient_id = patient_id ... ?;
     stmt = db.select(Log).filter_by(patient_id=patient_id)
     print(stmt)
     logs = db.session.scalars(stmt)
@@ -42,6 +45,7 @@ def get_patient_log(patient_id):
 @app.route("/patients/<int:patient_id>/logs/", methods=["POST"])
 def create_log(patient_id):
     body_data = request.get_json()
+    # SELECT * FROM logs WHERE log_id = log_id... ?;
     stmt = db.select(Log)  # .filter_by(log_id=log_id)
     log = db.session.scalar(stmt)
 
@@ -70,6 +74,7 @@ def create_log(patient_id):
 @app.route("/logs/<int:log_id>", methods=["PUT", "PATCH"])
 def update_log(log_id):
     body_data = request.get_json()
+    # SELECT * FROM logs WHERE log_id = log_id ... ?;
     stmt = db.select(Log).filter_by(log_id=log_id)
     log = db.session.scalar(stmt)
     if log:
@@ -91,6 +96,7 @@ def update_log(log_id):
 @app.route("/logs/<int:log_id>", methods=["DELETE"])
 def delete_log(log_id):
     # check for authorisation
+    # SELECT * FROM logs WHERE log_id = log_id ... ?;
     stmt = db.select(Log).filter_by(log_id=log_id)
     log = db.session.scalar(stmt)
     if log:
