@@ -7,31 +7,60 @@ from marshmallow.validate import OneOf
 
 VALID_STATUSES = ("Scheduled", "Completed", "Cancelled")
 
+
 #########################################
 
-treat = db.Table(
-    # Aamod: add a start/end date for treat_ids
-    # how to set it to be required unique?
-    "treat",
-    db.Column('treat_id', db.Integer, primary_key=True),
-    db.Column(
-        "patient_id",
-        db.Integer,
-        db.ForeignKey("patients.patient_id"),
-        nullable=False
-    ),
-    db.Column(
-        "doc_id",
-        db.Integer,
-        db.ForeignKey("doctors.doc_id"),
-        nullable=False
-    ),
-    db.UniqueConstraint('patient_id', 'doc_id', name='uix_patient_doctor')
-)
+# treat = db.Table(
+#     # Aamod: add a start/end date for treat_ids
+#     # how to set it to be required unique?
+#     "treat",
+#     db.Column('treat_id', db.Integer, primary_key=True),
+#     db.Column(
+#         "patient_id",
+#         db.Integer,
+#         db.ForeignKey("patients.patient_id"),
+#         nullable=False
+#     ),
+#     db.Column(
+#         "doc_id",
+#         db.Integer,
+#         db.ForeignKey("doctors.doc_id"),
+#         nullable=False
+#     ),
+#     db.UniqueConstraint('patient_id', 'doc_id', name='uix_patient_doctor')
+# )
 
 # treat.columns
 
 # TreatSchema? Seems like don't need one for db.Table()
+
+#########################################
+
+# rewrite treat Table as a model (Treat) and add start/end date
+
+
+class Treat(db.Model):
+    __tablename__ = "treat"
+    treat_id = db.Column(db.Integer, primary_key=True)
+    # do i need the names here?:
+    patient_id = db.Column("patient_id", db.Integer, db.ForeignKey(
+        "patients.patient_id"), nullable=False)
+    doc_id = db.Column("doc_id", db.Integer, db.ForeignKey(
+        "doctors.doc_id"), nullable=False)
+    start_date = db.Column(db.Date, nullable=False)
+    # validate that end date is on or after start date:
+    end_date = db.Column(db.Date, nullable=False)
+
+
+class TreatSchema(ma.Schema):
+    
+    # constrain each entry to be unique
+    class Meta:
+        fields = ("treat_id", "patient_id", "doc_id", "start_date", "end_date")
+
+
+treat_schema = TreatSchema()
+treats_schema = TreatSchema(many=True)
 
 #########################################
 
@@ -63,7 +92,7 @@ class PatientSchema(ma.Schema):
     class Meta:
         fields = ("patient_id", "name", "email", "password",
                   "dob", "sex", "diagnoses", "is_admin")
-        # fields = ("patient_id", "name", "email", "password", "dob", "sex", "diagnoses", "is_admin", "doctor")
+        # fields = ("patient_id", "name", "email", "password", "dob", "sex", "diagnoses", "is_admin", "doctor")  # or "doctors" plural?
 
 
 patient_schema = PatientSchema(exclude=["password"])
@@ -133,7 +162,8 @@ class Log(db.Model):
     log_id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=False)  # add default of today
     symptom = db.Column(db.String, nullable=False)
-    duration = db.Column(db.String)  # str, not int, to facilitate multiple timescales
+    # str, not int, to facilitate multiple timescales
+    duration = db.Column(db.String)
 
     severity = db.Column(db.String)
 
