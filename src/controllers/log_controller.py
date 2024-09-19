@@ -27,15 +27,29 @@ def get_a_log(log_id):
 
 ############################################
 
-# change route to /patients/<patient_id>/logs/?
+# change route to /patients/<int:patient_id>/logs/?
 
 
 @app.route("/logs/patients/<int:patient_id>")
-def get_patient_log(patient_id):
+def get_patient_logs(patient_id):
+    """
+    Get all logs for a particular patient
+
+    Args:
+        patient_id (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     # SELECT * FROM logs WHERE patient_id = patient_id ... ?;
     stmt = db.select(Log).filter_by(patient_id=patient_id)
-    print(stmt)
+    
+    
+    # need an if statement here somewhere (and in all other routes) to avoid returning an empty list for e.g. patient_id=9999 
+    
+    
     logs = db.session.scalars(stmt)
+    
     return logs_schema.dump(logs)
 
 
@@ -68,14 +82,17 @@ def create_log(patient_id):
 
 ############################################
 
-# change route to /patients/<patient_id>/logs/?
+# change route to /patients/<int:patient_id>/logs/?
 
 
 @app.route("/logs/<int:log_id>", methods=["PUT", "PATCH"])
 def update_log(log_id):
     body_data = request.get_json()
+    
+    # create SQL statement
     # SELECT * FROM logs WHERE log_id = log_id ... ?;
     stmt = db.select(Log).filter_by(log_id=log_id)
+    
     log = db.session.scalar(stmt)
     if log:
         log.date = body_data.get("date") or log.date
@@ -90,7 +107,7 @@ def update_log(log_id):
 
 ############################################
 
-# change route to /patients/<patient_id>/logs/?
+# change route to /patients/<int:patient_id>/logs/?
 
 
 @app.route("/logs/<int:log_id>", methods=["DELETE"])
@@ -104,6 +121,6 @@ def delete_log(log_id):
         db.session.commit()
         return {"message": f"Log {log_id} deleted."}  # , 200
     else:
-        return {"error": f"Sorry, log {log_id} can't be found."}  # , 404?
+        return {"error": f"Sorry, log {log_id} not found."}  # , 404?
 
 ############################################

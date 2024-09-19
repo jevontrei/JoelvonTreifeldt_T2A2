@@ -62,6 +62,58 @@ Design an entity relationship diagram (ERD) for this app’s database, and expla
 
 This should focus on the database design BEFORE coding has begun, eg. during the project planning or design phase.
 
+<!-- how to display mermaid diagram in markdown? -->
+```
+erDiagram
+    Patient ||--o{ Treat : "has optional"
+    Doctor ||--o{ Treat : "provides optional"
+    Patient ||--o{ Log : "records optional"
+    Treat ||--o{ Appointment : "schedules optional"
+
+    Patient {
+        int patient_id PK
+        string name
+        string email
+        string password
+        date dob
+        string sex
+        boolean is_admin
+    }
+
+    Doctor {
+        int doc_id PK
+        string name
+        string email
+        string password
+    }
+
+    Treat {
+        int treat_id PK
+        int patient_id FK
+        int doc_id FK
+        date start_date
+        date end_date
+    }
+
+    Appointment {
+        int appt_id PK
+        date datetime
+        string place
+        int cost
+        string status
+        int treat_id FK
+    }
+
+    Log {
+        int log_id PK
+        date date
+        string symptom
+        string duration
+        string severity
+        int patient_id FK
+    }
+```
+
 # R7
 
 Explain the implemented models and their relationships, including how the relationships aid the database implementation.

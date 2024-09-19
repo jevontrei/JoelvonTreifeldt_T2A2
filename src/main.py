@@ -8,6 +8,8 @@ from flask import Flask
 app = Flask(__name__)
 # ----------------------------------------------------
 
+###########################################################################
+
 import os
 
 from init import db, ma, bcrypt, jwt
@@ -18,16 +20,24 @@ from controllers.cli_controller import *
 from controllers.doctor_controller import *
 from controllers.log_controller import *
 from controllers.patient_controller import *
-from controllers.treat_controller import *
+from controllers.treatment_controller import *
 
+from marshmallow.exceptions import ValidationError
+
+
+###########################################################################
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URI")
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
+
+###########################################################################
 
 db.init_app(app)
 ma.init_app(app)
 bcrypt.init_app(app)
 jwt.init_app(app)
+
+###########################################################################
 
 
 # globally handle errors here (global = main.py) for good practice:
@@ -37,6 +47,7 @@ def validation_error(err):
     return {"error": err.messages}, 400
 
 
+# i'm getting Insomnia error "AttributeError: 'BadRequest' object has no attribute 'message'"
 @app.errorhandler(400)
 def bad_request(err):
     return {"error": err.messages}, 400
@@ -46,7 +57,9 @@ def bad_request(err):
 def unauthorised():
     return {"error": "You are not an authorised user."}, 401
 
+###########################################################################
 
+# root route
 @app.route("/")
 def welcome():
     """_summary_
@@ -56,6 +69,10 @@ def welcome():
     """
     return "Welcome. Let's get healthy."
 
+###########################################################################
 
+# delet?:
 # if __name__ == "__main__":
 #     app.run(debug=True)
+
+###########################################################################

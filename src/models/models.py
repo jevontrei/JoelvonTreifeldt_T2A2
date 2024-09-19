@@ -9,29 +9,36 @@ VALID_STATUSES = ("Scheduled", "Completed", "Cancelled")
 
 #########################################
 
-treat = db.Table(
-    # Aamod: add a start/end date for treat_ids
-    # how to set it to be required unique?
-    "treat",
-    db.Column('treat_id', db.Integer, primary_key=True),
-    db.Column(
-        "patient_id",
-        db.Integer,
-        db.ForeignKey("patients.patient_id"),
-        nullable=False
-    ),
-    db.Column(
-        "doc_id",
-        db.Integer,
-        db.ForeignKey("doctors.doc_id"),
-        nullable=False
-    ),
-    db.UniqueConstraint('patient_id', 'doc_id', name='uix_patient_doctor')
-)
 
-# treat.columns
+class Treatment(db.Model):
+    # change this to "treatments" plural and figure out where else to change it!
+    __tablename__ = "treatment"
+    treatment_id = db.Column(db.Integer, primary_key=True)
+    
+    # do i need the "patient_id" etc names here?:
+    patient_id = db.Column("patient_id", db.Integer, db.ForeignKey(
+        "patients.patient_id"), nullable=False)
+    doc_id = db.Column("doc_id", db.Integer, db.ForeignKey(
+        "doctors.doc_id"), nullable=False)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date)
 
-# TreatSchema? Seems like don't need one for db.Table()
+    # not sure if these cascade bits should be here... delet?:
+    patient = db.relationship("Patient", back_populates="treatment")  # , cascade="all, delete"
+    doctor = db.relationship("Doctor", back_populates="treatment")  # , cascade="all, delete"
+
+
+class TreatmentSchema(ma.Schema):
+
+    # remember to constrain each entry to be unique
+    # remember to validate that end date, if it exists, is on or after start date:
+
+    class Meta:
+        fields = ("treatment_id", "patient_id", "doc_id", "start_date", "end_date")
+
+
+treatment_schema = TreatmentSchema()
+treatments_schema = TreatmentSchema(many=True)
 
 #########################################
 
@@ -45,25 +52,25 @@ class Patient(db.Model):
     password = db.Column(db.String, nullable=False)
     dob = db.Column(db.Date, nullable=False)
     sex = db.Column(db.String(15))
-    diagnoses = db.Column(db.String)
     is_admin = db.Column(db.Boolean, default=False)
 
-    # or just cascade="delete"?
     logs = db.relationship(
-        "Log", back_populates="patient", cascade="all, delete")  # all, delete or just delete? fix the others too
+        "Log", back_populates="patient", cascade="all, delete")
 
-    doctors = db.relationship("Doctor", secondary=treat,
-                              back_populates="patients")
+    # check if this makes sense as cascade
+    treatment = db.relationship(
+        "Treatment", back_populates="patient", cascade="all, delete")
 
 
 class PatientSchema(ma.Schema):
     # email = fields.String(required=True, validate=Regexp(
     #     "^\S+@\S+\.\S+$", error="Invalid email format"))
 
+
+    treatment = fields.Nested(TreatmentSchema, many=True)
     class Meta:
         fields = ("patient_id", "name", "email", "password",
-                  "dob", "sex", "diagnoses", "is_admin")
-        # fields = ("patient_id", "name", "email", "password", "dob", "sex", "diagnoses", "is_admin", "doctor")
+                  "dob", "sex", "is_admin", "treatment")
 
 
 patient_schema = PatientSchema(exclude=["password"])
@@ -80,8 +87,9 @@ class Doctor(db.Model):
     email = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
 
-    patients = db.relationship(
-        "Patient", secondary=treat, back_populates="doctors")
+    # check if this makes sense as cascade
+    treatment = db.relationship(
+        "Treatment", back_populates="doctor", cascade="all, delete")
 
 
 class DoctorSchema(ma.Schema):
@@ -89,8 +97,7 @@ class DoctorSchema(ma.Schema):
     #     "^\S+@\S+\.\S+$", error="Invalid email format"))
 
     class Meta:
-        fields = ("doc_id", "name", "email", "password")
-        # fields = ("doc_id", "name", "email", "password", "patient")
+        fields = ("doc_id", "name", "email", "password", "treatment")
 
 
 doctor_schema = DoctorSchema(exclude=["password"])
@@ -110,15 +117,15 @@ class Appointment(db.Model):
     cost = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String, nullable=False)
 
-    treat_id = db.Column(db.Integer, db.ForeignKey(
-        "treat.treat_id", ondelete="CASCADE"), nullable=False)
+    treatment_id = db.Column(db.Integer, db.ForeignKey(
+        "treatment.treatment_id", ondelete="CASCADE"), nullable=False)
 
 
 class AppointmentSchema(ma.Schema):
     status = fields.String(validate=OneOf(VALID_STATUSES))
 
     class Meta:
-        fields = ("appt_id", "datetime", "place", "cost", "status", "treat_id")
+        fields = ("appt_id", "datetime", "place", "cost", "status", "treatment_id")
 
 
 appointment_schema = AppointmentSchema()
@@ -133,7 +140,8 @@ class Log(db.Model):
     log_id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=False)  # add default of today
     symptom = db.Column(db.String, nullable=False)
-    duration = db.Column(db.String)  # str, not int, to facilitate multiple timescales
+    # str, not int, to facilitate multiple timescales
+    duration = db.Column(db.String)
 
     severity = db.Column(db.String)
 

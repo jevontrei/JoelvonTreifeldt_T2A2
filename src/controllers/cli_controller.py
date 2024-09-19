@@ -1,11 +1,20 @@
 from init import db, bcrypt
-from models.models import Patient, Doctor, treat, Appointment, Log
-# from models.doctor import Doctor
 from main import app
+from models.models import Patient, Doctor, Treatment, Appointment, Log
 
 ##################################################
 
+# drop tables
+@app.cli.command("drop")
+def drop_tables():
+    """_summary_
+    """
+    db.drop_all()
+    print("Tables droppped.")
 
+##################################################
+
+# create tables
 @app.cli.command("create")
 def create_tables():
     """_summary_
@@ -15,11 +24,14 @@ def create_tables():
 
 ##################################################
 
-
+# seed tables with patients, doctors, treatments, logs and appointments
 @app.cli.command("seed")
 def seed_tables():
     """_summary_
     """
+    
+    
+    # seed patients
     patients = [
         Patient(
             name="Joel von Treifeldt",
@@ -48,13 +60,16 @@ def seed_tables():
             email="sue@email.com",
             password="password",
             dob="1900-01-01",
-            sex="female",
-            diagnoses="ADHD"
+            sex="female"
         )
     ]
-
+    
+    # add seeded patients to database session and commit
     db.session.add_all(patients)
+    db.session.commit()
 
+
+    # seed doctors
     doctors = [
         Doctor(
             name="Jane Smyth",
@@ -77,92 +92,84 @@ def seed_tables():
             password="password",
         )
     ]
-
+    
+    # add seeded doctors to database session and commit
     db.session.add_all(doctors)
-
-##########################################################
-
-    # seed treat table? via doctor OR equivalently patients?
-
-    doctors[0].patients.append(patients[0])
-    # doctors[0].patients.append(patients[0])  # this should raise a UniqueViolation error
-    doctors[0].patients.append(patients[1])
-    doctors[1].patients.append(patients[2])
-    doctors[2].patients.append(patients[1])
-    # or
-    # doctors[0].patients = patients
-    # or
-    # patients[0].doctors = doctors
-
     db.session.commit()
 
-##########################################################
 
-    stmt = db.session.query(treat).filter_by(
-        patient_id=patients[0].patient_id,
-        doc_id=doctors[0].doc_id
-    )
+    # seed treatments
+    treatments = [
+        Treatment(
+            patient = patients[0],
+            doctor = doctors[0],
+            start_date="2024-01-01",
+            end_date="2024-01-02"
+        ),
+        Treatment(
+            patient = patients[0],
+            doctor = doctors[1],
+            start_date="2023-11-21"
+        ),
+        Treatment(
+            patient = patients[1],
+            doctor = doctors[0],
+            start_date="1999-01-01",
+            end_date="2024-03-04"
+        )
+    ]
+    
+    # add seeded treatments to database session and commit
+    db.session.add_all(treatments)
+    db.session.commit()
 
-    # print()
-    # print(stmt)
-    # print(type(stmt))
-    # print()
-    # print(db.session.scalar(stmt), patients[0].patient_id, doctors[0].doc_id)
-    # print(type(db.session.scalar(stmt)), type(
-    #     patients[0].patient_id), type(doctors[0].doc_id))
-    # print()
 
-##########################################################
-
-#     print(treat, type(treat))
-#   Session.
-
-    # seed =
-
+    # seed appointments
     appointments = [
         Appointment(
             datetime="2000-12-12",
             place="Frog's Hollow Medical Centre",
             cost="100",
             status="Completed",
-            treat_id=2  # should change this so that i'm querying treat for a particular patient and doctor combo
+            treatment_id=treatments[0].treatment_id  # should change this so that i'm querying treatment for a particular patient and doctor combo
         ),
         Appointment(
             datetime="1999-06-13",
             place="Spring Hill Medical Centre",
             cost="206",
             status="Completed",
-            treat_id=2  # should change this so that i'm querying treat for a particular patient and doctor combo
+            treatment_id=treatments[0].treatment_id  # should change this so that i'm querying treatment for a particular patient and doctor combo
         ),
         Appointment(
             datetime="2024-10-01",
             place="UQ Medical Centre",
             cost="58",
             status="Scheduled",
-            treat_id=1  # should change this so that i'm querying treat for a particular patient and doctor combo
+            treatment_id=treatments[1].treatment_id  # should change this so that i'm querying treatment for a particular patient and doctor combo
         ),
         Appointment(
             datetime="2023-10-01",
             place="UQ Medical Centre",
             cost="77",
             status="Completed",
-            treat_id=1  # should change this so that i'm querying treat for a particular patient and doctor combo
+            treatment_id=treatments[1].treatment_id  # should change this so that i'm querying treatment for a particular patient and doctor combo
         ),
         Appointment(
             datetime="1463-09-02",
             place="London Medical Centre",
             cost="2",
             status="Completed",
-            treat_id=3  # should change this so that i'm querying treat for a particular patient and doctor combo
+            treatment_id=treatments[2].treatment_id  # should change this so that i'm querying treatment for a particular patient and doctor combo
         )
     ]
-
-    # do i need to add and commit appointments?
+    
+    # add seeded appointments to database session and commit
     db.session.add_all(appointments)
     db.session.commit()
+    
 
-##########################################################
-
+    
+    # seed logs
     logs = [
         Log(
             date = "2024-09-16",
@@ -172,45 +179,32 @@ def seed_tables():
         Log(
             date = "1724-09-16",
             symptom = "tuberculosis",
+            duration = "3 months",
             patient_id = 3
         ),
         Log(
             date = "1111-11-11",
             symptom = "death",
+            duration = "a while now",
+            severity = "severe",
             patient_id = 2
         ),
         Log(
             date = "2023-12-3",
             symptom = "Sore spirit",
+            severity = "mild",
             patient_id = 2
         )
     ]
     
+
+    # add seeded logs to database session and commit
     db.session.add_all(logs)
     db.session.commit()
+    
 
-##########################################################
-
-    # understand this (and delete?). Is this just Luis investigating querying and that the list is empty so far? AND QUERYING FOR ALL APPTS FOR A PARTICULAR PATIENT?!:
-    appointments = db.session.query(Appointment).join(treat).filter(
-        Appointment.treat_id == treat.c.treat_id,
-        treat.c.patient_id == patients[0].patient_id
-    ).all()
-
-    # print(appointments, type(appointments))
-    # print(f"len(appointments) = {len(appointments)}")
-    # print()
-
+    # print success message
     print("Tables seeded.")
 
 ##################################################
 
-
-@app.cli.command("drop")
-def drop_tables():
-    """_summary_
-    """
-    db.drop_all()
-    print("Tables droppped.")
-
-##################################################
