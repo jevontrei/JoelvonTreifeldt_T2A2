@@ -15,9 +15,10 @@ def get_all_treatments():
         _type_: _description_
     """
     # create SQL statement
-    # SELECT * FROM treatment;
+    # SELECT * FROM treatments;
     stmt = db.select(Treatment)
-    
+    print(stmt)
+
     # execute statement, store in an iterable object
     treatments = db.session.scalars(stmt)
     
@@ -39,8 +40,9 @@ def get_a_treatment(treatment_id):
         _type_: _description_
     """
     # create SQL statement
-    # SELECT * FROM treatment WHERE treatment_id=treatment_id ... ?;
+    # SELECT * FROM treatments WHERE treatment_id=treatment_id ... ?;
     stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
+    print(stmt)
     
     treatment = db.session.scalar(stmt)
     
@@ -57,8 +59,9 @@ def get_patient_treatments(patient_id):
         patient_id (_type_): _description_
     """
     # create SQL statement
-    # SELECT * FROM treatment WHERE patient_id=patient_id ...?
+    # SELECT * FROM treatments WHERE patient_id=patient_id ...?
     stmt = db.select(Treatment).filter_by(patient_id=patient_id)
+    print(stmt)
     
     treatments = db.session.scalars(stmt)
     
@@ -67,19 +70,20 @@ def get_patient_treatments(patient_id):
 #####################################################
 
 
-@app.route("/treatments/doctors/<int:doc_id>")
-def get_doctor_treatments(doc_id):
+@app.route("/treatments/doctors/<int:doctor_id>")
+def get_doctor_treatments(doctor_id):
     """
     Get all treatment details for a particular doctor
 
     Args:
-        doc_id (_type_): _description_
+        doctor_id (_type_): _description_
     """
     # create SQL statement
-    # SELECT * FROM treatment WHERE doc_id=doc_id ...?
+    # SELECT * FROM treatments WHERE doctor_id=doctor_id ...?
     
-    stmt = db.select(Treatment).filter_by(doc_id=doc_id)
-    
+    stmt = db.select(Treatment).filter_by(doctor_id=doctor_id)
+    print(stmt)
+
     treatments = db.session.scalars(stmt)
     
     return treatments_schema.dump(treatments)
@@ -94,7 +98,7 @@ def create_treatment():
 
     Args:
         patient_id (_type_): _description_
-        doc_id (_type_): _description_
+        doctor_id (_type_): _description_
     """
     # fetch data, deserialise it, store in variable
     body_data = request.get_json()
@@ -103,7 +107,7 @@ def create_treatment():
     # define new instance of Treatment class
     treatment = Treatment(
         patient_id=body_data.get("patient_id"),
-        doc_id=body_data.get("doc_id"),
+        doctor_id=body_data.get("doctor_id"),
         start_date=body_data.get("start_date"),
         end_date=body_data.get("end_date")
     )
@@ -124,8 +128,9 @@ def update_treatment(treatment_id):
     body_data = request.get_json()
     
     # create SQL statement
-    # SELECT * FROM treatment WHERE treatment_id = treatment_id ... ?;
+    # SELECT * FROM treatments WHERE treatment_id = treatment_id ... ?;
     stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
+    print(stmt)
     
     # execute ...
     treatment = db.session.scalar(stmt)
@@ -133,7 +138,7 @@ def update_treatment(treatment_id):
     # if treatment exists, apply ...
     if treatment:
         treatment.patient_id = body_data.get("patient_id") or treatment.patient_id
-        treatment.doc_id = body_data.get("doc_id") or treatment.doc_id
+        treatment.doctor_id = body_data.get("doctor_id") or treatment.doctor_id
         treatment.start_date = body_data.get("start_date") or treatment.start_date
         treatment.end_date = body_data.get("end_date") or treatment.end_date
 
@@ -142,7 +147,7 @@ def update_treatment(treatment_id):
         return treatment_schema.dump(treatment)
     
     else:
-        return {"error": f"Treatment {treatment_id} not found."}  # , 404
+        return {"error": f"Treatment {treatment_id} not found."}, 404
     
 #####################################################
 
@@ -153,7 +158,9 @@ def delete_treatment(treatment_id):
     # still need to authorise!!
     
     # create SQL statement
+    # SELECT ?
     stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
+    print(stmt)
     
     # execute statement and ...
     treatment = db.session.scalar(stmt)
@@ -165,4 +172,4 @@ def delete_treatment(treatment_id):
         return {"message": f"Treatment {treatment_id} deleted."}  # , 200
     
     else:
-        return {"error": f"Sorry, Treatment {treatment_id} not found."}  # , 404?
+        return {"error": f"Treatment {treatment_id} not found."}, 404

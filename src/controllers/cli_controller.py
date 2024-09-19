@@ -9,6 +9,7 @@ from models.models import Patient, Doctor, Treatment, Appointment, Log
 def drop_tables():
     """_summary_
     """
+    # delete all tables from the database (even if FK constraints are present? how to do this?)
     db.drop_all()
     print("Tables droppped.")
 
@@ -131,35 +132,35 @@ def seed_tables():
             place="Frog's Hollow Medical Centre",
             cost="100",
             status="Completed",
-            treatment_id=treatments[0].treatment_id  # should change this so that i'm querying treatment for a particular patient and doctor combo
+            treatment_id=treatments[0].treatment_id  # should change these so that i'm querying treatment for a particular patient and doctor combo
         ),
         Appointment(
             datetime="1999-06-13",
             place="Spring Hill Medical Centre",
             cost="206",
             status="Completed",
-            treatment_id=treatments[0].treatment_id  # should change this so that i'm querying treatment for a particular patient and doctor combo
+            treatment_id=treatments[0].treatment_id
         ),
         Appointment(
             datetime="2024-10-01",
             place="UQ Medical Centre",
             cost="58",
             status="Scheduled",
-            treatment_id=treatments[1].treatment_id  # should change this so that i'm querying treatment for a particular patient and doctor combo
+            treatment_id=treatments[1].treatment_id
         ),
         Appointment(
             datetime="2023-10-01",
             place="UQ Medical Centre",
             cost="77",
             status="Completed",
-            treatment_id=treatments[1].treatment_id  # should change this so that i'm querying treatment for a particular patient and doctor combo
+            treatment_id=treatments[1].treatment_id
         ),
         Appointment(
             datetime="1463-09-02",
             place="London Medical Centre",
             cost="2",
             status="Completed",
-            treatment_id=treatments[2].treatment_id  # should change this so that i'm querying treatment for a particular patient and doctor combo
+            treatment_id=treatments[2].treatment_id
         )
     ]
     

@@ -1,9 +1,11 @@
 from init import db
 from models.models import Appointment, appointment_schema, appointments_schema, Treatment
 from main import app
-from flask import request
+from flask import request, jsonify
+
 
 ##################################################
+
 
 @app.route("/appointments/")
 def get_all_appointments():
@@ -17,9 +19,14 @@ def get_all_appointments():
     # SELECT * FROM appointments;
     stmt = db.select(Appointment)  # .order_by(Appointment.datetime)
     
+    print(stmt)
+
+    # execute statement
     appointments = db.session.scalars(stmt)
     
+    # serialise and return
     return appointments_schema.dump(appointments)
+
 
 ##################################################
 
@@ -38,64 +45,92 @@ def get_an_appointment(appt_id):
     # SELECT * FROM appointments WHERE ... = appt_id?;
     stmt = db.select(Appointment).filter_by(appt_id=appt_id)
     
+    print(stmt)
+    
     appointment = db.session.scalar(stmt)
     
     return appointment_schema.dump(appointment)
 
+
 ##################################################
 
-# GOAL: get all appointments for a particular patient
-
-# this is complicated maybe? becuase it's not patient_id, it's treatment_id. how to query treatment using patient_id?
-
-# this was working but not anymore since i renamed auth to treatment?:
 
 @app.route("/appointments/patients/<int:patient_id>")
 def get_patient_appointments(patient_id):
-    """_summary_
+    """
+    Get all appointments for a particular patient
 
     Args:
         patient_id (_type_): _description_
 
     Returns:
-        _type_: _description_
+        JSON: a list of appointments for the given patient
     """
+    
     # create SQL statement
-    # SELECT * FROM appointments JOIN? ... WHERE ... ?;
-    stmt = db.session.query(Appointment).join(treatment).filter(
-        Appointment.treatment_id == treatment.c.treatment_id,
-        treatment.c.patient_id == patient_id
-    ).all()
 
-    # print(f"stmt = {stmt}, type = {type(stmt)}")
+    # SELECT appointments.appt_id, appointments.datetime, appointments.place, appointments.cost, appointments.status, appointments.treatment_id 
+    # FROM appointments JOIN treatments ON treatments.treatment_id = appointments.treatment_id 
+    # WHERE treatments.patient_id = :patient_id_1
+    
+    stmt = db.select(Appointment).join(Treatment).filter(
+        Treatment.patient_id == patient_id
+        )
 
-    return appointments_schema.dump(stmt)
+    # print(stmt)
+    
+    # execute SQL statement using scalars(), and return a list of scalar values with fetchall()
+    appointments = db.session.scalars(stmt)#.fetchall()
+    
+    # guard clause
+    if not appointments:
+        return {"message": f"No appointments found for patient {patient_id}."}, 404
+
+    # serialise and return
+    return appointments_schema.dump(appointments)
+
 
 ##################################################
 
-@app.route("/appointments/doctors/<int:doc_id>")
-def get_doctor_appointments(doc_id):
-    """_summary_
+
+@app.route("/appointments/doctors/<int:doctor_id>")
+def get_doctor_appointments(doctor_id):
+    """
+    Get all appointments for a particular doctor
 
     Args:
-        doc_id (_type_): _description_
+        doctor_id (_type_): _description_
 
     Returns:
-        _type_: _description_
+        JSON: a list of appointments for the given doctor
     """
+    
     # create SQL statement
-    # SELECT * FROM appointments JOIN? ... WHERE ... ?;
-    stmt = db.session.query(Appointment).join(treatment).filter(
-        Appointment.treatment_id == treatment.c.treatment_id,
-        treatment.c.doc_id == doc_id
-    )  # .all()
 
-    # print(f"stmt = {stmt}, type = {type(stmt)}")
+    # SELECT appointments.appt_id, appointments.datetime, appointments.place, appointments.cost, appointments.status, appointments.treatment_id 
+    # FROM appointments JOIN treatments ON treatments.treatment_id = appointments.treatment_id 
+    # WHERE treatments.doctor_id = :doctor_id_1
 
-    return appointments_schema.dump(stmt)
+    stmt = db.select(Appointment).join(Treatment).filter(
+        Treatment.doctor_id==doctor_id
+        )
+
+    # print(stmt)
+    
+    # execute SQL statement using scalars()
+    # use fetchall() to return scalar values, which avoids returning an empty list for queries for nonexistent doctors (e.g. doctor_id=9999)
+    appointments = db.session.scalars(stmt)#.fetchall()
+
+    # guard clause
+    if not appointments:
+        return {"message": f"No appointments found for doctor {doctor_id}."}, 404
+
+    # serialise and return
+    return appointments_schema.dump(appointments)
 
 
 ##################################################
+
 
 # @app.route("/appointments/", methods=["POST"])
 # def create_appointment():
@@ -104,6 +139,7 @@ def get_doctor_appointments(doc_id):
 
 ##################################################
 
+
 @app.route("/appointments/<int:appt_id>", methods=["PUT", "PATCH"])
 def update_appointment(appt_id):
     body_data = request.get_json()
@@ -111,7 +147,8 @@ def update_appointment(appt_id):
     # create SQL statement
     # SELECT * FROM appointments WHERE appointment_id = appointment_id ... ?;
     stmt = db.select(Appointment).filter_by(appt_id=appt_id)
-    
+    print(stmt)
+
     appointment = db.session.scalar(stmt)
     
     if appointment:
@@ -124,19 +161,19 @@ def update_appointment(appt_id):
         return appointment_schema.dump(appointment)
     
     else:
-        return {"error": f"Appointment {appt_id} not found."}, 404
-    
-    
-    
+        return jsonify({"error": f"Appointment {appt_id} not found."}), 404
+
 
 ##################################################
+
 
 @app.route("/appointments/<int:appt_id>", methods=["DELETE"])
 def delete_appointment(appt_id):
     # create SQL statement
     # SELECT * FROM appointments WHERE ... ?;
     stmt = db.select(Appointment).filter_by(appt_id=appt_id)
-    
+    print(stmt)
+
     appt = db.session.scalar(stmt)
     
     if appt:
@@ -145,6 +182,7 @@ def delete_appointment(appt_id):
         return {"message": f"Appointment {appt_id} deleted."}
     
     else:
-        return {"error": f"Sorry, appointment {appt_id} not found."}  # , 404?
+        return jsonify({"error": f"Appointment {appt_id} not found."}), 404
+
 
 ##################################################

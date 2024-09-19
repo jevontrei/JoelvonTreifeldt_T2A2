@@ -11,21 +11,20 @@ VALID_STATUSES = ("Scheduled", "Completed", "Cancelled")
 
 
 class Treatment(db.Model):
-    # change this to "treatments" plural and figure out where else to change it!
-    __tablename__ = "treatment"
+    __tablename__ = "treatments"
     treatment_id = db.Column(db.Integer, primary_key=True)
     
     # do i need the "patient_id" etc names here?:
     patient_id = db.Column("patient_id", db.Integer, db.ForeignKey(
         "patients.patient_id"), nullable=False)
-    doc_id = db.Column("doc_id", db.Integer, db.ForeignKey(
-        "doctors.doc_id"), nullable=False)
+    doctor_id = db.Column("doctor_id", db.Integer, db.ForeignKey(
+        "doctors.doctor_id"), nullable=False)
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date)
 
     # not sure if these cascade bits should be here... delet?:
-    patient = db.relationship("Patient", back_populates="treatment")  # , cascade="all, delete"
-    doctor = db.relationship("Doctor", back_populates="treatment")  # , cascade="all, delete"
+    patient = db.relationship("Patient", back_populates="treatments")  # , cascade="all, delete"
+    doctor = db.relationship("Doctor", back_populates="treatments")  # , cascade="all, delete"
 
 
 class TreatmentSchema(ma.Schema):
@@ -34,7 +33,7 @@ class TreatmentSchema(ma.Schema):
     # remember to validate that end date, if it exists, is on or after start date:
 
     class Meta:
-        fields = ("treatment_id", "patient_id", "doc_id", "start_date", "end_date")
+        fields = ("treatment_id", "patient_id", "doctor_id", "start_date", "end_date")
 
 
 treatment_schema = TreatmentSchema()
@@ -58,7 +57,7 @@ class Patient(db.Model):
         "Log", back_populates="patient", cascade="all, delete")
 
     # check if this makes sense as cascade
-    treatment = db.relationship(
+    treatments = db.relationship(
         "Treatment", back_populates="patient", cascade="all, delete")
 
 
@@ -67,10 +66,10 @@ class PatientSchema(ma.Schema):
     #     "^\S+@\S+\.\S+$", error="Invalid email format"))
 
 
-    treatment = fields.Nested(TreatmentSchema, many=True)
+    treatments = fields.Nested(TreatmentSchema, many=True)
     class Meta:
         fields = ("patient_id", "name", "email", "password",
-                  "dob", "sex", "is_admin", "treatment")
+                  "dob", "sex", "is_admin", "treatments")
 
 
 patient_schema = PatientSchema(exclude=["password"])
@@ -82,13 +81,13 @@ patients_schema = PatientSchema(many=True, exclude=["password"])
 class Doctor(db.Model):
     __tablename__ = "doctors"
 
-    doc_id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
 
     # check if this makes sense as cascade
-    treatment = db.relationship(
+    treatments = db.relationship(
         "Treatment", back_populates="doctor", cascade="all, delete")
 
 
@@ -97,7 +96,7 @@ class DoctorSchema(ma.Schema):
     #     "^\S+@\S+\.\S+$", error="Invalid email format"))
 
     class Meta:
-        fields = ("doc_id", "name", "email", "password", "treatment")
+        fields = ("doctor_id", "name", "email", "password", "treatments")
 
 
 doctor_schema = DoctorSchema(exclude=["password"])
@@ -118,7 +117,7 @@ class Appointment(db.Model):
     status = db.Column(db.String, nullable=False)
 
     treatment_id = db.Column(db.Integer, db.ForeignKey(
-        "treatment.treatment_id", ondelete="CASCADE"), nullable=False)
+        "treatments.treatment_id", ondelete="CASCADE"), nullable=False)
 
 
 class AppointmentSchema(ma.Schema):

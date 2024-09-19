@@ -12,7 +12,8 @@ def get_all_doctors():
     # create SQL statement
     # SELECT * FROM doctors ORDER BY ...?;
     stmt = db.select(Doctor).order_by(Doctor.name)
-    
+    print(stmt)
+
     doctors = db.session.scalars(stmt)
     
     return doctors_schema.dump(doctors)
@@ -20,12 +21,13 @@ def get_all_doctors():
 ##################################################
 
 
-@app.route("/doctors/<int:doc_id>")
-def get_a_doctor(doc_id):
+@app.route("/doctors/<int:doctor_id>")
+def get_a_doctor(doctor_id):
     # create SQL statement
-    # SELECT * FROM doctos WHERE ... = doc_id?;
-    stmt = db.select(Doctor).filter_by(doc_id=doc_id)
-    
+    # SELECT * FROM doctos WHERE ... = doctor_id?;
+    stmt = db.select(Doctor).filter_by(doctor_id=doctor_id)
+    print(stmt)
+
     doctor = db.session.scalar(stmt)
     
     return doctor_schema.dump(doctor)
@@ -54,47 +56,49 @@ def create_doctor():
 ##################################################
 
 
-@app.route("/doctors/<int:doc_id>", methods=["PUT", "PATCH"])
-def update_doctor(doc_id):
+@app.route("/doctors/<int:doctor_id>", methods=["PUT", "PATCH"])
+def update_doctor(doctor_id):
     
     body_data = request.get_json()
     
     # create SQL statement
-    # SELECT * FROM doctors WHERE ... = doc_id?;
-    stmt = db.select(Doctor).filter_by(doc_id=doc_id)
-    
+    # SELECT * FROM doctors WHERE ... = doctor_id?;
+    stmt = db.select(Doctor).filter_by(doctor_id=doctor_id)
+    print(stmt)
+
     doctor = db.session.scalar(stmt)
     
     if doctor:
         doctor.name = body_data.get("name") or doctor.name
         doctor.email = body_data.get("email") or doctor.email
         doctor.password = body_data.get("password") or doctor.password
-        # patients and appointments? no, do this through treatment and appts, respectively?
+        # patients and appointments? no, do this through treatments and appointments, respectively?
 
         db.session.commit()
         
         return doctor_schema.dump(doctor)
     
     else:
-        return {"error": f"Doctor {doc_id} not found."}  # , 404
+        return jsonify({"error": f"Doctor {doctor_id} not found."}), 404
 
 ##################################################
 
 
-@app.route("/doctors/<int:doc_id>", methods=["DELETE"])
-def delete_doctor(doc_id):
+@app.route("/doctors/<int:doctor_id>", methods=["DELETE"])
+def delete_doctor(doctor_id):
     # create SQL statement
-    # SELECT * FROM doctors WHERE doc_id = doc_id?;
-    stmt = db.select(Doctor).filter_by(doc_id=doc_id)
-    
+    # SELECT * FROM doctors WHERE doctor_id = doctor_id?;
+    stmt = db.select(Doctor).filter_by(doctor_id=doctor_id)
+    print(stmt)
+
     doctor = db.session.scalar(stmt)
     
     if doctor:
         db.session.delete(doctor)
         db.session.commit()
-        return {"message": f"Doctor {doc_id} deleted."}  # , 200
+        return {"message": f"Doctor {doctor_id} deleted."}  # , 200
     
     else:
-        return {"error": f"Sorry, doctor {doc_id} not found."}  # , 404?
+        return jsonify({"error": f"Doctor {doctor_id} not found."}), 404
 
 ##################################################

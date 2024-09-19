@@ -4,7 +4,7 @@
 # // prettier-ignore {from flask import Flask}
 # // prettier-ignore {app = Flask(__name__)}
 
-from flask import Flask 
+from flask import Flask, jsonify
 app = Flask(__name__)
 # ----------------------------------------------------
 
@@ -44,18 +44,18 @@ jwt.init_app(app)
 # generalised:
 @app.errorhandler(ValidationError)
 def validation_error(err):
-    return {"error": err.messages}, 400
+    return jsonify({"error": err.messages}), 400
 
 
 # i'm getting Insomnia error "AttributeError: 'BadRequest' object has no attribute 'message'"
 @app.errorhandler(400)
 def bad_request(err):
-    return {"error": err.messages}, 400
+    return jsonify({"error": err.messages}), 400
 
 
 @app.errorhandler(401)
 def unauthorised():
-    return {"error": "You are not an authorised user."}, 401
+    return jsonify({"error": "Unauthorised user."}), 401
 
 ###########################################################################
 
@@ -67,12 +67,6 @@ def welcome():
     Returns:
         _type_: _description_
     """
-    return "Welcome. Let's get healthy."
-
-###########################################################################
-
-# delet?:
-# if __name__ == "__main__":
-#     app.run(debug=True)
+    return jsonify({"message": "Welcome. Let's get healthy."})
 
 ###########################################################################

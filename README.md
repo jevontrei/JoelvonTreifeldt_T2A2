@@ -81,7 +81,7 @@ erDiagram
     }
 
     Doctor {
-        int doc_id PK
+        int doctor_id PK
         string name
         string email
         string password
@@ -90,7 +90,7 @@ erDiagram
     Treat {
         int treat_id PK
         int patient_id FK
-        int doc_id FK
+        int doctor_id FK
         date start_date
         date end_date
     }

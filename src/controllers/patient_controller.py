@@ -10,6 +10,8 @@ from flask import request
 def get_all_patients():
     # SELECT * FROM patients ORDER BY ... ?;
     stmt = db.select(Patient).order_by(Patient.name)
+    print(stmt)
+
     patients = db.session.scalars(stmt)
     return patients_schema.dump(patients)
 
@@ -21,6 +23,8 @@ def get_a_patient(patient_id):
     # create SQL statement
     # SELECT * FROM patients WHERE patient_id = patient_id ... ?;
     stmt = db.select(Patient).filter_by(patient_id=patient_id)
+    print(stmt)
+
     patient = db.session.scalar(stmt)
     return patient_schema.dump(patient)
 
@@ -56,6 +60,8 @@ def update_patient(patient_id):
     body_data = request.get_json()
     # SELECT * FROM patients WHERE patient_id = patient_id ... ?;
     stmt = db.select(Patient).filter_by(patient_id=patient_id)
+    print(stmt)
+
     patient = db.session.scalar(stmt)
     if patient:
         patient.name = body_data.get("name") or patient.name
@@ -64,12 +70,12 @@ def update_patient(patient_id):
         patient.dob = body_data.get("dob") or patient.dob
         patient.sex = body_data.get("sex") or patient.sex
         patient.is_admin = body_data.get("is_admin") or patient.is_admin
-        # logs and doctors? no, do this through logs and treatment, respectively?
+        # logs and doctors? no, do this through logs and treatments, respectively?
 
         db.session.commit()
         return patient_schema.dump(patient)
     else:
-        return {"error": f"Patient {patient_id} not found."}  # , 404
+        return jsonify({"error": f"Patient {patient_id} not found."}), 404
 
 ##################################################
 
@@ -78,12 +84,14 @@ def update_patient(patient_id):
 def delete_patient(patient_id):
     # SELECT * FROM patients WHERE patient_id = patient_id ... ?;
     stmt = db.select(Patient).filter_by(patient_id=patient_id)
+    print(stmt)
+
     patient = db.session.scalar(stmt)
     if patient:
         db.session.delete(patient)
         db.session.commit()
         return {"message": f"Patient {patient_id} deleted."}  # , 200
     else:
-        return {"error": f"Sorry, patient {patient_id} not found."}  # , 404?
+        return jsonify({"error": f"Patient {patient_id} not found."}), 404
 
 ##################################################

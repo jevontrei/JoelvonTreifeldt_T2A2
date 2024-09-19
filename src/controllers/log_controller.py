@@ -12,6 +12,8 @@ from datetime import date
 def get_all_logs():
     # SELECT * FROM logs ORDER BY ... ?;
     stmt = db.select(Log).order_by(Log.date)
+    print(stmt)
+
     logs = db.session.scalars(stmt)
     return logs_schema.dump(logs)
 
@@ -22,6 +24,8 @@ def get_all_logs():
 def get_a_log(log_id):
     # SELECT * FROM logs WHERE log_id = log_id ... ?;
     stmt = db.select(Log).filter_by(log_id=log_id)
+    print(stmt)
+
     log = db.session.scalar(stmt)
     return log_schema.dump(log)
 
@@ -43,7 +47,8 @@ def get_patient_logs(patient_id):
     """
     # SELECT * FROM logs WHERE patient_id = patient_id ... ?;
     stmt = db.select(Log).filter_by(patient_id=patient_id)
-    
+    print(stmt)
+
     
     # need an if statement here somewhere (and in all other routes) to avoid returning an empty list for e.g. patient_id=9999 
     
@@ -61,6 +66,8 @@ def create_log(patient_id):
     body_data = request.get_json()
     # SELECT * FROM logs WHERE log_id = log_id... ?;
     stmt = db.select(Log)  # .filter_by(log_id=log_id)
+    print(stmt)
+
     log = db.session.scalar(stmt)
 
     if log:
@@ -78,7 +85,7 @@ def create_log(patient_id):
         return log_schema.dump(log), 201
 
     else:
-        return {"error": f"Log {log_id} not found."}
+        return jsonify({"error": f"Log {log_id} not found."}), 404
 
 ############################################
 
@@ -92,6 +99,8 @@ def update_log(log_id):
     # create SQL statement
     # SELECT * FROM logs WHERE log_id = log_id ... ?;
     stmt = db.select(Log).filter_by(log_id=log_id)
+    print(stmt)
+
     
     log = db.session.scalar(stmt)
     if log:
@@ -103,7 +112,7 @@ def update_log(log_id):
         db.session.commit()
         return log_schema.dump(log)
     else:
-        return {"error": f"Log {log_id} not found."}, 404
+        return jsonify({"error": f"Log {log_id} not found."}), 404
 
 ############################################
 
@@ -115,12 +124,14 @@ def delete_log(log_id):
     # check for authorisation
     # SELECT * FROM logs WHERE log_id = log_id ... ?;
     stmt = db.select(Log).filter_by(log_id=log_id)
+    print(stmt)
+
     log = db.session.scalar(stmt)
     if log:
         db.session.delete(log)
         db.session.commit()
-        return {"message": f"Log {log_id} deleted."}  # , 200
+        return jsonify({"message": f"Log {log_id} deleted."})  # , 200
     else:
-        return {"error": f"Sorry, log {log_id} not found."}  # , 404?
+        return jsonify({"error": f"Log {log_id} not found."}), 404
 
 ############################################

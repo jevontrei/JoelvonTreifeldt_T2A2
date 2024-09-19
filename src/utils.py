@@ -11,5 +11,7 @@
 
     # SELECT * FROM users WHERE user_id = user_id;?
 #     stmt = db.select(User).filter_by(id=user_id)
+    # print(stmt)
+
 #     user = db.session.scalar(stmt)
 #     return user.is_admin
