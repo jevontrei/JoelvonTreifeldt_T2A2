@@ -1,11 +1,21 @@
 from init import db, bcrypt
 from main import app
 from models.models import Patient, Doctor, Treatment, Appointment, Log
+# from flask import Blueprint
+
 
 ##################################################
 
+# what's the point of this? dw about it? save time typing flask db drop every time?
+# db_commands = Blueprint("db", __name__)
+
+
+##################################################
+
+
 # drop tables
 @app.cli.command("drop")
+# db_commands.cli.command("drop")
 def drop_tables():
     """_summary_
     """
@@ -13,7 +23,9 @@ def drop_tables():
     db.drop_all()
     print("Tables dropped.")
 
+
 ##################################################
+
 
 # create tables
 @app.cli.command("create")
@@ -23,7 +35,9 @@ def create_tables():
     db.create_all()
     print("Tables created.")
 
+
 ##################################################
+
 
 # seed tables with patients, doctors, treatments, logs and appointments
 @app.cli.command("seed")
@@ -44,7 +58,7 @@ def seed_tables():
         ),
         Patient(
             name="Marie Curie",
-            email="Marie@email.com",
+            email="marie@email.com",
             password="password",
             dob="1867-11-07",
             sex="female"
@@ -57,8 +71,8 @@ def seed_tables():
             sex="male"
         ),
         Patient(
-            name="Sue Jackson",
-            email="sue@email.com",
+            name="Mary Magdalene",
+            email="mary@email.com",
             password="password",
             dob="1900-01-01",
             sex="female"
@@ -73,8 +87,8 @@ def seed_tables():
     # seed doctors
     doctors = [
         Doctor(
-            name="Jane Smyth",
-            email="jane@email.com",
+            name="Cardi B",
+            email="cardi@email.com",
             password="password",
         ),
         Doctor(
@@ -88,8 +102,8 @@ def seed_tables():
             password="password",
         ),
         Doctor(
-            name="John Smith",
-            email="john@email.com",
+            name="Steve Jobs",
+            email="steve@email.com",
             password="password",
         )
     ]
@@ -147,11 +161,27 @@ def seed_tables():
             treatment_id=treatments[0].treatment_id
         ),
         Appointment(
-            datetime="2024-10-01",
+            datetime="1989-06-13",
+            place="Spring Hill Medical Centre",
+            cost="99",
+            status="Cancelled",
+            notes="general checkup",
+            treatment_id=treatments[0].treatment_id
+        ),
+        Appointment(
+            datetime="2024-12-01",
             place="UQ Medical Centre",
             cost="58",
             status="Scheduled",
             treatment_id=treatments[1].treatment_id
+        ),
+        Appointment(
+            datetime="2025-06-08",
+            place="UQ Medical Centre",
+            cost="52",
+            status="Scheduled",
+            notes="yearly mental health appt",
+            treatment_id=treatments[2].treatment_id
         ),
         Appointment(
             datetime="2023-10-01",
@@ -163,8 +193,17 @@ def seed_tables():
         Appointment(
             datetime="1463-09-02",
             place="London Medical Centre",
-            cost="2",
+            cost="32",
             status="Completed",
+            notes="blood test",
+            treatment_id=treatments[2].treatment_id
+        ),
+        Appointment(
+            datetime="1463-09-11",
+            place="London Medical Centre",
+            cost="21",
+            status="Completed",
+            notes="follow-up for blood test",
             treatment_id=treatments[2].treatment_id
         )
     ]
@@ -184,7 +223,7 @@ def seed_tables():
         ),
         Log(
             date = "1724-09-16",
-            symptom = "tuberculosis",
+            symptom = "coughing, reminds me of the time I had tuberculosis",
             duration = "3 months",
             patient_id = 3
         ),
@@ -194,6 +233,17 @@ def seed_tables():
             duration = "a while now",
             severity = "severe",
             patient_id = 2
+        ),
+        Log(
+            date = "2222-12-12",
+            # change symptom attribute to event_symptom or something
+            symptom = "started taking antibiotics for a chest infection",
+            patient_id = 4
+        ),
+        Log(
+            date = "2222-12-30",
+            symptom = "finished antibiotics course; feeling better",
+            patient_id = 4
         ),
         Log(
             date = "2023-12-3",

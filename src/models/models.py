@@ -135,6 +135,7 @@ class Appointment(db.Model):
     place = db.Column(db.String(50), nullable=False)
     cost = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String, nullable=False)
+    notes = db.Column(db.String(50))
 
     treatment_id = db.Column(db.Integer, db.ForeignKey(
         "treatments.treatment_id", ondelete="CASCADE"), nullable=False)
@@ -146,7 +147,7 @@ class AppointmentSchema(ma.Schema):
     status = fields.String(validate=OneOf(VALID_STATUSES))
 
     class Meta:
-        fields = ("appt_id", "datetime", "place", "cost", "status", "treatment_id")
+        fields = ("appt_id", "datetime", "place", "cost", "status", "notes", "treatment_id")
 
 
 appointment_schema = AppointmentSchema()
@@ -158,13 +159,20 @@ appointments_schema = AppointmentSchema(many=True)
 
 class Log(db.Model):
     __tablename__ = "logs"
+    
+    # make sure i allow duplicate dates... so a patient can make multiple logs in one day
 
     log_id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, default=date.today, nullable=False)  # is it redundant to use nullable=False AND a default date?
-    symptom = db.Column(db.String, nullable=False)
+    
+    # CHANGE NAME TO NOTES... include word limit?!
+    symptom = db.Column(db.String(100), nullable=False)
+    
     # str, not int, to facilitate multiple timescales
+    # changed symptom to notes, so delete duration and severity
     duration = db.Column(db.String)
-
+    
+    # changed symptom to notes, so delete duration and severity
     severity = db.Column(db.String)
 
     # FK from patient (many-to-one)

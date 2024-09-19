@@ -1,13 +1,20 @@
 from init import db
 from models.models import Appointment, appointment_schema, appointments_schema, Treatment
 from main import app
-from flask import request, jsonify
+from flask import request, jsonify, Blueprint
 
 
 ##################################################
 
 
-@app.route("/appointments/")
+appointments_bp = Blueprint("appointments", __name__, url_prefix="/appointments")
+
+
+##################################################
+
+
+# @app.route("/appointments/")
+@appointments_bp.route("/")
 def get_all_appointments():
     """_summary_
 
@@ -31,7 +38,8 @@ def get_all_appointments():
 ##################################################
 
 
-@app.route("/appointments/<int:appt_id>")
+# @app.route("/appointments/<int:appt_id>")
+@appointments_bp.route("/<int:appt_id>")
 def get_an_appointment(appt_id):
     """_summary_
 
@@ -55,7 +63,8 @@ def get_an_appointment(appt_id):
 ##################################################
 
 
-@app.route("/appointments/patients/<int:patient_id>")
+# @app.route("/appointments/patients/<int:patient_id>")
+@appointments_bp.route("/patients/<int:patient_id>")
 def get_patient_appointments(patient_id):
     """
     Get all appointments for a particular patient
@@ -84,7 +93,7 @@ def get_patient_appointments(patient_id):
     
     # guard clause
     if not appointments:
-        return {"message": f"No appointments found for patient {patient_id}."}, 404
+        return jsonify({"message": f"No appointments found for patient {patient_id}."}), 404
 
     # serialise and return
     return appointments_schema.dump(appointments)
@@ -93,7 +102,8 @@ def get_patient_appointments(patient_id):
 ##################################################
 
 
-@app.route("/appointments/doctors/<int:doctor_id>")
+# @app.route("/appointments/doctors/<int:doctor_id>")
+@appointments_bp.route("/doctors/<int:doctor_id>")
 def get_doctor_appointments(doctor_id):
     """
     Get all appointments for a particular doctor
@@ -123,7 +133,7 @@ def get_doctor_appointments(doctor_id):
 
     # guard clause
     if not appointments:
-        return {"message": f"No appointments found for doctor {doctor_id}."}, 404
+        return jsonify({"message": f"No appointments found for doctor {doctor_id}."}), 404
 
     # serialise and return
     return appointments_schema.dump(appointments)
@@ -132,7 +142,8 @@ def get_doctor_appointments(doctor_id):
 ##################################################
 
 
-@app.route("/appointments/", methods=["POST"])
+# @app.route("/appointments/", methods=["POST"])
+@appointments_bp.route("/", methods=["POST"])
 def create_appointment():
     # try:
     body_data = request.get_json()
@@ -167,7 +178,8 @@ def create_appointment():
 ##################################################
 
 
-@app.route("/appointments/<int:appt_id>", methods=["PUT", "PATCH"])
+# @app.route("/appointments/<int:appt_id>", methods=["PUT", "PATCH"])
+@appointments_bp.route("/<int:appt_id>", methods=["PUT", "PATCH"])
 def update_appointment(appt_id):
     body_data = request.get_json()
 
@@ -194,7 +206,8 @@ def update_appointment(appt_id):
 ##################################################
 
 
-@app.route("/appointments/<int:appt_id>", methods=["DELETE"])
+# @app.route("/appointments/<int:appt_id>", methods=["DELETE"])
+@appointments_bp.route("/<int:appt_id>", methods=["DELETE"])
 def delete_appointment(appt_id):
     # create SQL statement
     # SELECT * FROM appointments WHERE ... ?;
@@ -206,7 +219,7 @@ def delete_appointment(appt_id):
     if appt:
         db.session.delete(appt)
         db.session.commit()
-        return {"message": f"Appointment {appt_id} deleted."}
+        return jsonify({"message": f"Appointment {appt_id} deleted."})
     
     else:
         return jsonify({"error": f"Appointment {appt_id} not found."}), 404

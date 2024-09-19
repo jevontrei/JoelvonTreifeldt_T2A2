@@ -1,13 +1,20 @@
 from init import db
 from models.models import Patient, patient_schema, patients_schema
 from main import app
-from flask import request
+from flask import jsonify, request, Blueprint
+
+
+##################################################
+
+patients_bp = Blueprint("patients", __name__, url_prefix="/patients")
+
 
 
 ##################################################
 
 
-@app.route("/patients/")
+# @app.route("/patients/")
+@patients_bp.route("/")
 def get_all_patients():
     # create SQL statement
     
@@ -24,7 +31,8 @@ def get_all_patients():
 ##################################################
 
 
-@app.route("/patients/<int:patient_id>")
+# @app.route("/patients/<int:patient_id>")
+@patients_bp.route("/<int:patient_id>")
 def get_a_patient(patient_id):
     # create SQL statement
 
@@ -42,7 +50,8 @@ def get_a_patient(patient_id):
 ##################################################
 
 
-@app.route("/patients/", methods=["POST"])
+# @app.route("/patients/", methods=["POST"])
+@patients_bp.route("/", methods=["POST"])
 def create_patient():
     # fetch data, deserialise it, store in variable
     body_data = request.get_json()
@@ -67,7 +76,8 @@ def create_patient():
 ##################################################
 
 
-@app.route("/patients/<int:patient_id>", methods=["PUT", "PATCH"])
+# @app.route("/patients/<int:patient_id>", methods=["PUT", "PATCH"])
+@patients_bp.route("/<int:patient_id>", methods=["PUT", "PATCH"])
 def update_patient(patient_id):
     # fetch ...
     body_data = request.get_json()
@@ -100,7 +110,8 @@ def update_patient(patient_id):
 ##################################################
 
 
-@app.route("/patients/<int:patient_id>", methods=["DELETE"])
+# @app.route("/patients/<int:patient_id>", methods=["DELETE"])
+@patients_bp.route("/<int:patient_id>", methods=["DELETE"])
 def delete_patient(patient_id):
     
     # create SQL statement
@@ -116,7 +127,7 @@ def delete_patient(patient_id):
     if patient:
         db.session.delete(patient)
         db.session.commit()
-        return {"message": f"Patient {patient_id} deleted."}  # , 200
+        return jsonify({"message": f"Patient {patient_id} deleted."})  # , 200
     else:
         return jsonify({"error": f"Patient {patient_id} not found."}), 404
 

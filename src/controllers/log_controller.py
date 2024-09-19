@@ -1,14 +1,21 @@
 from init import db
 from main import app
 from models.models import Log, log_schema, logs_schema
-from flask import request
+from flask import Blueprint, jsonify, request
 from datetime import date
 
 
 ############################################
 
 
-@app.route("/logs/")
+logs_bp = Blueprint("logs", __name__, url_prefix="/logs")
+
+
+############################################
+
+# delet: carefully trying to implement blueprint / url prefixes
+# @app.route("/logs/")
+@logs_bp.route("/")
 def get_all_logs():
     # SELECT * FROM logs ORDER BY ... ?;
     stmt = db.select(Log).order_by(Log.date)
@@ -20,7 +27,8 @@ def get_all_logs():
 ############################################
 
 
-@app.route("/logs/<int:log_id>")
+# @app.route("/logs/<int:log_id>")
+@logs_bp.route("/<int:log_id>")
 def get_a_log(log_id):
     # SELECT * FROM logs WHERE log_id = log_id ... ?;
     stmt = db.select(Log).filter_by(log_id=log_id)
@@ -34,7 +42,8 @@ def get_a_log(log_id):
 # change route to /patients/<int:patient_id>/logs/?
 
 
-@app.route("/logs/patients/<int:patient_id>")
+# @app.route("/logs/patients/<int:patient_id>")
+@logs_bp.route("/patients/<int:patient_id>")
 def get_patient_logs(patient_id):
     """
     Get all logs for a particular patient
@@ -60,7 +69,8 @@ def get_patient_logs(patient_id):
 
 ############################################
 
-
+# @logs_bp?
+# @app.route("/patients/<int:patient_id>/logs/", methods=["POST"])
 @app.route("/patients/<int:patient_id>/logs/", methods=["POST"])
 def create_log(patient_id):
     body_data = request.get_json()
@@ -88,7 +98,8 @@ def create_log(patient_id):
 # change route to /patients/<int:patient_id>/logs/?
 
 
-@app.route("/logs/<int:log_id>", methods=["PUT", "PATCH"])
+# @app.route("/logs/<int:log_id>", methods=["PUT", "PATCH"])
+@logs_bp.route("/<int:log_id>", methods=["PUT", "PATCH"])
 def update_log(log_id):
     body_data = request.get_json()
     
@@ -115,7 +126,8 @@ def update_log(log_id):
 # change route to /patients/<int:patient_id>/logs/?
 
 
-@app.route("/logs/<int:log_id>", methods=["DELETE"])
+# @app.route("/logs/<int:log_id>", methods=["DELETE"])
+@logs_bp.route("/<int:log_id>", methods=["DELETE"])
 def delete_log(log_id):
     # check for authorisation
     # SELECT * FROM logs WHERE log_id = log_id ... ?;

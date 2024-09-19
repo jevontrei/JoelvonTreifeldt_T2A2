@@ -1,12 +1,17 @@
 from init import db
 from models.models import Treatment, treatment_schema, treatments_schema
 from main import app
-from flask import request
+from flask import Blueprint, request, jsonify
 
 
 #####################################################
 
-@app.route("/treatments/")
+treatments_bp = Blueprint("treatments", __name__, url_prefix="/treatments")
+
+#####################################################
+
+# @app.route("/treatments/")
+@treatments_bp.route("/")
 def get_all_treatments():
     """
     Get all treatments
@@ -28,10 +33,11 @@ def get_all_treatments():
 
 #####################################################
 
-@app.route("/treatments/<int:treatment_id>")
+# @app.route("/treatments/<int:treatment_id>")
+@treatments_bp.route("/<int:treatment_id>")
 def get_a_treatment(treatment_id):
     """
-    Get a specific treatment
+    Get a specific treatment using the id
 
     Args:
         treatment_id (_type_): _description_
@@ -50,7 +56,8 @@ def get_a_treatment(treatment_id):
 
 #####################################################
 
-@app.route("/treatments/patients/<int:patient_id>")
+# @app.route("/treatments/patients/<int:patient_id>")
+@treatments_bp.route("/patients/<int:patient_id>")
 def get_patient_treatments(patient_id):
     """
     Get all treatment details for a particular patient
@@ -70,7 +77,8 @@ def get_patient_treatments(patient_id):
 #####################################################
 
 
-@app.route("/treatments/doctors/<int:doctor_id>")
+# @app.route("/treatments/doctors/<int:doctor_id>")
+@treatments_bp.route("/doctors/<int:doctor_id>")
 def get_doctor_treatments(doctor_id):
     """
     Get all treatment details for a particular doctor
@@ -91,7 +99,8 @@ def get_doctor_treatments(doctor_id):
 #####################################################
 
 
-@app.route("/treatments/", methods=["POST"])
+# @app.route("/treatments/", methods=["POST"])
+@treatments_bp.route("/", methods=["POST"])
 def create_treatment():
     """
     Add a new treatment between doctor and patient
@@ -120,7 +129,8 @@ def create_treatment():
 #####################################################
 
 
-@app.route("/treatments/<int:treatment_id>", methods=["PUT", "PATCH"])
+# @app.route("/treatments/<int:treatment_id>", methods=["PUT", "PATCH"])
+@treatments_bp.route("/<int:treatment_id>", methods=["PUT", "PATCH"])
 def update_treatment(treatment_id):
     
     # still need to authorise!!
@@ -147,12 +157,13 @@ def update_treatment(treatment_id):
         return treatment_schema.dump(treatment)
     
     else:
-        return {"error": f"Treatment {treatment_id} not found."}, 404
+        return jsonify({"error": f"Treatment {treatment_id} not found."}), 404
     
 #####################################################
 
 
-@app.route("/treatments/<int:treatment_id>", methods=["DELETE"])
+# @app.route("/treatments/<int:treatment_id>", methods=["DELETE"])
+@treatments_bp.route("/<int:treatment_id>", methods=["DELETE"])
 def delete_treatment(treatment_id):
     
     # still need to authorise!!
@@ -169,7 +180,7 @@ def delete_treatment(treatment_id):
     if treatment:
         db.session.delete(treatment)
         db.session.commit()
-        return {"message": f"Treatment {treatment_id} deleted."}  # , 200
+        return jsonify({"message": f"Treatment {treatment_id} deleted."})  # , 200
     
     else:
-        return {"error": f"Treatment {treatment_id} not found."}, 404
+        return jsonify({"error": f"Treatment {treatment_id} not found."}), 404

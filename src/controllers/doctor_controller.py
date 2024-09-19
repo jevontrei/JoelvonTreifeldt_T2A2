@@ -2,14 +2,21 @@ from init import db
 # from models.doctor import Doctor, doctor_schema, doctors_schema
 from models.models import Doctor, doctor_schema, doctors_schema
 from main import app
-from flask import request
+from flask import jsonify, request, Blueprint
 
 
 ##################################################
 
-# THIS IS BROKEN NOW :( Insomnia: "TypeError: Object of type Treatment is not JSON serializable"
 
-@app.route("/doctors/")
+doctors_bp = Blueprint("doctors", __name__, url_prefix="/doctors")
+# doctors_bp.register_blueprint(comments_bp)
+
+
+##################################################
+
+
+# @app.route("/doctors/")
+@doctors_bp.route("/")
 def get_all_doctors():
     # create SQL statement
     # SELECT * FROM doctors ORDER BY ...?;
@@ -20,10 +27,12 @@ def get_all_doctors():
     
     return doctors_schema.dump(doctors)
 
+
 ##################################################
 
 
-@app.route("/doctors/<int:doctor_id>")
+# @app.route("/doctors/<int:doctor_id>")
+@doctors_bp.route("/<int:doctor_id>")
 def get_a_doctor(doctor_id):
     # create SQL statement
     
@@ -36,10 +45,12 @@ def get_a_doctor(doctor_id):
     
     return doctor_schema.dump(doctor)
 
+
 ##################################################
 
 
-@app.route("/doctors/", methods=["POST"])
+# @app.route("/doctors/", methods=["POST"])
+@doctors_bp.route("/", methods=["POST"])
 def create_doctor():
     body_data = request.get_json()
     
@@ -57,10 +68,12 @@ def create_doctor():
 
     return doctor_schema.dump(doctor), 201
 
+
 ##################################################
 
 
-@app.route("/doctors/<int:doctor_id>", methods=["PUT", "PATCH"])
+# @app.route("/doctors/<int:doctor_id>", methods=["PUT", "PATCH"])
+@doctors_bp.route("/<int:doctor_id>", methods=["PUT", "PATCH"])
 def update_doctor(doctor_id):
     
     body_data = request.get_json()
@@ -85,10 +98,12 @@ def update_doctor(doctor_id):
     else:
         return jsonify({"error": f"Doctor {doctor_id} not found."}), 404
 
+
 ##################################################
 
 
-@app.route("/doctors/<int:doctor_id>", methods=["DELETE"])
+# @app.route("/doctors/<int:doctor_id>", methods=["DELETE"])
+@doctors_bp.route("/<int:doctor_id>", methods=["DELETE"])
 def delete_doctor(doctor_id):
     # create SQL statement
     # SELECT * FROM doctors WHERE doctor_id = doctor_id?;
@@ -100,9 +115,10 @@ def delete_doctor(doctor_id):
     if doctor:
         db.session.delete(doctor)
         db.session.commit()
-        return {"message": f"Doctor {doctor_id} deleted."}  # , 200
+        return jsonify({"message": f"Doctor {doctor_id} deleted."})  # , 200
     
     else:
         return jsonify({"error": f"Doctor {doctor_id} not found."}), 404
+
 
 ##################################################

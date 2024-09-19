@@ -3,6 +3,14 @@
 Joel von Treifeldt
 #15517
 
+hopefully an improvement on myhealthrecord, with a focus on helping the patient / giving them more agency
+
+things to add:
+medications
+past medications
+diagnoses
+
+
 # do i need to grant permissions in psql?
 
 Note:
