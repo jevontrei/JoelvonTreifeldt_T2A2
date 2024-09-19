@@ -1,7 +1,7 @@
 from init import db
 from models.models import Appointment, appointment_schema, appointments_schema, Treatment
 from main import app
-
+from flask import request
 
 ##################################################
 
@@ -12,11 +12,13 @@ def get_all_appointments():
     Returns:
         _type_: _description_
     """
+    
     # create SQL statement
     # SELECT * FROM appointments;
     stmt = db.select(Appointment)  # .order_by(Appointment.datetime)
-    # print(f"stmt = {stmt}")
+    
     appointments = db.session.scalars(stmt)
+    
     return appointments_schema.dump(appointments)
 
 ##################################################
@@ -35,8 +37,9 @@ def get_an_appointment(appt_id):
     # create SQL statement
     # SELECT * FROM appointments WHERE ... = appt_id?;
     stmt = db.select(Appointment).filter_by(appt_id=appt_id)
-    # print(stmt, type(stmt))
+    
     appointment = db.session.scalar(stmt)
+    
     return appointment_schema.dump(appointment)
 
 ##################################################
@@ -90,3 +93,58 @@ def get_doctor_appointments(doc_id):
     # print(f"stmt = {stmt}, type = {type(stmt)}")
 
     return appointments_schema.dump(stmt)
+
+
+##################################################
+
+# @app.route("/appointments/", methods=["POST"])
+# def create_appointment():
+#     body_data
+    
+
+##################################################
+
+@app.route("/appointments/<int:appt_id>", methods=["PUT", "PATCH"])
+def update_appointment(appt_id):
+    body_data = request.get_json()
+
+    # create SQL statement
+    # SELECT * FROM appointments WHERE appointment_id = appointment_id ... ?;
+    stmt = db.select(Appointment).filter_by(appt_id=appt_id)
+    
+    appointment = db.session.scalar(stmt)
+    
+    if appointment:
+        appointment.datetime = body_data.get("datetime") or appointment.datetime
+        appointment.place = body_data.get("place") or appointment.place
+        appointment.cost = body_data.get("cost") or appointment.cost
+        appointment.status = body_data.get("status") or appointment.status
+        db.session.commit()
+        
+        return appointment_schema.dump(appointment)
+    
+    else:
+        return {"error": f"Appointment {appt_id} not found."}, 404
+    
+    
+    
+
+##################################################
+
+@app.route("/appointments/<int:appt_id>", methods=["DELETE"])
+def delete_appointment(appt_id):
+    # create SQL statement
+    # SELECT * FROM appointments WHERE ... ?;
+    stmt = db.select(Appointment).filter_by(appt_id=appt_id)
+    
+    appt = db.session.scalar(stmt)
+    
+    if appt:
+        db.session.delete(appt)
+        db.session.commit()
+        return {"message": f"Appointment {appt_id} deleted."}
+    
+    else:
+        return {"error": f"Sorry, appointment {appt_id} not found."}  # , 404?
+
+##################################################
