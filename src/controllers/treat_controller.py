@@ -1,39 +1,31 @@
 from init import db
-from models.models import Treat, treat_schema, treats_schema
+from models.models import Treatment, treatment_schema, treatments_schema
 from main import app
 from flask import jsonify
 
-# THESE ALL NEED TO CHANGE BC I AM NOW USING DB.MODEL FOR TREAT. THEY NEED TO BE SERIALISED NOW!
+# THESE ALL NEED TO CHANGE BC I AM NOW USING DB.MODEL FOR Treatment. THEY NEED TO BE SERIALISED NOW!
 
 #####################################################
 
-# delet:
-# @app.route("/treatments/")
-# def get_all_treatments():
-#     # SELECT * FROM treat;
-#     stmt = db.select(treat)
-#     with db.session.begin():
-#         results = db.session.execute(stmt).fetchall()
-#     treats = [row._asdict() for row in results]
-#     return jsonify(treats)
-
-# REWRITE for db.Model:
 @app.route("/treatments/")
 def get_all_treatments():
-    # SELECT * FROM treat;
-    stmt = db.select(Treat)
+    # create SQL statement
+    # SELECT * FROM treatment;
+    stmt = db.select(Treatment)
+    # execute statement, store in an iterable object
     treatments = db.session.scalars(stmt)
-    return treats_schema.dump(treatments)
+    # serialise object to JSON, return it
+    return treatments_schema.dump(treatments)
 
 
 #####################################################
 
-@app.route("/treatments/<int:treat_id>")
-def get_a_treatmeant(treat_id):
-    # SELECT * FROM treat WHERE treat_id=treat_id ... ?;
-    stmt = db.select(Treat).filter_by(treat_id=treat_id)
+@app.route("/treatments/<int:treatment_id>")
+def get_a_treatmeant(treatment_id):
+    # SELECT * FROM treatment WHERE treatment_id=treatment_id ... ?;
+    stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
     treatment = db.session.scalar(stmt)
-    return treat_schema.dump(treatment)
+    return treatment_schema.dump(treatment)
 
 #####################################################
 

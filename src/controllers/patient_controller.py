@@ -28,6 +28,7 @@ def get_a_patient(patient_id):
 
 @app.route("/patients/", methods=["POST"])
 def create_patient():
+    # fetch data, deserialise it, store in variable
     body_data = request.get_json()
     # remember to validate input!
     patient = Patient(

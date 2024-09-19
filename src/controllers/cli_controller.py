@@ -1,11 +1,11 @@
 from init import db, bcrypt
-from models.models import Patient, Doctor, Treat, Appointment, Log
+from models.models import Patient, Doctor, Treatment, Appointment, Log
 # from models.doctor import Doctor
 from main import app
 
 ##################################################
 
-
+# create tables
 @app.cli.command("create")
 def create_tables():
     """_summary_
@@ -15,7 +15,7 @@ def create_tables():
 
 ##################################################
 
-
+# seed tables with ..., ...?
 @app.cli.command("seed")
 def seed_tables():
     """_summary_
@@ -80,19 +80,19 @@ def seed_tables():
 
     db.session.add_all(doctors)
     
-    treats = [
-        Treat(
+    treatments = [
+        Treatment(
             patient = patients[0],
             doctor = doctors[0],
             start_date="2024-01-01",
             end_date="2024-01-02"
         ),
-        Treat(
+        Treatment(
             patient = patients[0],
             doctor = doctors[1],
             start_date="2023-11-21"
         ),
-        Treat(
+        Treatment(
             patient = patients[1],
             doctor = doctors[0],
             start_date="1999-01-01",
@@ -100,11 +100,11 @@ def seed_tables():
         )
     ]
 
-    db.session.add_all(treats)
+    db.session.add_all(treatments)
     
 ##########################################################
 
-    # # seed treat table? via doctor OR equivalently patients?
+    # # seed treatment table? via doctor OR equivalently patients?
 
     # doctors[0].patients.append(patients[0])
     # # doctors[0].patients.append(patients[0])  # this should raise a UniqueViolation error
@@ -129,35 +129,35 @@ def seed_tables():
     #         place="Frog's Hollow Medical Centre",
     #         cost="100",
     #         status="Completed",
-    #         treat_id=2  # should change this so that i'm querying treat for a particular patient and doctor combo
+    #         treatment_id=2  # should change this so that i'm querying treatment for a particular patient and doctor combo
     #     ),
     #     Appointment(
     #         datetime="1999-06-13",
     #         place="Spring Hill Medical Centre",
     #         cost="206",
     #         status="Completed",
-    #         treat_id=2  # should change this so that i'm querying treat for a particular patient and doctor combo
+    #         treatment_id=2  # should change this so that i'm querying treatment for a particular patient and doctor combo
     #     ),
     #     Appointment(
     #         datetime="2024-10-01",
     #         place="UQ Medical Centre",
     #         cost="58",
     #         status="Scheduled",
-    #         treat_id=1  # should change this so that i'm querying treat for a particular patient and doctor combo
+    #         treatment_id=1  # should change this so that i'm querying treatment for a particular patient and doctor combo
     #     ),
     #     Appointment(
     #         datetime="2023-10-01",
     #         place="UQ Medical Centre",
     #         cost="77",
     #         status="Completed",
-    #         treat_id=1  # should change this so that i'm querying treat for a particular patient and doctor combo
+    #         treatment_id=1  # should change this so that i'm querying treatment for a particular patient and doctor combo
     #     ),
     #     Appointment(
     #         datetime="1463-09-02",
     #         place="London Medical Centre",
     #         cost="2",
     #         status="Completed",
-    #         treat_id=3  # should change this so that i'm querying treat for a particular patient and doctor combo
+    #         treatment_id=3  # should change this so that i'm querying treatment for a particular patient and doctor combo
     #     )
     # ]
 
@@ -202,7 +202,7 @@ def seed_tables():
 
 ##################################################
 
-
+# drop tables
 @app.cli.command("drop")
 def drop_tables():
     """_summary_
