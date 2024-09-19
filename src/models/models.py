@@ -3,9 +3,12 @@ from init import db, ma
 from marshmallow import fields
 from marshmallow.validate import OneOf
 
+from datetime import date
+
 # rename to patient.py if i move classes etc to their own files
 
 VALID_STATUSES = ("Scheduled", "Completed", "Cancelled")
+
 
 #########################################
 
@@ -14,17 +17,21 @@ class Treatment(db.Model):
     __tablename__ = "treatments"
     treatment_id = db.Column(db.Integer, primary_key=True)
     
-    # do i need the "patient_id" etc names here?:
-    patient_id = db.Column("patient_id", db.Integer, db.ForeignKey(
-        "patients.patient_id"), nullable=False)
-    doctor_id = db.Column("doctor_id", db.Integer, db.ForeignKey(
-        "doctors.doctor_id"), nullable=False)
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date)
+    
+    patient_id = db.Column(db.Integer, db.ForeignKey(
+        "patients.patient_id"), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey(
+        "doctors.doctor_id"), nullable=False)
 
-    # not sure if these cascade bits should be here... delet?:
-    patient = db.relationship("Patient", back_populates="treatments")  # , cascade="all, delete"
-    doctor = db.relationship("Doctor", back_populates="treatments")  # , cascade="all, delete"
+    # many-to-one
+    patient = db.relationship("Patient", back_populates="treatments")
+    doctor = db.relationship("Doctor", back_populates="treatments")
+    
+    # this allows us to view a treatment's appts... bi-directionally but no need for a line starting with appt_id = ... bc it's not actually a column in the treatments table, and bc treatments is the parent. this is just to establish the two-way connection
+    # one-to-many
+    appointments = db.relationship("Appointment", back_populates="treatment", cascade="all, delete")
 
 
 class TreatmentSchema(ma.Schema):
@@ -38,6 +45,7 @@ class TreatmentSchema(ma.Schema):
 
 treatment_schema = TreatmentSchema()
 treatments_schema = TreatmentSchema(many=True)
+
 
 #########################################
 
@@ -56,17 +64,21 @@ class Patient(db.Model):
     logs = db.relationship(
         "Log", back_populates="patient", cascade="all, delete")
 
-    # check if this makes sense as cascade
+    # one-to-many
+    # check if this makes sense as cascade?! i think it does bc this is the parent?
     treatments = db.relationship(
         "Treatment", back_populates="patient", cascade="all, delete")
 
 
 class PatientSchema(ma.Schema):
+    # email = fields.Email(required=True)
     # email = fields.String(required=True, validate=Regexp(
     #     "^\S+@\S+\.\S+$", error="Invalid email format"))
 
+    # review and understand this deeply
+    treatments = fields.Nested(TreatmentSchema, many=True, exclude=("patient_id",))  # this exclude part prevents circular refs
 
-    treatments = fields.Nested(TreatmentSchema, many=True)
+    
     class Meta:
         fields = ("patient_id", "name", "email", "password",
                   "dob", "sex", "is_admin", "treatments")
@@ -74,6 +86,7 @@ class PatientSchema(ma.Schema):
 
 patient_schema = PatientSchema(exclude=["password"])
 patients_schema = PatientSchema(many=True, exclude=["password"])
+
 
 #########################################
 
@@ -89,13 +102,19 @@ class Doctor(db.Model):
     # does this need to be nested? to avoid circular chaos?
     # check if this makes sense as cascade
     treatments = db.relationship(
-        "Treatment", back_populates="doctor", cascade="all, delete")  # should this be "doctor" or "doctors"?
+        "Treatment", back_populates="doctor", cascade="all, delete")
 
 
 class DoctorSchema(ma.Schema):
+    # email = fields.Email(required=True)
     # email = fields.String(required=True, validate=Regexp(
     #     "^\S+@\S+\.\S+$", error="Invalid email format"))
 
+
+    # review and understand this deeply
+    treatments = fields.Nested(TreatmentSchema, many=True, exclude=("doctor_id",))  # this exclude thing prevents circular refs
+
+    
     class Meta:
         fields = ("doctor_id", "name", "email", "password", "treatments")
 
@@ -111,14 +130,16 @@ class Appointment(db.Model):
     __tablename__ = "appointments"
 
     appt_id = db.Column(db.Integer, primary_key=True)
-    # change to datetime, and remember to change seed values etc
-    datetime = db.Column(db.Date, nullable=False)
+    # changed to datetime, and remember to change seed values etc to include time
+    datetime = db.Column(db.DateTime, nullable=False)
     place = db.Column(db.String(50), nullable=False)
     cost = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String, nullable=False)
 
     treatment_id = db.Column(db.Integer, db.ForeignKey(
         "treatments.treatment_id", ondelete="CASCADE"), nullable=False)
+    
+    treatment = db.relationship("Treatment", back_populates="appointments")
 
 
 class AppointmentSchema(ma.Schema):
@@ -131,6 +152,7 @@ class AppointmentSchema(ma.Schema):
 appointment_schema = AppointmentSchema()
 appointments_schema = AppointmentSchema(many=True)
 
+
 #########################################
 
 
@@ -138,17 +160,18 @@ class Log(db.Model):
     __tablename__ = "logs"
 
     log_id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date, nullable=False)  # add default of today
+    date = db.Column(db.Date, default=date.today, nullable=False)  # is it redundant to use nullable=False AND a default date?
     symptom = db.Column(db.String, nullable=False)
     # str, not int, to facilitate multiple timescales
     duration = db.Column(db.String)
 
     severity = db.Column(db.String)
 
-    # FK from patient (1 to many)
+    # FK from patient (many-to-one)
     patient_id = db.Column(db.Integer, db.ForeignKey(
         "patients.patient_id", ondelete="CASCADE"), nullable=False)
 
+    # many-to-one?
     patient = db.relationship("Patient", back_populates="logs")
 
 
