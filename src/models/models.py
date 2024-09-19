@@ -86,9 +86,10 @@ class Doctor(db.Model):
     email = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
 
+    # does this need to be nested? to avoid circular chaos?
     # check if this makes sense as cascade
     treatments = db.relationship(
-        "Treatment", back_populates="doctor", cascade="all, delete")
+        "Treatment", back_populates="doctor", cascade="all, delete")  # should this be "doctor" or "doctors"?
 
 
 class DoctorSchema(ma.Schema):

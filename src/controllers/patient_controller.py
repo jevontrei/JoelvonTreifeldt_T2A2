@@ -3,17 +3,23 @@ from models.models import Patient, patient_schema, patients_schema
 from main import app
 from flask import request
 
+
 ##################################################
 
 
 @app.route("/patients/")
 def get_all_patients():
-    # SELECT * FROM patients ORDER BY ... ?;
+    # create SQL statement
+    
+    # SELECT patients.patient_id, patients.name, patients.email, patients.password, patients.dob, patients.sex, patients.is_admin 
+    # FROM patients ORDER BY patients.name
+    
     stmt = db.select(Patient).order_by(Patient.name)
-    print(stmt)
+    # print(stmt)
 
     patients = db.session.scalars(stmt)
     return patients_schema.dump(patients)
+
 
 ##################################################
 
@@ -21,12 +27,17 @@ def get_all_patients():
 @app.route("/patients/<int:patient_id>")
 def get_a_patient(patient_id):
     # create SQL statement
-    # SELECT * FROM patients WHERE patient_id = patient_id ... ?;
+
+    # SELECT patients.patient_id, patients.name, patients.email, patients.password, patients.dob, patients.sex, patients.is_admin 
+    # FROM patients 
+    # WHERE patients.patient_id = :patient_id_1
+
     stmt = db.select(Patient).filter_by(patient_id=patient_id)
-    print(stmt)
+    # print(stmt)
 
     patient = db.session.scalar(stmt)
     return patient_schema.dump(patient)
+
 
 ##################################################
 
@@ -52,15 +63,23 @@ def create_patient():
 
     return patient_schema.dump(patient), 201
 
+
 ##################################################
 
 
 @app.route("/patients/<int:patient_id>", methods=["PUT", "PATCH"])
 def update_patient(patient_id):
+    # fetch ...
     body_data = request.get_json()
-    # SELECT * FROM patients WHERE patient_id = patient_id ... ?;
+    
+    # create SQL statement
+    
+    # SELECT patients.patient_id, patients.name, patients.email, patients.password, patients.dob, patients.sex, patients.is_admin 
+    # FROM patients 
+    # WHERE patients.patient_id = :patient_id_1
+    
     stmt = db.select(Patient).filter_by(patient_id=patient_id)
-    print(stmt)
+    # print(stmt)
 
     patient = db.session.scalar(stmt)
     if patient:
@@ -77,14 +96,21 @@ def update_patient(patient_id):
     else:
         return jsonify({"error": f"Patient {patient_id} not found."}), 404
 
+
 ##################################################
 
 
 @app.route("/patients/<int:patient_id>", methods=["DELETE"])
 def delete_patient(patient_id):
-    # SELECT * FROM patients WHERE patient_id = patient_id ... ?;
+    
+    # create SQL statement
+
+    # SELECT patients.patient_id, patients.name, patients.email, patients.password, patients.dob, patients.sex, patients.is_admin 
+    # FROM patients 
+    # WHERE patients.patient_id = :patient_id_1
+    
     stmt = db.select(Patient).filter_by(patient_id=patient_id)
-    print(stmt)
+    # print(stmt)
 
     patient = db.session.scalar(stmt)
     if patient:
@@ -93,5 +119,6 @@ def delete_patient(patient_id):
         return {"message": f"Patient {patient_id} deleted."}  # , 200
     else:
         return jsonify({"error": f"Patient {patient_id} not found."}), 404
+
 
 ##################################################

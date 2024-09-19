@@ -7,6 +7,8 @@ from flask import request
 
 ##################################################
 
+# THIS IS BROKEN NOW :( Insomnia: "TypeError: Object of type Treatment is not JSON serializable"
+
 @app.route("/doctors/")
 def get_all_doctors():
     # create SQL statement
@@ -24,7 +26,9 @@ def get_all_doctors():
 @app.route("/doctors/<int:doctor_id>")
 def get_a_doctor(doctor_id):
     # create SQL statement
+    
     # SELECT * FROM doctos WHERE ... = doctor_id?;
+    
     stmt = db.select(Doctor).filter_by(doctor_id=doctor_id)
     print(stmt)
 

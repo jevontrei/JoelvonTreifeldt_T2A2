@@ -47,7 +47,7 @@ def validation_error(err):
     return jsonify({"error": err.messages}), 400
 
 
-# i'm getting Insomnia error "AttributeError: 'BadRequest' object has no attribute 'message'"
+# i'm getting Insomnia error "AttributeError: 'BadRequest' object has no attribute 'message' etc"
 @app.errorhandler(400)
 def bad_request(err):
     return jsonify({"error": err.messages}), 400

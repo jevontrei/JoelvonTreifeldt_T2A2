@@ -74,6 +74,7 @@ def create_log(patient_id):
         severity=body_data.get("severity"),
         
         # validate this!
+        # change this to match create_app()... change route, incl in Insomnia
         patient_id=patient_id
     )
 
