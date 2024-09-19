@@ -103,7 +103,7 @@ def create_treatment():
     # fetch data, deserialise it, store in variable
     body_data = request.get_json()
     
-    # remember to validate input!
+    # remember to validate input! especially FKs
     # define new instance of Treatment class
     treatment = Treatment(
         patient_id=body_data.get("patient_id"),

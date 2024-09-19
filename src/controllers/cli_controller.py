@@ -11,7 +11,7 @@ def drop_tables():
     """
     # delete all tables from the database (even if FK constraints are present? how to do this?)
     db.drop_all()
-    print("Tables droppped.")
+    print("Tables dropped.")
 
 ##################################################
 
@@ -111,6 +111,11 @@ def seed_tables():
             patient = patients[0],
             doctor = doctors[1],
             start_date="2023-11-21"
+        ),
+        Treatment(
+            patient = patients[3],
+            doctor = doctors[2],
+            start_date="1923-03-01"
         ),
         Treatment(
             patient = patients[1],

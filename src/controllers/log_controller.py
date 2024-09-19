@@ -64,28 +64,23 @@ def get_patient_logs(patient_id):
 @app.route("/patients/<int:patient_id>/logs/", methods=["POST"])
 def create_log(patient_id):
     body_data = request.get_json()
-    # SELECT * FROM logs WHERE log_id = log_id... ?;
-    stmt = db.select(Log)  # .filter_by(log_id=log_id)
-    print(stmt)
+    
+    # remember to validate input!
+    # define new instance of Log class
+    log = Log(
+        date=body_data.get("date") or date.today(),
+        symptom=body_data.get("symptom"),
+        duration=body_data.get("duration"),
+        severity=body_data.get("severity"),
+        
+        # validate this!
+        patient_id=patient_id
+    )
 
-    log = db.session.scalar(stmt)
+    db.session.add(log)
+    db.session.commit()
 
-    if log:
-        log = Log(
-            date=body_data.get("date") or date.today(),
-            symptom=body_data.get("symptom"),
-            duration=body_data.get("duration"),
-            severity=body_data.get("severity"),
-            patient_id=patient_id
-        )
-
-        db.session.add(log)
-        db.session.commit()
-
-        return log_schema.dump(log), 201
-
-    else:
-        return jsonify({"error": f"Log {log_id} not found."}), 404
+    return log_schema.dump(log), 201
 
 ############################################
 

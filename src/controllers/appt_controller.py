@@ -132,9 +132,36 @@ def get_doctor_appointments(doctor_id):
 ##################################################
 
 
-# @app.route("/appointments/", methods=["POST"])
-# def create_appointment():
-#     body_data
+@app.route("/appointments/", methods=["POST"])
+def create_appointment():
+    # try:
+    body_data = request.get_json()
+    
+    # remember to validate input!
+    # define new instance of Appointment class
+    appointment = Appointment(
+        datetime=body_data.get("datetime"),
+        # datetime=body_data["datetime"],  # use this version instead? does it matter?
+        
+        place=body_data.get("place"),
+        # place=body_data["place"],
+        
+        cost=body_data.get("cost"),
+        # cost=body_data["cost"],
+        
+        status=body_data.get("status"),
+        # status=body_data["status"],
+        
+        # validate this! check it exists. with a guard clause?
+        treatment_id=body_data.get("treatment_id")
+        # treatment_id=body_data["treatment_id"]
+    )
+    
+    db.session.add(appointment)
+    db.session.commit()
+    
+    return appointment_schema.dump(appointment), 201
+    # except IntegrityError?:
     
 
 ##################################################
