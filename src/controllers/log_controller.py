@@ -27,7 +27,7 @@ def get_a_log(log_id):
 
 ############################################
 
-# change route to /patients/<patient_id>/logs/?
+# change route to /patients/<int:patient_id>/logs/?
 
 
 @app.route("/logs/patients/<int:patient_id>")
@@ -68,7 +68,7 @@ def create_log(patient_id):
 
 ############################################
 
-# change route to /patients/<patient_id>/logs/?
+# change route to /patients/<int:patient_id>/logs/?
 
 
 @app.route("/logs/<int:log_id>", methods=["PUT", "PATCH"])
@@ -90,7 +90,7 @@ def update_log(log_id):
 
 ############################################
 
-# change route to /patients/<patient_id>/logs/?
+# change route to /patients/<int:patient_id>/logs/?
 
 
 @app.route("/logs/<int:log_id>", methods=["DELETE"])
@@ -104,6 +104,6 @@ def delete_log(log_id):
         db.session.commit()
         return {"message": f"Log {log_id} deleted."}  # , 200
     else:
-        return {"error": f"Sorry, log {log_id} can't be found."}  # , 404?
+        return {"error": f"Sorry, log {log_id} not found."}  # , 404?
 
 ############################################

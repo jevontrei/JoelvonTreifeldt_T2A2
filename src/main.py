@@ -47,6 +47,7 @@ def validation_error(err):
     return {"error": err.messages}, 400
 
 
+# i'm getting Insomnia error "AttributeError: 'BadRequest' object has no attribute 'message'"
 @app.errorhandler(400)
 def bad_request(err):
     return {"error": err.messages}, 400

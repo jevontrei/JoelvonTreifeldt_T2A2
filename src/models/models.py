@@ -11,9 +11,11 @@ VALID_STATUSES = ("Scheduled", "Completed", "Cancelled")
 
 
 class Treatment(db.Model):
+    # change this to "treatments" plural and figure out where else to change it!
     __tablename__ = "treatment"
     treatment_id = db.Column(db.Integer, primary_key=True)
-    # do i need the names here?:
+    
+    # do i need the "patient_id" etc names here?:
     patient_id = db.Column("patient_id", db.Integer, db.ForeignKey(
         "patients.patient_id"), nullable=False)
     doc_id = db.Column("doc_id", db.Integer, db.ForeignKey(
@@ -21,8 +23,9 @@ class Treatment(db.Model):
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date)
 
-    patient = db.relationship("Patient", back_populates="treatment")
-    doctor = db.relationship("Doctor", back_populates="treatment")
+    # not sure if these cascade bits should be here... delet?:
+    patient = db.relationship("Patient", back_populates="treatment")  # , cascade="all, delete"
+    doctor = db.relationship("Doctor", back_populates="treatment")  # , cascade="all, delete"
 
 
 class TreatmentSchema(ma.Schema):
@@ -49,10 +52,8 @@ class Patient(db.Model):
     password = db.Column(db.String, nullable=False)
     dob = db.Column(db.Date, nullable=False)
     sex = db.Column(db.String(15))
-    diagnoses = db.Column(db.String)
     is_admin = db.Column(db.Boolean, default=False)
 
-    # or just cascade="delete"?
     logs = db.relationship(
         "Log", back_populates="patient", cascade="all, delete")
 
@@ -65,9 +66,11 @@ class PatientSchema(ma.Schema):
     # email = fields.String(required=True, validate=Regexp(
     #     "^\S+@\S+\.\S+$", error="Invalid email format"))
 
+
+    treatment = fields.Nested(TreatmentSchema, many=True)
     class Meta:
         fields = ("patient_id", "name", "email", "password",
-                  "dob", "sex", "diagnoses", "is_admin", "treatment")
+                  "dob", "sex", "is_admin", "treatment")
 
 
 patient_schema = PatientSchema(exclude=["password"])

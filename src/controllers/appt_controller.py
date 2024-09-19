@@ -1,5 +1,5 @@
 from init import db
-from models.models import Appointment, appointment_schema, appointments_schema, Treatmeant
+from models.models import Appointment, appointment_schema, appointments_schema, Treatment
 from main import app
 
 

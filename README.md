@@ -77,7 +77,6 @@ erDiagram
         string password
         date dob
         string sex
-        string diagnoses
         boolean is_admin
     }
 

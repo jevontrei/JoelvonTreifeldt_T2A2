@@ -79,6 +79,6 @@ def delete_doctor(doc_id):
         db.session.commit()
         return {"message": f"Doctor {doc_id} deleted."}  # , 200
     else:
-        return {"error": f"Sorry, doctor {doc_id} can't be found."}  # , 404?
+        return {"error": f"Sorry, doctor {doc_id} not found."}  # , 404?
 
 ##################################################

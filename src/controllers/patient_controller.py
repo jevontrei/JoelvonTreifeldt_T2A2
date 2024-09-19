@@ -18,6 +18,7 @@ def get_all_patients():
 
 @app.route("/patients/<int:patient_id>")
 def get_a_patient(patient_id):
+    # create SQL statement
     # SELECT * FROM patients WHERE patient_id = patient_id ... ?;
     stmt = db.select(Patient).filter_by(patient_id=patient_id)
     patient = db.session.scalar(stmt)
@@ -30,14 +31,15 @@ def get_a_patient(patient_id):
 def create_patient():
     # fetch data, deserialise it, store in variable
     body_data = request.get_json()
+    
     # remember to validate input!
+    # define new instance of Patient class
     patient = Patient(
         name=body_data.get("name"),
         email=body_data.get("email"),
         password=body_data.get("password"),
         dob=body_data.get("dob"),
         sex=body_data.get("sex"),
-        diagnoses=body_data.get("diagnoses"),
         is_admin=body_data.get("is_admin"),
     )
 
@@ -61,9 +63,8 @@ def update_patient(patient_id):
         patient.password = body_data.get("password") or patient.password
         patient.dob = body_data.get("dob") or patient.dob
         patient.sex = body_data.get("sex") or patient.sex
-        patient.diagnoses = body_data.get("diagnoses") or patient.diagnoses
         patient.is_admin = body_data.get("is_admin") or patient.is_admin
-        # logs and doctors? no, do this through logs and auth, respectively?
+        # logs and doctors? no, do this through logs and treatment, respectively?
 
         db.session.commit()
         return patient_schema.dump(patient)
@@ -83,6 +84,6 @@ def delete_patient(patient_id):
         db.session.commit()
         return {"message": f"Patient {patient_id} deleted."}  # , 200
     else:
-        return {"error": f"Sorry, patient {patient_id} can't be found."}  # , 404?
+        return {"error": f"Sorry, patient {patient_id} not found."}  # , 404?
 
 ##################################################
