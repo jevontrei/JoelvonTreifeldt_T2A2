@@ -1,6 +1,6 @@
 from init import db, bcrypt
  
-from models.models import Patient, Doctor, Treatment, Appointment, Log
+from models import Patient, Doctor, Treatment, Appointment, Log
 from flask import Blueprint
 
 

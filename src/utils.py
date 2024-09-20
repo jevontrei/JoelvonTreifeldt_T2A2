@@ -1,17 +1,17 @@
 ## ADAPT ALL THIS (FROM TRELLO APP)
 
-# from models.user import User
+# from models.patient import Patient
 # from init import db
 # from flask_jwt_extended import get_jwt_identity
 
 
 # def authorise_as_admin():
-#     user_id = get_jwt_identity()
+#     patient_id = get_jwt_identity()
     # create SQL statement
 
-    # SELECT * FROM users WHERE user_id = user_id;?
-#     stmt = db.select(User).filter_by(id=user_id)
+    # SELECT * FROM patients WHERE patient_id = patient_id;?
+#     stmt = db.select(Patient).filter_by(patient_id=patient_id)
     # print(stmt)
 
-#     user = db.session.scalar(stmt)
-#     return user.is_admin
+#     patient = db.session.scalar(stmt)
+#     return patient.is_admin

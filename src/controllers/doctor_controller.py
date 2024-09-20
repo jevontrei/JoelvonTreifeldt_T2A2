@@ -1,6 +1,5 @@
 from init import db
-# from models.doctor import Doctor, doctor_schema, doctors_schema
-from models.models import Doctor, doctor_schema, doctors_schema
+from models import Doctor, doctor_schema, doctors_schema
  
 from flask import jsonify, request, Blueprint
 
