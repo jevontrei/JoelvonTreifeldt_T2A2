@@ -39,6 +39,7 @@ def get_a_log(log_id):
 
 ############################################
 
+# FIX THIS!
 # change route to /patients/<int:patient_id>/logs/?
 
 

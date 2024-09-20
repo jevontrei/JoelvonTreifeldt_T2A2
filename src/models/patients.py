@@ -1,4 +1,5 @@
 from init import db, ma
+from models.treatments import TreatmentSchema
 
 from marshmallow import fields
 
