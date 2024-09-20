@@ -46,6 +46,8 @@ def get_a_patient(patient_id):
     patient = db.session.scalar(stmt)
     return patient_schema.dump(patient)
 
+    # NEED to prevent empty {} being returned for if not patient!... fetchall()?
+
 
 ##################################################
 
