@@ -3,12 +3,6 @@
 Joel von Treifeldt
 Student no. 15517
 
-Things to add in future versions:
-
-- Medications
-- Past medications
-- Diagnoses
-
 # do i need to grant permissions in psql?
 
 Note:
@@ -16,20 +10,30 @@ Note:
 - All links to online material should have corresponding screenshots included in submission.
 - i.e. make sure Trello link is public! etc! and make heaps of screenshots, starting early on
 
-MAKE A TABLE OF CONTENTS
+Table of Contents
 
 - [Title](#title)
 - [do i need to grant permissions in psql?](#do-i-need-to-grant-permissions-in-psql)
     - [R1 - Explain the problem that this app will solve, and explain how this app solves or addresses the problem.](#r1---explain-the-problem-that-this-app-will-solve-and-explain-how-this-app-solves-or-addresses-the-problem)
     - [R2 - Describe the way tasks are allocated and tracked in your project.](#r2---describe-the-way-tasks-are-allocated-and-tracked-in-your-project)
+      - [Trello Board Screenshots](#trello-board-screenshots)
+      - [GitHub Commit Screenshots](#github-commit-screenshots)
     - [R3 - List and explain the third-party services, packages and dependencies used in this app.](#r3---list-and-explain-the-third-party-services-packages-and-dependencies-used-in-this-app)
     - [R4 - Explain the benefits and drawbacks of this app’s underlying database system.](#r4---explain-the-benefits-and-drawbacks-of-this-apps-underlying-database-system)
     - [R5 - Explain the features, purpose and functionalities of the object-relational mapping system (ORM) used in this app.](#r5---explain-the-features-purpose-and-functionalities-of-the-object-relational-mapping-system-orm-used-in-this-app)
     - [R6 - Design an entity relationship diagram (ERD) for this app’s database, and explain how the relations between the diagrammed models will aid the database design. This should focus on the database design BEFORE coding has begun, eg. during the project planning or design phase.](#r6---design-an-entity-relationship-diagram-erd-for-this-apps-database-and-explain-how-the-relations-between-the-diagrammed-models-will-aid-the-database-design-this-should-focus-on-the-database-design-before-coding-has-begun-eg-during-the-project-planning-or-design-phase)
     - [R7 - Explain the implemented models and their relationships, including how the relationships aid the database implementation. This should focus on the database implementation AFTER coding has begun, eg. during the project development phase.](#r7---explain-the-implemented-models-and-their-relationships-including-how-the-relationships-aid-the-database-implementation-this-should-focus-on-the-database-implementation-after-coding-has-begun-eg-during-the-project-development-phase)
+      - [Patient model](#patient-model)
+      - [Doctor model](#doctor-model)
+      - [Treatment model (join table)](#treatment-model-join-table)
+      - [Appointment model](#appointment-model)
+      - [Log model](#log-model)
+      - [Relationships: move R6 answers here](#relationships-move-r6-answers-here)
     - [R8 - Explain how to use this application’s API endpoints.](#r8---explain-how-to-use-this-applications-api-endpoints)
       - [patient\_controller.py](#patient_controllerpy)
         - [Example JSON response](#example-json-response)
+- [Design Requirements](#design-requirements)
+- [Code Requirements](#code-requirements)
 - [Coding requirements](#coding-requirements)
 - [.](#)
 - [.](#-1)
@@ -46,6 +50,12 @@ Medical tracker / planner? smooth and user-friendly interface between patients a
 
 hopefully an improvement on myhealthrecord, with a focus on helping the patient / giving them more agency
 
+Things to add in future versions:
+
+- Medications
+- Past medications
+- Diagnoses
+
 ### R2 - Describe the way tasks are allocated and tracked in your project.
 
 <!-- CMP1001-2.3: DESCRIBES the way tasks are planned and tracked in the project.
@@ -59,7 +69,19 @@ Meets P, and includes reference to and proof of THOROUGH usage of specific task 
 6 to >5 pts HD
 Meets D, and includes proof of THOROUGH usage of specific task management tools THROUGH THE LENGTH OF THE PROJECT. -->
 
-Trello?!
+Trello Kanban, GitHub source control
+
+Link to public Trello board: https://trello.com/b/zxqDWRsS/t2a2-api-webserver
+
+Link to public GitHub repository: https://github.com/jevontrei/JoelvonTreifeldt_T2A2
+
+#### Trello Board Screenshots
+
+...
+
+#### GitHub Commit Screenshots
+
+...
 
 ### R3 - List and explain the third-party services, packages and dependencies used in this app.
 
@@ -73,10 +95,12 @@ The description provided is DETAILED, and the description details ALL of the ser
   - Psycopg2: driver for
   - flask_marshmallow: library for serialising and deserialising ...
   - flask_jwt_extended:
+  - JWT Manager?
   - flask_bcrypt:
   - python-dotenv:
   - datetime:
 - Insomnia: API client for
+- PostgreSQL: DBMS for
 -
 
 ### R4 - Explain the benefits and drawbacks of this app’s underlying database system.
@@ -90,6 +114,8 @@ Identifies an appropriate database system and DESCRIBES SOME benefits and/or dra
 Meets D, and describes benefits AND drawbacks to a thorough level of detail. -->
 
 PostgreSQL
+DBMS
+ACID
 
 https://docs.digitalocean.com/glossary/acid/
 
@@ -102,6 +128,8 @@ Explains MULTIPLE features or functionalities of an ORM to a THOROUGH level of d
 SQLAlchemy
 
 ### R6 - Design an entity relationship diagram (ERD) for this app’s database, and explain how the relations between the diagrammed models will aid the database design. This should focus on the database design BEFORE coding has begun, eg. during the project planning or design phase.
+
+<!-- 12 points! -->
 
 <!-- PMG1003-2.1, PMG1003-7.3: EXPLAINS a plan for normalised database relations.
 
@@ -127,9 +155,8 @@ The relations are as follows:
 - Treatment-Appointment (one-mandatory to many-optional)
 
 <!-- redo and replace this whole diagram, it's out of date -->
-<!-- how to display mermaid diagram in markdown? -->
 
-```
+```mermaid
 erDiagram
     Patient ||--o{ Treat : "has optional"
     Doctor ||--o{ Treat : "provides optional"
@@ -198,7 +225,74 @@ Meets D, and includes appropriate code examples supporting the descriptions. -->
 
 **AFTER CODING begins**
 
+#### Patient model
+
+Patients ...
+
+```py
+class Patient(db.Model):
+    __tablename__ = "patients"
+
+    patient_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False, unique=True)
+    password = db.Column(db.String, nullable=False)
+    dob = db.Column(db.Date, nullable=False)
+    sex = db.Column(db.String(15))
+    is_admin = db.Column(db.Boolean, default=False)
+
+    logs = db.relationship(
+        "Log", back_populates="patient", cascade="all, delete")
+
+    # one-to-many
+    # check if this makes sense as cascade?! i think it does bc this is the parent?
+    treatments = db.relationship(
+        "Treatment", back_populates="patient", cascade="all, delete")
+```
+
+should i include schemas here?
+
+#### Doctor model
+
+Doctors ...
+
+```py
 .
+```
+
+#### Treatment model (join table)
+
+Treatments were initially represented using `db.Table()` with FK attributes only. However, to facilitate the inclusion of other attributes (start date, end date), it was converted to a full entity using `db.model()` along with a schema.
+
+```py
+.
+```
+
+#### Appointment model
+
+Appointments ...
+
+```py
+.
+```
+
+#### Log model
+
+Logs ...
+
+```py
+.
+```
+
+#### Relationships: move R6 answers here
+
+The relationships ...
+
+`db.relationship()`
+
+`back_populates`
+
+`cascade`
 
 ### R8 - Explain how to use this application’s API endpoints.
 
@@ -207,7 +301,8 @@ Each endpoint should be explained, including the following data for each endpoin
 - HTTP verb
 - Path or route
 - Any required body or header data
-- Response
+- Response / Expected response data
+- Authentication methods where applicable
 
 <!-- CMP1001-1.4: IDENTIFY AND DESCRIBE the application’s API endpoints.
 
@@ -325,6 +420,34 @@ Route: `http://localhost:5000/patients/`
 - Response: JSON? SHOW EXAMPLE? HTTP STATUS CODE? 200/404?
 
 ---
+
+# Design Requirements
+
+- The web server must:
+- function as intended
+- store data in a persistent data storage medium (eg. a relational database)
+- appropriately validate & sanitise any data it interacts with
+- use appropriate HTTP web request verbs - following REST conventions - for various types of data manipulation
+- cover the full range of CRUD functionality for data within the database
+- The database manipulated by the web server must accurately reflect the entity relationship diagram created for the Documentation Requirements.
+- The database tables or documents must be normalised
+- API endpoints must be documented in your readme
+- Endpoint documentation should include
+- HTTP request verbs
+- Required data where applicable
+- Expected response data
+- Authentication methods where applicable
+
+# Code Requirements
+
+- The web server must:
+- use appropriate functionalities or libraries from the relevant programming language in its construction
+- use appropriate model methods to query the database
+- catch errors and handle them gracefully
+- returns appropriate error codes and messages to malformed requests
+- use appropriate functions or methods to sanitise & validate data
+- use D.R.Y coding principles
+- All queries to the database must be commented with an explanation of how they work and the data they are intended to retrieve
 
 # Coding requirements
 
