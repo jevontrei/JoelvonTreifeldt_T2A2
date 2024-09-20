@@ -1,6 +1,6 @@
 from init import db
 from models.models import Treatment, treatment_schema, treatments_schema
-from main import app
+# from main import app
 from flask import Blueprint, request, jsonify
 
 

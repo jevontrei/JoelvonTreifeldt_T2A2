@@ -1,5 +1,5 @@
 from init import db
-from main import app
+# from main import app
 from models.models import Log, log_schema, logs_schema
 from flask import Blueprint, jsonify, request
 from datetime import date
@@ -68,10 +68,10 @@ def get_patient_logs(patient_id):
 
 
 ############################################
-
+# NEED TO FIX THIS! CHANGE ROUTE
 # @logs_bp?
 # @app.route("/patients/<int:patient_id>/logs/", methods=["POST"])
-@app.route("/patients/<int:patient_id>/logs/", methods=["POST"])
+# @app.route("/patients/<int:patient_id>/logs/", methods=["POST"])
 def create_log(patient_id):
     body_data = request.get_json()
     

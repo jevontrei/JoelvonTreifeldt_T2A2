@@ -3,7 +3,6 @@
 Joel von Treifeldt
 #15517
 
-hopefully an improvement on myhealthrecord, with a focus on helping the patient / giving them more agency
 
 things to add:
 medications
@@ -22,14 +21,14 @@ MAKE A TABLE OF CONTENTS
 
 - [Title](#title)
 - [do i need to grant permissions in psql?](#do-i-need-to-grant-permissions-in-psql)
-- [R1](#r1)
-- [R2](#r2)
-- [R3](#r3)
-- [R4](#r4)
-- [R5](#r5)
-- [R6](#r6)
-- [R7](#r7)
-- [R8](#r8)
+    - [R1 - Explain the problem that this app will solve, and explain how this app solves or addresses the problem.](#r1---explain-the-problem-that-this-app-will-solve-and-explain-how-this-app-solves-or-addresses-the-problem)
+    - [R2 - Describe the way tasks are allocated and tracked in your project.](#r2---describe-the-way-tasks-are-allocated-and-tracked-in-your-project)
+    - [R3 - List and explain the third-party services, packages and dependencies used in this app.](#r3---list-and-explain-the-third-party-services-packages-and-dependencies-used-in-this-app)
+    - [R4 - Explain the benefits and drawbacks of this app’s underlying database system.](#r4---explain-the-benefits-and-drawbacks-of-this-apps-underlying-database-system)
+    - [R5 - Explain the features, purpose and functionalities of the object-relational mapping system (ORM) used in this app.](#r5---explain-the-features-purpose-and-functionalities-of-the-object-relational-mapping-system-orm-used-in-this-app)
+    - [R6 - Design an entity relationship diagram (ERD) for this app’s database, and explain how the relations between the diagrammed models will aid the database design. This should focus on the database design BEFORE coding has begun, eg. during the project planning or design phase.](#r6---design-an-entity-relationship-diagram-erd-for-this-apps-database-and-explain-how-the-relations-between-the-diagrammed-models-will-aid-the-database-design-this-should-focus-on-the-database-design-before-coding-has-begun-eg-during-the-project-planning-or-design-phase)
+    - [R7 - Explain the implemented models and their relationships, including how the relationships aid the database implementation. This should focus on the database implementation AFTER coding has begun, eg. during the project development phase.](#r7---explain-the-implemented-models-and-their-relationships-including-how-the-relationships-aid-the-database-implementation-this-should-focus-on-the-database-implementation-after-coding-has-begun-eg-during-the-project-development-phase)
+    - [R8 - Explain how to use this application’s API endpoints. Each endpoint should be explained, including the following data for each endpoint:](#r8---explain-how-to-use-this-applications-api-endpoints-each-endpoint-should-be-explained-including-the-following-data-for-each-endpoint)
 - [.](#)
 - [.](#-1)
 - [.](#-2)
@@ -44,31 +43,38 @@ MAKE A TABLE OF CONTENTS
 - [.](#-11)
 - [.](#-12)
 
-# R1
+### R1 - Explain the problem that this app will solve, and explain how this app solves or addresses the problem.
 
-Explain the problem that this app will solve, and explain how this app solves or addresses the problem.
+hopefully an improvement on myhealthrecord, with a focus on helping the patient / giving them more agency
 
-# R2
+### R2 - Describe the way tasks are allocated and tracked in your project.
 
-Describe the way tasks are allocated and tracked in your project.
+.
 
-# R3
+### R3 - List and explain the third-party services, packages and dependencies used in this app.
 
-List and explain the third-party services, packages and dependencies used in this app.
+- Imports
+  - flask: micro web framework for
+  - flask_sqlalchemy: ORM for 
+  - Psycopg2: driver for
+  - flask_marshmallow: library for serialising and deserialising ...
+  - flask_jwt_extended: 
+  - flask_bcrypt: 
+  - python-dotenv:
+  - datetime:
+- Insomnia: API client for
+- 
 
-# R4
 
-Explain the benefits and drawbacks of this app’s underlying database system.
+### R4 - Explain the benefits and drawbacks of this app’s underlying database system.
 
-# R5
+PostgreSQL
 
-Explain the features, purpose and functionalities of the object-relational mapping system (ORM) used in this app.
+### R5 - Explain the features, purpose and functionalities of the object-relational mapping system (ORM) used in this app.
 
-# R6
+.
 
-Design an entity relationship diagram (ERD) for this app’s database, and explain how the relations between the diagrammed models will aid the database design.
-
-This should focus on the database design BEFORE coding has begun, eg. during the project planning or design phase.
+### R6 - Design an entity relationship diagram (ERD) for this app’s database, and explain how the relations between the diagrammed models will aid the database design. This should focus on the database design BEFORE coding has begun, eg. during the project planning or design phase.
 
 <!-- how to display mermaid diagram in markdown? -->
 ```
@@ -122,20 +128,16 @@ erDiagram
     }
 ```
 
-# R7
+### R7 - Explain the implemented models and their relationships, including how the relationships aid the database implementation. This should focus on the database implementation AFTER coding has begun, eg. during the project development phase.
 
-Explain the implemented models and their relationships, including how the relationships aid the database implementation.
+.
 
-This should focus on the database implementation AFTER coding has begun, eg. during the project development phase.
+### R8 - Explain how to use this application’s API endpoints. Each endpoint should be explained, including the following data for each endpoint:
 
-# R8
-
-Explain how to use this application’s API endpoints. Each endpoint should be explained, including the following data for each endpoint:
-
-HTTP verb
-Path or route
-Any required body or header data
-Response
+- HTTP verb
+- Path or route
+- Any required body or header data
+- Response
 
 ...
 

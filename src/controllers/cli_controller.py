@@ -1,21 +1,19 @@
 from init import db, bcrypt
-from main import app
+# from main import app
 from models.models import Patient, Doctor, Treatment, Appointment, Log
-# from flask import Blueprint
+from flask import Blueprint
 
 
 ##################################################
 
-# what's the point of this? dw about it? save time typing flask db drop every time?
-# db_commands = Blueprint("db", __name__)
-
+# change this, remove "db", save time typing
+db_commands = Blueprint("db", __name__)
 
 ##################################################
 
 
 # drop tables
-@app.cli.command("drop")
-# db_commands.cli.command("drop")
+@db_commands.cli.command("drop")
 def drop_tables():
     """_summary_
     """
@@ -28,7 +26,7 @@ def drop_tables():
 
 
 # create tables
-@app.cli.command("create")
+@db_commands.cli.command("create")
 def create_tables():
     """_summary_
     """
@@ -40,7 +38,7 @@ def create_tables():
 
 
 # seed tables with patients, doctors, treatments, logs and appointments
-@app.cli.command("seed")
+@db_commands.cli.command("seed")
 def seed_tables():
     """_summary_
     """
