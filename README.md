@@ -76,6 +76,8 @@ PostgreSQL
 
 ### R6 - Design an entity relationship diagram (ERD) for this app’s database, and explain how the relations between the diagrammed models will aid the database design. This should focus on the database design BEFORE coding has begun, eg. during the project planning or design phase.
 
+
+<!-- redo and replace this whole diagram, it's out of date -->
 <!-- how to display mermaid diagram in markdown? -->
 ```
 erDiagram

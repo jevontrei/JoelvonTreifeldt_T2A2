@@ -1,12 +1,12 @@
 from init import db
 from models.models import Appointment, appointment_schema, appointments_schema, Treatment
-# from main import app
+ 
 from flask import request, jsonify, Blueprint
 
 
 ##################################################
 
-
+# create blueprint with url prefix
 appointments_bp = Blueprint("appointments", __name__, url_prefix="/appointments")
 
 
@@ -89,7 +89,7 @@ def get_patient_appointments(patient_id):
     # print(stmt)
     
     # execute SQL statement using scalars(), and return a list of scalar values with fetchall()
-    appointments = db.session.scalars(stmt)#.fetchall()
+    appointments = db.session.scalars(stmt).fetchall()
     
     # guard clause
     if not appointments:
@@ -129,7 +129,7 @@ def get_doctor_appointments(doctor_id):
     
     # execute SQL statement using scalars()
     # use fetchall() to return scalar values, which avoids returning an empty list for queries for nonexistent doctors (e.g. doctor_id=9999)
-    appointments = db.session.scalars(stmt)#.fetchall()
+    appointments = db.session.scalars(stmt).fetchall()
 
     # guard clause
     if not appointments:

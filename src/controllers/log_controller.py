@@ -1,5 +1,5 @@
 from init import db
-# from main import app
+ 
 from models.models import Log, log_schema, logs_schema
 from flask import Blueprint, jsonify, request
 from datetime import date

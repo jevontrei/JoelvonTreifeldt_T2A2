@@ -1,5 +1,5 @@
 from init import db, bcrypt
-# from main import app
+ 
 from models.models import Patient, Doctor, Treatment, Appointment, Log
 from flask import Blueprint
 
