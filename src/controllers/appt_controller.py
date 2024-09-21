@@ -92,7 +92,7 @@ def get_patient_appointments(patient_id):
     
     stmt = db.select(Appointment).join(Treatment).filter(
         Treatment.patient_id == patient_id
-        )
+        )#.order_by()
 
     # print(stmt)
     
@@ -131,7 +131,7 @@ def get_doctor_appointments(doctor_id):
 
     stmt = db.select(Appointment).join(Treatment).filter(
         Treatment.doctor_id==doctor_id
-        )
+        )#.order_by()
 
     # print(stmt)
     

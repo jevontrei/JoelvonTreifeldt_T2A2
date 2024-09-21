@@ -232,42 +232,37 @@ def seed_tables():
     logs = [
         Log(
             date = "2024-09-16",
-            symptom = "API-induced headache",
+            notes = "API-induced headache",
             patient_id = 1
         ),
         Log(
             date = "1724-09-16",
-            symptom = "coughing, reminds me of the time I had tuberculosis",
-            duration = "3 months",
+            notes = "coughing, reminds me of the time I had tuberculosis; it's been 3 months now",
             patient_id = 3
         ),
         Log(
             date = "1111-11-11",
-            symptom = "death",
-            duration = "a while now",
-            severity = "severe",
+            notes = "death; a while now; severe",
             patient_id = 2
         ),
         Log(
             date = "2222-12-12",
-            # change symptom attribute to event_symptom or something
-            symptom = "started taking antibiotics for a chest infection",
+            notes = "started taking antibiotics for a chest infection",
             patient_id = 4
         ),
         Log(
             date = "2222-12-30",
-            symptom = "finished antibiotics course; feeling better",
+            notes = "finished antibiotics course; feeling better",
             patient_id = 4
         ),
         Log(
             date = "4442-12-30",
-            symptom = "my Neuralink fell out",
+            notes = "my Neuralink fell out",
             patient_id = 1
         ),
         Log(
             date = "2023-12-3",
-            symptom = "Sore spirit",
-            severity = "mild",
+            notes = "Sore spirit",
             patient_id = 2
         )
     ]

@@ -28,7 +28,7 @@ def get_all_treatments():
     """
     # create SQL statement
     # SELECT * FROM treatments;
-    stmt = db.select(Treatment)
+    stmt = db.select(Treatment)#.order_by()
     print(stmt)
 
     # execute statement, store in an iterable object
@@ -85,7 +85,7 @@ def get_patient_treatments(patient_id):
     """
     # create SQL statement
     # SELECT * FROM treatments WHERE patient_id=patient_id ...?
-    stmt = db.select(Treatment).filter_by(patient_id=patient_id)
+    stmt = db.select(Treatment).filter_by(patient_id=patient_id)#.order_by()
     print(stmt)
     
     treatments = db.session.scalars(stmt).fetchall()
@@ -114,7 +114,7 @@ def get_doctor_treatments(doctor_id):
     # create SQL statement
     # SELECT * FROM treatments WHERE doctor_id=doctor_id ...?
     
-    stmt = db.select(Treatment).filter_by(doctor_id=doctor_id)
+    stmt = db.select(Treatment).filter_by(doctor_id=doctor_id)#.order_by()
     print(stmt)
 
     # need to use .fetchall() for scalars plural (write this comment everywhere, and remove fetchall() from any singular ones?!)

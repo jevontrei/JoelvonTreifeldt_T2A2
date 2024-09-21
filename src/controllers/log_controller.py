@@ -10,25 +10,31 @@ from datetime import date
 
 logs_bp = Blueprint("logs", __name__, url_prefix="/logs")
 
-############################################
-
-# http://localhost:5000/logs/
-@logs_bp.route("/")
-@jwt_required()
-# @authorise_as_participant
-def get_all_logs():
-    # SELECT * FROM logs ORDER BY ... ?;
-    stmt = db.select(Log).order_by(Log.date)
-    print(stmt)
-
-    logs = db.session.scalars(stmt)
-    return logs_schema.dump(logs)
+# change all routes to start with /patients/<int:patient_id>/logs/ ? prob makes more sense
 
 ############################################
 
+# DELETE THIS ROUTE - not practical for the real world // security risk?
+
+# # http://localhost:5000/logs/
+# @logs_bp.route("/")
+# @jwt_required()
+# # @authorise_as_participant
+# def get_all_logs():
+#     # SELECT * FROM logs ORDER BY ... ?;
+#     stmt = db.select(Log).order_by(Log.date)
+#     print(stmt)
+
+#     logs = db.session.scalars(stmt)
+#     return logs_schema.dump(logs)
+
+############################################
+
+# change this to be specific to a patient_id as well as a log_id?
 # http://localhost:5000/logs/<int:log_id>
 @logs_bp.route("/<int:log_id>")
 @jwt_required()
+# justify this decorator auth choice
 # @authorise_as_participant
 def get_a_log(log_id):
     # SELECT * FROM logs WHERE log_id = log_id ... ?;
@@ -59,7 +65,7 @@ def get_patient_logs(patient_id):
         _type_: _description_
     """
     # SELECT * FROM logs WHERE patient_id = patient_id ... ?;
-    stmt = db.select(Log).filter_by(patient_id=patient_id)
+    stmt = db.select(Log).filter_by(patient_id=patient_id)#.order_by()
     print(stmt)
 
     logs = db.session.scalars(stmt).fetchall()
@@ -82,9 +88,7 @@ def create_log(patient_id):
     # define new instance of Log class
     log = Log(
         date=body_data.get("date") or date.today(),
-        symptom=body_data.get("symptom"),
-        duration=body_data.get("duration"),
-        severity=body_data.get("severity"),
+        notes=body_data.get("notes"),
         
         # validate this!
         # change this to match create_app()... change route, incl in Insomnia
@@ -114,9 +118,7 @@ def update_log(log_id):
     log = db.session.scalar(stmt)
     if log:
         log.date = body_data.get("date") or log.date
-        log.symptom = body_data.get("symptom") or log.symptom
-        log.duration = body_data.get("duration") or log.duration
-        log.severity = body_data.get("severity") or log.severity
+        log.notes = body_data.get("notes") or log.notes
         # Do it for FK too? No. A log is not realistically going to change patients.
         db.session.commit()
         return log_schema.dump(log)
