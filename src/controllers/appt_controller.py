@@ -183,7 +183,7 @@ def create_appointment():
 @appointments_bp.route("/<int:appt_id>", methods=["PUT", "PATCH"])
 @jwt_required()
 # @authorise_as_admin
-# @authorise_participant
+# @authorise_as_participant
 def update_appointment(appt_id):
     body_data = request.get_json()
 
@@ -213,7 +213,7 @@ def update_appointment(appt_id):
 @appointments_bp.route("/<int:appt_id>", methods=["DELETE"])
 @jwt_required()
 # @authorise_as_admin
-# @authorise_participant
+# @authorise_as_participant
 def delete_appointment(appt_id):
     # create SQL statement
     # SELECT * FROM appointments WHERE ... ?;

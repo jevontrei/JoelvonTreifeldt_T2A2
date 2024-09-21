@@ -312,6 +312,10 @@ Each endpoint should be explained, including the following data for each endpoin
 - Any required body or header data
 - Response / Expected response data
 - Authentication methods where applicable
+  - jwt_required()
+  - authorise_as_admin
+  - authorise_as_participant
+  - authorise_creator
 
 # header data = auth / bearer token?
 

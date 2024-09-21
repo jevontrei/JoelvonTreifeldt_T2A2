@@ -68,6 +68,7 @@ def register_user(user_type):
                 name=body_data.get("name"),
                 email=body_data.get("email"),
                 # password=body_data.get("password")#,
+                sex=body_data.get("sex"),
                 is_admin=body_data.get("is_admin")
             )
 

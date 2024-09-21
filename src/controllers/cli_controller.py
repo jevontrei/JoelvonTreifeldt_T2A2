@@ -58,7 +58,8 @@ def seed_tables():
             email="marie@email.com",
             password=bcrypt.generate_password_hash("password").decode("utf-8"),
             dob="1867-11-07",
-            sex="female"
+            sex="female",
+            is_admin=True
         ),
         Patient(
             name="Erwin Schrodinger",
@@ -69,7 +70,7 @@ def seed_tables():
         ),
         Patient(
             name="Mary Magdalene",
-            email="mary@email.com",
+            email="mary@magmail.com",
             password=bcrypt.generate_password_hash("password").decode("utf-8"),
             dob="1900-01-01",
             sex="female"
@@ -85,23 +86,31 @@ def seed_tables():
     doctors = [
         Doctor(
             name="Cardi B",
-            email="cardi@email.com",
+            email="cardi@hipmail.com",
             password=bcrypt.generate_password_hash("password").decode("utf-8")
         ),
         Doctor(
             name="Fred Hollows",
-            email="fred@email.com",
+            email="fred@eyemail.com",
             password=bcrypt.generate_password_hash("password").decode("utf-8")
         ),
         Doctor(
             name="Cleopatra",
             email="cleo@email.com",
             password=bcrypt.generate_password_hash("password").decode("utf-8"),
+            sex="female",
+            is_admin=True
+        ),
+        Doctor(
+            name="Socrates",
+            email="socrates@email.com",
+            password=bcrypt.generate_password_hash("password").decode("utf-8"),
+            sex="male",
             is_admin=True
         ),
         Doctor(
             name="Steve Jobs",
-            email="steve@email.com",
+            email="steve@applemail.com",
             password=bcrypt.generate_password_hash("password").decode("utf-8")
         )
     ]

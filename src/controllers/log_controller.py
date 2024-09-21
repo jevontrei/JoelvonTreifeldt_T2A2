@@ -13,7 +13,7 @@ logs_bp = Blueprint("logs", __name__, url_prefix="/logs")
 
 @logs_bp.route("/")
 @jwt_required()
-# @authorise_participant
+# @authorise_as_participant
 def get_all_logs():
     # SELECT * FROM logs ORDER BY ... ?;
     stmt = db.select(Log).order_by(Log.date)
@@ -27,7 +27,7 @@ def get_all_logs():
 # @app.route("/logs/<int:log_id>")
 @logs_bp.route("/<int:log_id>")
 @jwt_required()
-# @authorise_participant
+# @authorise_as_participant
 def get_a_log(log_id):
     # SELECT * FROM logs WHERE log_id = log_id ... ?;
     stmt = db.select(Log).filter_by(log_id=log_id)
@@ -44,7 +44,7 @@ def get_a_log(log_id):
 # @app.route("/logs/patients/<int:patient_id>")
 @logs_bp.route("/patients/<int:patient_id>")
 @jwt_required()
-# @authorise_participant # just patient? or use @authorise_as_creator
+# @authorise_as_participant # just patient? or use @authorise_as_creator
 def get_patient_logs(patient_id):
     """
     Get all logs for a particular patient
