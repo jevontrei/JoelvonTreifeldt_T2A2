@@ -14,7 +14,7 @@ appointments_bp = Blueprint("appointments", __name__, url_prefix="/appointments"
 
 ##################################################
 
-
+# http://localhost:5000/appointments/
 @appointments_bp.route("/")
 # @jwt_required()
 def get_all_appointments():
@@ -39,7 +39,7 @@ def get_all_appointments():
 
 ##################################################
 
-
+# http://localhost:5000/appointments/<int:appt_id>
 @appointments_bp.route("/<int:appt_id>")
 # @jwt_required()
 def get_an_appointment(appt_id):
@@ -58,6 +58,12 @@ def get_an_appointment(appt_id):
     print(stmt)
     
     appointment = db.session.scalar(stmt)
+    
+    # guard clause
+    if not appointment:
+        return jsonify({
+            "error": f"Appointment {appt_id} not found."
+            }), 404
     
     return appointment_schema.dump(appointment)
 

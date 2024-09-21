@@ -12,6 +12,7 @@ doctors_bp = Blueprint("doctors", __name__, url_prefix="/doctors")
 
 ##################################################
 
+# http://localhost:5000/doctors/
 @doctors_bp.route("/")
 # @jwt_required()
 def get_all_doctors():
@@ -26,22 +27,28 @@ def get_all_doctors():
 
 ##################################################
 
+# http://localhost:5000/doctors/<int:doctor_id>
 @doctors_bp.route("/<int:doctor_id>")
 # @jwt_required()
 def get_a_doctor(doctor_id):
     # create SQL statement
     
-    # SELECT * FROM doctos WHERE ... = doctor_id?;
+    # SELECT * FROM doctors WHERE ... = doctor_id?;
     
     stmt = db.select(Doctor).filter_by(doctor_id=doctor_id)
     print(stmt)
 
     doctor = db.session.scalar(stmt)
     
+    # guard clause
+    if not doctor:
+        return jsonify({"error": f"Doctor {doctor_id} not found."}), 404
+    
     return doctor_schema.dump(doctor)
 
 ##################################################
 
+# http://localhost:5000/doctors/<int:doctor_id>
 @doctors_bp.route("/<int:doctor_id>", methods=["PUT", "PATCH"])
 @jwt_required()
 def update_doctor(doctor_id):
@@ -70,6 +77,7 @@ def update_doctor(doctor_id):
 
 ##################################################
 
+# http://localhost:5000/doctors/<int:doctor_id>
 @doctors_bp.route("/<int:doctor_id>", methods=["DELETE"])
 @jwt_required()
 @authorise_as_admin

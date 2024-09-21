@@ -5,6 +5,8 @@ from utils import authorise_as_admin
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 
+# TO DO: verify that end date is AFTER start date?!
+
 
 #####################################################
 
@@ -15,6 +17,8 @@ treatments_bp = Blueprint("treatments", __name__, url_prefix="/treatments")
 # http://localhost:5000/treatments/
 @treatments_bp.route("/")
 @jwt_required()
+# justify why i chose this particular auth decorator
+@authorise_as_admin
 def get_all_treatments():
     """
     Get all treatments
@@ -39,6 +43,8 @@ def get_all_treatments():
 # http://localhost:5000/treatments/<int:treatment_id>
 @treatments_bp.route("/<int:treatment_id>")
 @jwt_required()
+# justify why i chose this particular auth decorator
+@authorise_as_admin
 def get_a_treatment(treatment_id):
     """
     Get a specific treatment using the id
@@ -56,14 +62,20 @@ def get_a_treatment(treatment_id):
     
     treatment = db.session.scalar(stmt)
     
+    # guard clause
+    if not treatment:
+        return jsonify({"error": f"Treatment {treatment_id} not found."}), 404
+    
     return treatment_schema.dump(treatment)
 
 #####################################################
 
+# http://localhost:5000/treatments/patients/<int:patient_id>
 # is this URL backwards?
-
 @treatments_bp.route("/patients/<int:patient_id>")
 @jwt_required()
+# justify why i chose this particular auth decorator
+@authorise_as_admin
 def get_patient_treatments(patient_id):
     """
     Get all treatment details for a particular patient
@@ -76,16 +88,22 @@ def get_patient_treatments(patient_id):
     stmt = db.select(Treatment).filter_by(patient_id=patient_id)
     print(stmt)
     
-    treatments = db.session.scalars(stmt)
+    treatments = db.session.scalars(stmt).fetchall()
+    
+    # guard clause
+    if not treatments:
+        return jsonify({"error": f"No treatments found for patient {patient_id}."}), 404
     
     return treatments_schema.dump(treatments)
 
 #####################################################
 
+# http://localhost:5000/treatments/doctors/<int:doctor_id>
 # is this URL backwards?
-
 @treatments_bp.route("/doctors/<int:doctor_id>")
 @jwt_required()
+# justify why i chose this particular auth decorator
+@authorise_as_admin
 def get_doctor_treatments(doctor_id):
     """
     Get all treatment details for a particular doctor
@@ -99,15 +117,22 @@ def get_doctor_treatments(doctor_id):
     stmt = db.select(Treatment).filter_by(doctor_id=doctor_id)
     print(stmt)
 
-    treatments = db.session.scalars(stmt)
+    # need to use .fetchall() for scalars plural (write this comment everywhere, and remove fetchall() from any singular ones?!)
+    treatments = db.session.scalars(stmt).fetchall()
+    
+    # guard clause
+    if not treatments:
+        return jsonify({"error": f"No treatments found for doctor {doctor_id}."}), 404
     
     return treatments_schema.dump(treatments)
 
 #####################################################
 
-
+# http://localhost:5000/treatments/
 @treatments_bp.route("/", methods=["POST"])
 @jwt_required()
+# must authorise as admin, otherwise any person could create a treatment relationship and view any patient's private logs
+@authorise_as_admin
 def create_treatment():
     """
     Add a new treatment between doctor and patient
@@ -135,12 +160,13 @@ def create_treatment():
 
 #####################################################
 
-
+# http://localhost:5000/treatments/<int:treatment_id>
 @treatments_bp.route("/<int:treatment_id>", methods=["PUT", "PATCH"])
 @jwt_required()
+# @authorise_as_admin
+# justify why i chose this particular auth decorator
+# @authorise_as_participant
 def update_treatment(treatment_id):
-    
-    # still need to authorise!!
     
     body_data = request.get_json()
     
@@ -168,9 +194,10 @@ def update_treatment(treatment_id):
     
 #####################################################
 
-
+# http://localhost:5000/treatments/<int:treatment_id>
 @treatments_bp.route("/<int:treatment_id>", methods=["DELETE"])
 @jwt_required()
+# justify why i chose this particular auth decorator
 @authorise_as_admin
 def delete_treatment(treatment_id):
     

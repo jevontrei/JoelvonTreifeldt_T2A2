@@ -14,7 +14,7 @@ patients_bp = Blueprint("patients", __name__, url_prefix="/patients")
 
 ##################################################
 
-
+# http://localhost:5000/patients/
 @patients_bp.route("/")
 # @jwt_required()
 def get_all_patients():
@@ -32,7 +32,7 @@ def get_all_patients():
 
 ##################################################
 
-
+# http://localhost:5000/patients/<int:patient_id>
 @patients_bp.route("/<int:patient_id>")
 # @jwt_required()
 def get_a_patient(patient_id):
@@ -46,12 +46,19 @@ def get_a_patient(patient_id):
     # print(stmt)
 
     patient = db.session.scalar(stmt)
+    
+    # NEED to prevent empty {} being returned for if not patient!... fetchall()? as well as guard clause? idk. maybe fetchall() doesn't apply for singular scalar
+    
+    # guard clause
+    if not patient:
+        return jsonify({"error": f"Patient {patient_id} not found."}), 404
+    
     return patient_schema.dump(patient)
 
-    # NEED to prevent empty {} being returned for if not patient!... fetchall()?
 
 ##################################################
 
+# http://localhost:5000/patients/<int:patient_id>
 @patients_bp.route("/<int:patient_id>", methods=["PUT", "PATCH"])
 @jwt_required()
 def update_patient(patient_id):
@@ -85,7 +92,7 @@ def update_patient(patient_id):
 
 ##################################################
 
-
+# http://localhost:5000/patients/<int:patient_id>
 @patients_bp.route("/<int:patient_id>", methods=["DELETE"])
 @jwt_required()
 @authorise_as_admin

@@ -25,7 +25,7 @@ class Treatment(db.Model):
 
 class TreatmentSchema(ma.Schema):
 
-    # remember to constrain each entry to be unique
+    # remember to constrain each entry to be unique... right now you can create 100 different identical treatment entries?!
     # remember to validate that end date, if it exists, is on or after start date:
 
     class Meta:
