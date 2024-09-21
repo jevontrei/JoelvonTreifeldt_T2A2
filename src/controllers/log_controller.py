@@ -12,6 +12,7 @@ logs_bp = Blueprint("logs", __name__, url_prefix="/logs")
 
 ############################################
 
+# http://localhost:5000/logs/
 @logs_bp.route("/")
 @jwt_required()
 # @authorise_as_participant
@@ -25,6 +26,7 @@ def get_all_logs():
 
 ############################################
 
+# http://localhost:5000/logs/<int:log_id>
 @logs_bp.route("/<int:log_id>")
 @jwt_required()
 # @authorise_as_participant
@@ -34,15 +36,14 @@ def get_a_log(log_id):
     print(stmt)
 
     log = db.session.scalar(stmt)
+    
+    if not log:
+        return jsonify({"message": f"Log {log_id} not found."}), 404
+    
     return log_schema.dump(log)
 
 ############################################
 
-
-  
-# need an "if not ..." statement here somewhere (done for this one) (and in all other routes) to avoid returning an empty list for e.g. patient_id=9999 
-    
-    
 # http://localhost:5000/logs/patients/<int:patient_id>
 @logs_bp.route("/patients/<int:patient_id>")
 @jwt_required()
@@ -116,7 +117,7 @@ def update_log(log_id):
         log.symptom = body_data.get("symptom") or log.symptom
         log.duration = body_data.get("duration") or log.duration
         log.severity = body_data.get("severity") or log.severity
-        # Do it for FK too? Probably not. A log is not realistically going to change patients
+        # Do it for FK too? No. A log is not realistically going to change patients.
         db.session.commit()
         return log_schema.dump(log)
     else:
