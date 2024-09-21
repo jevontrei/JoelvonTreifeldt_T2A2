@@ -24,6 +24,8 @@ auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 ###########################################################################
 
 # http://localhost:5000/auth/register/<user_type>
+
+
 @auth_bp.route("/register/<user_type>", methods=["POST"])
 def register_user(user_type):
     try:
@@ -31,58 +33,55 @@ def register_user(user_type):
         body_data = request.get_json()
 
         if user_type not in ["patient", "doctor"]:
-
             return jsonify(
                 {
                     "message": f"User type '{user_type}' not valid. URL must include '/auth/register/patient' or '/auth/register/doctor'."
                 }
             ), 400
 
-        if user_type == "patient":
+        # fields common to both patient and doctor
+        email = body_data.get("email")
+        password = body_data.get("password")
+        name = body_data.get("name")
+        sex = body_data.get("sex")
+        is_admin = body_data.get("is_admin", False)
 
+        if user_type == "patient":
             # remember to validate input!
             # define new instance of Patient class
-            patient = Patient(
-                name=body_data.get("name"),
-                email=body_data.get("email"),
-                # password=body_data.get("password"),
+            user = Patient(
+                name=name,
+                email=email,
                 dob=body_data.get("dob"),
-                sex=body_data.get("sex"),
-                is_admin=body_data.get("is_admin")
+                sex=sex,
+                is_admin=is_admin
             )
 
-            # hash password separately
-            password = body_data.get("password")
-            if password:
-                patient.password = bcrypt.generate_password_hash(
-                    password).decode("utf-8")
-
-            db.session.add(patient)
-            db.session.commit()
-
-            return patient_schema.dump(patient), 201
+            schema = patient_schema
 
         elif user_type == "doctor":
-
-            doctor = Doctor(
-                name=body_data.get("name"),
-                email=body_data.get("email"),
-                # password=body_data.get("password")#,
-                sex=body_data.get("sex"),
+            user = Doctor(
+                name=name,
+                email=email,
+                sex=sex,
                 specialty=body_data.get("specialty"),
-                is_admin=body_data.get("is_admin")
+                is_admin=is_admin
             )
 
-            # hash password separately
-            password = body_data.get("password")
-            if password:
-                doctor.password = bcrypt.generate_password_hash(
-                    password).decode("utf-8")
+            schema = doctor_schema
+            
+        # hash password separately
+        if password:
+            user.password = bcrypt.generate_password_hash(
+                password).decode("utf-8")
+            
+        else:
+            return jsonify({"error": "Password required."}), 400
 
-            db.session.add(doctor)
-            db.session.commit()
+        db.session.add(user)
+        db.session.commit()
 
-            return doctor_schema.dump(doctor), 201
+        return schema.dump(user), 201
 
     except IntegrityError as err:
         if err.orig.pgcode == errorcodes.NOT_NULL_VIOLATION:
@@ -105,6 +104,8 @@ def register_user(user_type):
 # doctor and patient emails must be unique within one type of model, but a doctor can duplicate themselves as a patient with the same email no worries. BUT! that will cause confusion with logging in. how do you know what someone is trying to log in as? use roles?
 
 # http://localhost:5000/auth/login/<user_type>
+
+
 @auth_bp.route("/login/<user_type>", methods=["POST"])
 def login_user(user_type):
     # try:
@@ -114,55 +115,52 @@ def login_user(user_type):
 
     if user_type not in ["patient", "doctor"]:
         return jsonify({
-                "message": f"User type '{user_type}' not valid. URL must include '/auth/login/patient' or '/auth/login/doctor'."
-            }), 400
+            "message": f"User type '{user_type}' not valid. URL must include '/auth/login/patient' or '/auth/login/doctor'."
+        }), 400
+
+    email = body_data.get("email")
+    password = body_data.get("password")
+
+    if not email or not password:
+        return jsonify({"error": "Email and password required."}), 400
 
     if user_type == "patient":
-        stmt = db.select(Patient).filter_by(email=body_data["email"])
+        stmt = db.select(Patient).filter_by(email=email)
         user = db.session.scalar(stmt)
+        user_id = user.patient_id
+        schema = patient_schema
+
 
     elif user_type == "doctor":
-        stmt = db.select(Doctor).filter_by(email=body_data["email"])
+        stmt = db.select(Doctor).filter_by(email=email)
         user = db.session.scalar(stmt)
+        user_id = user.doctor_id
+        schema = doctor_schema
 
     if not user:
-        return jsonify({"message": f"user account '{body_data['email']}' not found. Please register user or initialise database."}), 404
+        return jsonify({"error": f"User account '{email}' not found. Please register user or initialise database."}), 404
 
-    if patient and bcrypt.check_password_hash(patient.password, body_data.get("password")):
+    # is 'password' a keyword for this function? will this give me issues?:
+    if not bcrypt.check_password_hash(user.password, password):
+        return jsonify({"error": "Invalid password."}), 401
+            
+    token = create_access_token(
+        identity=str(user_id),
+        additional_claims={
+            "email": user.email,
+            "user_type": user_type,
+            "is_admin": user.is_admin
+            },
+        expires_delta=timedelta(days=1)
+    )
 
-        token = create_access_token(
-            identity=str(patient.patient_id),
-            expires_delta=timedelta(days=1)
-        )
+    response = {
+        "email": email,
+        "is_admin": user.is_admin,
+        "user_type": user_type,
+        "token": token
+    }
 
-        return jsonify(
-            {
-                "email": patient.email,
-                "is_admin": patient.is_admin,
-                "token": token
-            }
-        )
-
-
-
-    if doctor and bcrypt.check_password_hash(doctor.password, body_data.get("password")):
-
-        token = create_access_token(
-            identity=str(doctor.doctor_id),
-            expires_delta=timedelta(days=1)
-        )
-
-        return jsonify(
-            {
-                "email": doctor.email,
-                "is_admin": doctor.is_admin,
-                "token": token
-            }
-        )
-
-    # what do i do with this?:
-    else:
-        return jsonify({"error": "Invalid email or password."}), 400
+    return jsonify(response)
 
     # except ... as ?:
-
