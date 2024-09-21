@@ -6,10 +6,10 @@ from datetime import date
 class Log(db.Model):
     __tablename__ = "logs"
     
-    # make sure i allow duplicate dates... so a patient can make multiple logs in one day
+    # make sure i allow duplicate dates... so a patient can make multiple logs in one day. but how to prevent stupid identical duplicates?
 
     log_id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date, default=date.today, nullable=False)  # is it redundant to use nullable=False AND a default date?
+    date = db.Column(db.Date, default=date.today, nullable=False)  # is it redundant to use nullable=False AND a default date? -> seems okay/good
     
     notes = db.Column(db.String(1000), nullable=False)
 

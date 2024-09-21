@@ -62,18 +62,18 @@ def update_doctor(doctor_id):
 
     doctor = db.session.scalar(stmt)
     
-    if doctor:
-        doctor.name = body_data.get("name") or doctor.name
-        doctor.email = body_data.get("email") or doctor.email
-        doctor.password = body_data.get("password") or doctor.password
-        # patients and appointments? no, do this through treatments and appointments, respectively?
-
-        db.session.commit()
-        
-        return doctor_schema.dump(doctor)
-    
-    else:
+    # guard clause
+    if not doctor:
         return jsonify({"error": f"Doctor {doctor_id} not found."}), 404
+    
+    doctor.name = body_data.get("name") or doctor.name
+    doctor.email = body_data.get("email") or doctor.email
+    doctor.password = body_data.get("password") or doctor.password
+    # patients and appointments? no, do this through treatments and appointments, respectively?
+
+    db.session.commit()
+    
+    return doctor_schema.dump(doctor)
 
 ##################################################
 
@@ -91,12 +91,11 @@ def delete_doctor(doctor_id):
     print(stmt)
 
     doctor = db.session.scalar(stmt)
-    
-    if doctor:
-        db.session.delete(doctor)
-        db.session.commit()
-        return jsonify({"message": f"Doctor {doctor_id} deleted."})  # , 200
-    
-    else:
+
+    # guard clause
+    if not doctor:
         return jsonify({"error": f"Doctor {doctor_id} not found."}), 404
 
+    db.session.delete(doctor)
+    db.session.commit()
+    return jsonify({"message": f"Doctor {doctor_id} deleted."})

@@ -4,6 +4,7 @@ from utils import authorise_as_admin
 
 from flask import request, jsonify, Blueprint
 from flask_jwt_extended import jwt_required
+from sqlalchemy.exc import IntegrityError
 
 
 ##################################################
@@ -101,7 +102,7 @@ def get_patient_appointments(patient_id):
     
     # guard clause
     if not appointments:
-        return jsonify({"message": f"No appointments found for patient {patient_id}."}), 404
+        return jsonify({"error": f"No appointments found for patient {patient_id}."}), 404
 
     # serialise and return
     return appointments_schema.dump(appointments)
@@ -141,7 +142,7 @@ def get_doctor_appointments(doctor_id):
 
     # guard clause
     if not appointments:
-        return jsonify({"message": f"No appointments found for doctor {doctor_id}."}), 404
+        return jsonify({"error": f"No appointments found for doctor {doctor_id}."}), 404
 
     # serialise and return
     return appointments_schema.dump(appointments)
@@ -181,10 +182,8 @@ def create_appointment():
     
     return appointment_schema.dump(appointment), 201
     # except IntegrityError?:
-    
 
 ##################################################
-
 
 @appointments_bp.route("/<int:appt_id>", methods=["PUT", "PATCH"])
 @jwt_required()
@@ -200,21 +199,19 @@ def update_appointment(appt_id):
 
     appointment = db.session.scalar(stmt)
     
-    if appointment:
-        appointment.datetime = body_data.get("datetime") or appointment.datetime
-        appointment.place = body_data.get("place") or appointment.place
-        appointment.cost = body_data.get("cost") or appointment.cost
-        appointment.status = body_data.get("status") or appointment.status
-        db.session.commit()
-        
-        return appointment_schema.dump(appointment)
-    
-    else:
+    # guard clause
+    if not appointment:
         return jsonify({"error": f"Appointment {appt_id} not found."}), 404
-
+    
+    appointment.datetime = body_data.get("datetime") or appointment.datetime
+    appointment.place = body_data.get("place") or appointment.place
+    appointment.cost = body_data.get("cost") or appointment.cost
+    appointment.status = body_data.get("status") or appointment.status
+    db.session.commit()
+    
+    return appointment_schema.dump(appointment)
 
 ##################################################
-
 
 @appointments_bp.route("/<int:appt_id>", methods=["DELETE"])
 @jwt_required()
@@ -222,19 +219,21 @@ def update_appointment(appt_id):
 # @authorise_as_participant
 def delete_appointment(appt_id):
     # create SQL statement
+    
     # SELECT * FROM appointments WHERE ... ?;
+    
     stmt = db.select(Appointment).filter_by(appt_id=appt_id)
+    print()
     print(stmt)
 
     appt = db.session.scalar(stmt)
     
-    if appt:
-        db.session.delete(appt)
-        db.session.commit()
-        return jsonify({"message": f"Appointment {appt_id} deleted."})
-    
-    else:
+    # guard clause
+    if not appt:
         return jsonify({"error": f"Appointment {appt_id} not found."}), 404
-
-
-##################################################
+        
+    db.session.delete(appt)
+    
+    db.session.commit()
+    
+    return jsonify({"message": f"Appointment {appt_id} deleted."})

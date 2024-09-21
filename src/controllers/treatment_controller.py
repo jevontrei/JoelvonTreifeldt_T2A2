@@ -178,19 +178,19 @@ def update_treatment(treatment_id):
     # execute ...
     treatment = db.session.scalar(stmt)
     
-    # if treatment exists, apply ...
-    if treatment:
-        treatment.patient_id = body_data.get("patient_id") or treatment.patient_id
-        treatment.doctor_id = body_data.get("doctor_id") or treatment.doctor_id
-        treatment.start_date = body_data.get("start_date") or treatment.start_date
-        treatment.end_date = body_data.get("end_date") or treatment.end_date
-
-        db.session.commit()
-        
-        return treatment_schema.dump(treatment)
-    
-    else:
+    # guard clause
+    if not treatment:
         return jsonify({"error": f"Treatment {treatment_id} not found."}), 404
+    
+    treatment.patient_id = body_data.get("patient_id") or treatment.patient_id
+    treatment.doctor_id = body_data.get("doctor_id") or treatment.doctor_id
+    treatment.start_date = body_data.get("start_date") or treatment.start_date
+    treatment.end_date = body_data.get("end_date") or treatment.end_date
+
+    db.session.commit()
+    
+    return treatment_schema.dump(treatment)
+    
     
 #####################################################
 
@@ -209,11 +209,11 @@ def delete_treatment(treatment_id):
     # execute statement and ...
     treatment = db.session.scalar(stmt)
     
-    # if treatment exists:
-    if treatment:
-        db.session.delete(treatment)
-        db.session.commit()
-        return jsonify({"message": f"Treatment {treatment_id} deleted."})  # , 200
-    
-    else:
+    # guard clause
+    if not treatment:
         return jsonify({"error": f"Treatment {treatment_id} not found."}), 404
+        
+    db.session.delete(treatment)
+    db.session.commit()
+    return jsonify({"message": f"Treatment {treatment_id} deleted."})
+    

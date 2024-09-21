@@ -35,7 +35,7 @@ def register_user(user_type):
         if user_type not in ["patient", "doctor"]:
             return jsonify(
                 {
-                    "message": f"User type '{user_type}' not valid. URL must include '/auth/register/patient' or '/auth/register/doctor'."
+                    "error": f"User type '{user_type}' not valid. URL must include '/auth/register/patient' or '/auth/register/doctor'."
                 }
             ), 400
 
@@ -70,13 +70,13 @@ def register_user(user_type):
 
             schema = doctor_schema
 
-        # hash password separately
-        if password:
-            user.password = bcrypt.generate_password_hash(
-                password).decode("utf-8")
-
-        else:
+        # guard clause
+        if not password:
             return jsonify({"error": "Password required."}), 400
+        
+        # hash password separately
+        user.password = bcrypt.generate_password_hash(
+            password).decode("utf-8")
 
         db.session.add(user)
         db.session.commit()
@@ -115,31 +115,38 @@ def login_user(user_type):
 
     if user_type not in ["patient", "doctor"]:
         return jsonify({
-            "message": f"User type '{user_type}' not valid. URL must include '/auth/login/patient' or '/auth/login/doctor'."
+            "error": f"User type '{user_type}' not valid. URL must include '/auth/login/patient' or '/auth/login/doctor'."
         }), 400
 
     email = body_data.get("email")
     password = body_data.get("password")
 
+    # guard clause
     if not email or not password:
         return jsonify({"error": "Email and password required."}), 400
 
     if user_type == "patient":
+        # create SQL statement
+        # SELECT ...
         stmt = db.select(Patient).filter_by(email=email)
         user = db.session.scalar(stmt)
         user_id = user.patient_id
         schema = patient_schema
 
     elif user_type == "doctor":
+        # create SQL statement
+        # SELECT ...
         stmt = db.select(Doctor).filter_by(email=email)
         user = db.session.scalar(stmt)
         user_id = user.doctor_id
         schema = doctor_schema
 
+    # guard clause
     if not user:
         return jsonify({"error": f"User account '{email}' not found. Please register user or initialise database."}), 404
 
     # is 'password' a keyword for this function? will this give me issues?:
+    # guard clause
     if not bcrypt.check_password_hash(user.password, password):
         return jsonify({"error": "Invalid password."}), 401
 

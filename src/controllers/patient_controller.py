@@ -75,19 +75,21 @@ def update_patient(patient_id):
     # print(stmt)
 
     patient = db.session.scalar(stmt)
-    if patient:
-        patient.name = body_data.get("name") or patient.name
-        patient.email = body_data.get("email") or patient.email
-        patient.password = body_data.get("password") or patient.password
-        patient.dob = body_data.get("dob") or patient.dob
-        patient.sex = body_data.get("sex") or patient.sex
-        patient.is_admin = body_data.get("is_admin") or patient.is_admin
-        # logs and doctors? no, do this through logs and treatments, respectively?
-
-        db.session.commit()
-        return patient_schema.dump(patient)
-    else:
+    
+    # guard clause
+    if not patient:
         return jsonify({"error": f"Patient {patient_id} not found."}), 404
+    
+    patient.name = body_data.get("name") or patient.name
+    patient.email = body_data.get("email") or patient.email
+    patient.password = body_data.get("password") or patient.password
+    patient.dob = body_data.get("dob") or patient.dob
+    patient.sex = body_data.get("sex") or patient.sex
+    patient.is_admin = body_data.get("is_admin") or patient.is_admin
+    # logs and doctors? no, do this through logs and treatments, respectively?
+
+    db.session.commit()
+    return patient_schema.dump(patient)
 
 
 ##################################################
@@ -109,10 +111,12 @@ def delete_patient(patient_id):
 
     patient = db.session.scalar(stmt)
     
-    if patient:
-        db.session.delete(patient)
-        db.session.commit()
-        return jsonify({"message": f"Patient {patient_id} deleted."})  # , 200
-    
-    else:
+    # guard clause
+    if not patient:
         return jsonify({"error": f"Patient {patient_id} not found."}), 404
+    
+    db.session.delete(patient)
+    
+    db.session.commit()
+    
+    return jsonify({"message": f"Patient {patient_id} deleted."})
