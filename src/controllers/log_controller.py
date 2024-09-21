@@ -71,6 +71,7 @@ def get_patient_logs(patient_id):
 
 ############################################
 
+# http://localhost:5000/logs/patients/<int:patient_id>
 @logs_bp.route("/patients/<int:patient_id>/", methods=["POST"])
 @jwt_required()
 def create_log(patient_id):
@@ -96,36 +97,33 @@ def create_log(patient_id):
 
 ############################################
 
-#???FIX???
-# change route to /patients/<int:patient_id>/logs/?
-
-# @logs_bp.route("/<int:log_id>", methods=["PUT", "PATCH"])
-# @jwt_required()
-# @authorise_as_patient_creator
-# def update_log(log_id):
-#     body_data = request.get_json()
+# http://localhost:5000/logs/<int:log_id>
+@logs_bp.route("/<int:log_id>", methods=["PUT", "PATCH"])
+@jwt_required()
+@authorise_as_patient_creator
+def update_log(log_id):
+    body_data = request.get_json()
     
-#     # create SQL statement
-#     # SELECT * FROM logs WHERE log_id = log_id ... ?;
-#     stmt = db.select(Log).filter_by(log_id=log_id)
-#     print(stmt)
+    # create SQL statement
+    # SELECT * FROM logs WHERE log_id = log_id ... ?;
+    stmt = db.select(Log).filter_by(log_id=log_id)
+    print(stmt)
 
     
-#     log = db.session.scalar(stmt)
-#     if log:
-#         log.date = body_data.get("date") or log.date
-#         log.symptom = body_data.get("symptom") or log.symptom
-#         log.duration = body_data.get("duration") or log.duration
-#         log.severity = body_data.get("severity") or log.severity
-#         # Do it for FK too? Probably not. A log is not realistically going to change patients
-#         db.session.commit()
-#         return log_schema.dump(log)
-#     else:
-#         return jsonify({"error": f"Log {log_id} not found."}), 404
+    log = db.session.scalar(stmt)
+    if log:
+        log.date = body_data.get("date") or log.date
+        log.symptom = body_data.get("symptom") or log.symptom
+        log.duration = body_data.get("duration") or log.duration
+        log.severity = body_data.get("severity") or log.severity
+        # Do it for FK too? Probably not. A log is not realistically going to change patients
+        db.session.commit()
+        return log_schema.dump(log)
+    else:
+        return jsonify({"error": f"Log {log_id} not found."}), 404
 
 ############################################
 
-# change route to /patients/<int:patient_id>/logs/?
 
 # http://localhost:5000/logs/<int:log_id>
 @logs_bp.route("/<int:log_id>", methods=["DELETE"])
