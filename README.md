@@ -173,7 +173,7 @@ erDiagram
     Treat ||--o{ Appointment : "schedules optional"
 
     Patient {
-        int patient_id PK
+        int id PK
         string name
         string email
         string password
@@ -183,7 +183,7 @@ erDiagram
     }
 
     Doctor {
-        int doctor_id PK
+        int id PK
         string name
         string email
         string password
@@ -191,8 +191,8 @@ erDiagram
 
     Treat {
         int treat_id PK
-        int patient_id FK
-        int doctor_id FK
+        int id FK
+        int id FK
         date start_date
         date end_date
     }
@@ -212,7 +212,7 @@ erDiagram
         string symptom
         string duration
         string severity
-        int patient_id FK
+        int id FK
     }
 ```
 
@@ -242,7 +242,7 @@ Patients ...
 class Patient(db.Model):
     __tablename__ = "patients"
 
-    patient_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
@@ -422,7 +422,7 @@ HTTP status code: 200 OK
 ]
 ```
 
-Route: `http://localhost:5000/patients/<int:patient_id>`
+Route: `http://localhost:5000/patients/<int:id>`
 
 - HTTP verb: `GET`
 - Body/header data: ?

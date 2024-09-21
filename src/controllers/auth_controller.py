@@ -69,6 +69,7 @@ def register_user(user_type):
                 email=body_data.get("email"),
                 # password=body_data.get("password")#,
                 sex=body_data.get("sex"),
+                specialty=body_data.get("specialty"),
                 is_admin=body_data.get("is_admin")
             )
 
@@ -112,60 +113,52 @@ def login_user(user_type):
     body_data = request.get_json()
 
     if user_type not in ["patient", "doctor"]:
+        return jsonify({
+                "message": f"User type '{user_type}' not valid. URL must include '/auth/login/patient' or '/auth/login/doctor'."
+            }), 400
+
+    if user_type == "patient":
+        stmt = db.select(Patient).filter_by(email=body_data["email"])
+        user = db.session.scalar(stmt)
+
+    elif user_type == "doctor":
+        stmt = db.select(Doctor).filter_by(email=body_data["email"])
+        user = db.session.scalar(stmt)
+
+    if not user:
+        return jsonify({"message": f"user account '{body_data['email']}' not found. Please register user or initialise database."}), 404
+
+    if patient and bcrypt.check_password_hash(patient.password, body_data.get("password")):
+
+        token = create_access_token(
+            identity=str(patient.patient_id),
+            expires_delta=timedelta(days=1)
+        )
 
         return jsonify(
             {
-                "message": f"User type '{user_type}' not valid. URL must include '/auth/login/patient' or '/auth/login/doctor'."
+                "email": patient.email,
+                "is_admin": patient.is_admin,
+                "token": token
             }
-        ), 400
+        )
 
-    if user_type == "patient":
 
-        stmt = db.select(Patient).filter_by(email=body_data["email"])
 
-        patient = db.session.scalar(stmt)
+    if doctor and bcrypt.check_password_hash(doctor.password, body_data.get("password")):
 
-        if not patient:
-            return jsonify({"message": f"Patient account '{body_data['email']}' not found. Please register user or initialise database."}), 404
+        token = create_access_token(
+            identity=str(doctor.doctor_id),
+            expires_delta=timedelta(days=1)
+        )
 
-        if patient and bcrypt.check_password_hash(patient.password, body_data.get("password")):
-
-            token = create_access_token(
-                identity=str(patient.patient_id),
-                expires_delta=timedelta(days=1)
-            )
-
-            return jsonify(
-                {
-                    "email": patient.email,
-                    "is_admin": patient.is_admin,
-                    "token": token
-                }
-            )
-
-    elif user_type == "doctor":
-
-        stmt = db.select(Doctor).filter_by(email=body_data["email"])
-
-        doctor = db.session.scalar(stmt)
-
-        if not doctor:
-            return jsonify({"message": f"Doctor account '{body_data['email']}' not found. Please register user or initialise database."}), 404
-
-        if doctor and bcrypt.check_password_hash(doctor.password, body_data.get("password")):
-
-            token = create_access_token(
-                identity=str(doctor.doctor_id),
-                expires_delta=timedelta(days=1)
-            )
-
-            return jsonify(
-                {
-                    "email": doctor.email,
-                    "is_admin": doctor.is_admin,
-                    "token": token
-                }
-            )
+        return jsonify(
+            {
+                "email": doctor.email,
+                "is_admin": doctor.is_admin,
+                "token": token
+            }
+        )
 
     # what do i do with this?:
     else:

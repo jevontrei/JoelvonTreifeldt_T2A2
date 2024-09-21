@@ -92,7 +92,8 @@ def seed_tables():
         Doctor(
             name="Fred Hollows",
             email="fred@eyemail.com",
-            password=bcrypt.generate_password_hash("password").decode("utf-8")
+            password=bcrypt.generate_password_hash("password").decode("utf-8"),
+            specialty="optometry"
         ),
         Doctor(
             name="Cleopatra",
@@ -106,6 +107,7 @@ def seed_tables():
             email="socrates@email.com",
             password=bcrypt.generate_password_hash("password").decode("utf-8"),
             sex="male",
+            specialty="divination",
             is_admin=True
         ),
         Doctor(

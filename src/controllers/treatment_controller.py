@@ -174,8 +174,6 @@ def update_treatment(treatment_id):
 @authorise_as_admin
 def delete_treatment(treatment_id):
     
-    # still need to authorise!!
-    
     # create SQL statement
     # SELECT ?
     stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
