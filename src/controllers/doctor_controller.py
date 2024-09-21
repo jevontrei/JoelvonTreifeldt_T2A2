@@ -48,24 +48,24 @@ def get_a_doctor(doctor_id):
 ##################################################
 
 
-# @app.route("/doctors/", methods=["POST"])
-@doctors_bp.route("/", methods=["POST"])
-def create_doctor():
-    body_data = request.get_json()
-    
-    # remember to validate input!
-    
-    doctor = Doctor(
-        name=body_data.get("name"),
-        email=body_data.get("email"),
-        password=body_data.get("password")
-    )
+# this is moved to auth_controller.py
 
-    db.session.add(doctor)
+# @doctors_bp.route("/", methods=["POST"])
+# def create_doctor():
+#     body_data = request.get_json()
     
-    db.session.commit()
+#     # remember to validate input!
+#     # define new instance of Doctor class
+#     doctor = Doctor(
+#         name=body_data.get("name"),
+#         email=body_data.get("email"),
+#         password=body_data.get("password")
+#     )
 
-    return doctor_schema.dump(doctor), 201
+#     db.session.add(doctor)
+#     db.session.commit()
+
+#     return doctor_schema.dump(doctor), 201
 
 
 ##################################################

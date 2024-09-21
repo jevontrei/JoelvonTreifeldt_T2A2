@@ -14,6 +14,7 @@ Table of Contents
 
 - [Title](#title)
 - [do i need to grant permissions in psql?](#do-i-need-to-grant-permissions-in-psql)
+    - [R0 - Setup](#r0---setup)
     - [R1 - Explain the problem that this app will solve, and explain how this app solves or addresses the problem.](#r1---explain-the-problem-that-this-app-will-solve-and-explain-how-this-app-solves-or-addresses-the-problem)
     - [R2 - Describe the way tasks are allocated and tracked in your project.](#r2---describe-the-way-tasks-are-allocated-and-tracked-in-your-project)
       - [Trello Board Screenshots](#trello-board-screenshots)
@@ -39,6 +40,10 @@ Table of Contents
 - [.](#-1)
 - [.](#-2)
 - [.](#-3)
+
+### R0 - Setup
+
+.
 
 ### R1 - Explain the problem that this app will solve, and explain how this app solves or addresses the problem.
 

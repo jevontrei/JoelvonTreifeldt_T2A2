@@ -14,7 +14,7 @@ def create_app():
     from init import db, ma, bcrypt, jwt
 
     from controllers.appt_controller import appointments_bp
-    # from controllers.auth_controller import auth_bp
+    from controllers.auth_controller import auth_bp
     from controllers.cli_controller import db_commands
     from controllers.doctor_controller import doctors_bp
     from controllers.log_controller import logs_bp
@@ -35,7 +35,7 @@ def create_app():
 
     # register blueprints
     app.register_blueprint(appointments_bp)
-    # app.register_blueprint(auth_bp)
+    app.register_blueprint(auth_bp)
     app.register_blueprint(db_commands)
     app.register_blueprint(doctors_bp)
     app.register_blueprint(logs_bp)

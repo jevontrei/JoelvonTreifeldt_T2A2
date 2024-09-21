@@ -51,28 +51,28 @@ def get_a_patient(patient_id):
 
 ##################################################
 
+# this is moved to auth_controller.py
 
-# @app.route("/patients/", methods=["POST"])
-@patients_bp.route("/", methods=["POST"])
-def create_patient():
-    # fetch data, deserialise it, store in variable
-    body_data = request.get_json()
+# @patients_bp.route("/", methods=["POST"])
+# def create_patient():
+#     # fetch data, deserialise it, store in variable
+#     body_data = request.get_json()
     
-    # remember to validate input!
-    # define new instance of Patient class
-    patient = Patient(
-        name=body_data.get("name"),
-        email=body_data.get("email"),
-        password=body_data.get("password"),
-        dob=body_data.get("dob"),
-        sex=body_data.get("sex"),
-        is_admin=body_data.get("is_admin"),
-    )
+#     # remember to validate input!
+#     # define new instance of Patient class
+#     patient = Patient(
+#         name=body_data.get("name"),
+#         email=body_data.get("email"),
+#         password=body_data.get("password"),
+#         dob=body_data.get("dob"),
+#         sex=body_data.get("sex"),
+#         is_admin=body_data.get("is_admin"),
+#     )
 
-    db.session.add(patient)
-    db.session.commit()
+#     db.session.add(patient)
+#     db.session.commit()
 
-    return patient_schema.dump(patient), 201
+#     return patient_schema.dump(patient), 201
 
 
 ##################################################
