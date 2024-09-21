@@ -43,13 +43,12 @@ def seed_tables():
     """_summary_
     """
     
-    
     # seed patients
     patients = [
         Patient(
             name="Joel von Treifeldt",
             email="joel@email.com",
-            password="password",
+            password=bcrypt.generate_password_hash("password").decode("utf-8"),
             dob="1900-01-01",
             sex="male",
             is_admin=True
@@ -57,21 +56,21 @@ def seed_tables():
         Patient(
             name="Marie Curie",
             email="marie@email.com",
-            password="password",
+            password=bcrypt.generate_password_hash("password").decode("utf-8"),
             dob="1867-11-07",
             sex="female"
         ),
         Patient(
             name="Erwin Schrodinger",
             email="erwin@schromail.com",
-            password="password",
+            password=bcrypt.generate_password_hash("password").decode("utf-8"),
             dob="1887-08-12",
             sex="male"
         ),
         Patient(
             name="Mary Magdalene",
             email="mary@email.com",
-            password="password",
+            password=bcrypt.generate_password_hash("password").decode("utf-8"),
             dob="1900-01-01",
             sex="female"
         )
@@ -87,22 +86,22 @@ def seed_tables():
         Doctor(
             name="Cardi B",
             email="cardi@email.com",
-            password="password",
+            password=bcrypt.generate_password_hash("password").decode("utf-8")
         ),
         Doctor(
             name="Fred Hollows",
             email="fred@email.com",
-            password="password",
+            password=bcrypt.generate_password_hash("password").decode("utf-8")
         ),
         Doctor(
             name="Cleopatra",
             email="cleo@email.com",
-            password="password",
+            password=bcrypt.generate_password_hash("password").decode("utf-8")
         ),
         Doctor(
             name="Steve Jobs",
             email="steve@email.com",
-            password="password",
+            password=bcrypt.generate_password_hash("password").decode("utf-8")
         )
     ]
     

@@ -5,6 +5,8 @@ Student no. 15517
 
 # do i need to grant permissions in psql?
 
+# doctor and patient emails must be unique within one type of model, but a doctor can duplicate themselves as a patient with the same email no worries. BUT! that will cause confusion with logging in. how do you know what someone is trying to log in as? use roles?
+
 Note:
 
 - All links to online material should have corresponding screenshots included in submission.
@@ -14,6 +16,7 @@ Table of Contents
 
 - [Title](#title)
 - [do i need to grant permissions in psql?](#do-i-need-to-grant-permissions-in-psql)
+- [doctor and patient emails must be unique within one type of model, but a doctor can duplicate themselves as a patient with the same email no worries. BUT! that will cause confusion with logging in. how do you know](#doctor-and-patient-emails-must-be-unique-within-one-type-of-model-but-a-doctor-can-duplicate-themselves-as-a-patient-with-the-same-email-no-worries-but-that-will-cause-confusion-with-logging-in-how-do-you-know)
     - [R0 - Setup](#r0---setup)
     - [R1 - Explain the problem that this app will solve, and explain how this app solves or addresses the problem.](#r1---explain-the-problem-that-this-app-will-solve-and-explain-how-this-app-solves-or-addresses-the-problem)
     - [R2 - Describe the way tasks are allocated and tracked in your project.](#r2---describe-the-way-tasks-are-allocated-and-tracked-in-your-project)
@@ -53,7 +56,7 @@ Provides a DETAILED explanation about the problem being solved by the developed 
 
 Medical tracker / planner? smooth and user-friendly interface between patients and doctors
 
-hopefully an improvement on myhealthrecord, with a focus on helping the patient / giving them more agency
+hopefully an improvement on My Health Record, the Australian ... with a focus on helping the patient / giving them more agency
 
 Things to add in future versions:
 

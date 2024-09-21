@@ -1,6 +1,6 @@
 ## ADAPT ALL THIS (FROM TRELLO APP)
 
-# from models.patient import Patient
+# from models import Patient
 # from init import db
 # from flask_jwt_extended import get_jwt_identity
 
