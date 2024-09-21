@@ -2,20 +2,18 @@ from init import db
  
 from models import Log, log_schema, logs_schema
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
 from datetime import date
 
-
 ############################################
-
 
 logs_bp = Blueprint("logs", __name__, url_prefix="/logs")
 
-
 ############################################
 
-# delet: carefully trying to implement blueprint / url prefixes
-# @app.route("/logs/")
 @logs_bp.route("/")
+@jwt_required()
+# @authorise_participant
 def get_all_logs():
     # SELECT * FROM logs ORDER BY ... ?;
     stmt = db.select(Log).order_by(Log.date)
@@ -26,9 +24,10 @@ def get_all_logs():
 
 ############################################
 
-
 # @app.route("/logs/<int:log_id>")
 @logs_bp.route("/<int:log_id>")
+@jwt_required()
+# @authorise_participant
 def get_a_log(log_id):
     # SELECT * FROM logs WHERE log_id = log_id ... ?;
     stmt = db.select(Log).filter_by(log_id=log_id)
@@ -42,9 +41,10 @@ def get_a_log(log_id):
 # FIX THIS!
 # change route to /patients/<int:patient_id>/logs/?
 
-
 # @app.route("/logs/patients/<int:patient_id>")
 @logs_bp.route("/patients/<int:patient_id>")
+@jwt_required()
+# @authorise_participant # just patient? or use @authorise_as_creator
 def get_patient_logs(patient_id):
     """
     Get all logs for a particular patient
@@ -67,68 +67,69 @@ def get_patient_logs(patient_id):
     
     return logs_schema.dump(logs)
 
-
 ############################################
+
 # NEED TO FIX THIS! CHANGE ROUTE
-# @logs_bp?
-# @app.route("/patients/<int:patient_id>/logs/", methods=["POST"])
-# @app.route("/patients/<int:patient_id>/logs/", methods=["POST"])
-def create_log(patient_id):
-    body_data = request.get_json()
+# @logs_bp.route("/patients/<int:patient_id>/logs/", methods=["POST"])
+# @jwt_required()
+# def create_log(patient_id):
+#     body_data = request.get_json()
     
-    # remember to validate input!
-    # define new instance of Log class
-    log = Log(
-        date=body_data.get("date") or date.today(),
-        symptom=body_data.get("symptom"),
-        duration=body_data.get("duration"),
-        severity=body_data.get("severity"),
+#     # remember to validate input!
+#     # define new instance of Log class
+#     log = Log(
+#         date=body_data.get("date") or date.today(),
+#         symptom=body_data.get("symptom"),
+#         duration=body_data.get("duration"),
+#         severity=body_data.get("severity"),
         
-        # validate this!
-        # change this to match create_app()... change route, incl in Insomnia
-        patient_id=patient_id
-    )
+#         # validate this!
+#         # change this to match create_app()... change route, incl in Insomnia
+#         patient_id=patient_id
+#     )
 
-    db.session.add(log)
-    db.session.commit()
+#     db.session.add(log)
+#     db.session.commit()
 
-    return log_schema.dump(log), 201
+#     return log_schema.dump(log), 201
+
+############################################
+
+#???FIX???
+# change route to /patients/<int:patient_id>/logs/?
+
+# @logs_bp.route("/<int:log_id>", methods=["PUT", "PATCH"])
+# @jwt_required()
+# @authorise_as_creator
+# def update_log(log_id):
+#     body_data = request.get_json()
+    
+#     # create SQL statement
+#     # SELECT * FROM logs WHERE log_id = log_id ... ?;
+#     stmt = db.select(Log).filter_by(log_id=log_id)
+#     print(stmt)
+
+    
+#     log = db.session.scalar(stmt)
+#     if log:
+#         log.date = body_data.get("date") or log.date
+#         log.symptom = body_data.get("symptom") or log.symptom
+#         log.duration = body_data.get("duration") or log.duration
+#         log.severity = body_data.get("severity") or log.severity
+#         # Do it for FK too? Probably not. A log is not realistically going to change patients
+#         db.session.commit()
+#         return log_schema.dump(log)
+#     else:
+#         return jsonify({"error": f"Log {log_id} not found."}), 404
 
 ############################################
 
 # change route to /patients/<int:patient_id>/logs/?
 
 
-# @app.route("/logs/<int:log_id>", methods=["PUT", "PATCH"])
-@logs_bp.route("/<int:log_id>", methods=["PUT", "PATCH"])
-def update_log(log_id):
-    body_data = request.get_json()
-    
-    # create SQL statement
-    # SELECT * FROM logs WHERE log_id = log_id ... ?;
-    stmt = db.select(Log).filter_by(log_id=log_id)
-    print(stmt)
-
-    
-    log = db.session.scalar(stmt)
-    if log:
-        log.date = body_data.get("date") or log.date
-        log.symptom = body_data.get("symptom") or log.symptom
-        log.duration = body_data.get("duration") or log.duration
-        log.severity = body_data.get("severity") or log.severity
-        # Do it for FK too? Probably not. A log is not realistically going to change patients
-        db.session.commit()
-        return log_schema.dump(log)
-    else:
-        return jsonify({"error": f"Log {log_id} not found."}), 404
-
-############################################
-
-# change route to /patients/<int:patient_id>/logs/?
-
-
-# @app.route("/logs/<int:log_id>", methods=["DELETE"])
 @logs_bp.route("/<int:log_id>", methods=["DELETE"])
+@jwt_required()
+# @authorise_as_creator
 def delete_log(log_id):
     # check for authorisation
     # SELECT * FROM logs WHERE log_id = log_id ... ?;
@@ -143,4 +144,3 @@ def delete_log(log_id):
     else:
         return jsonify({"error": f"Log {log_id} not found."}), 404
 
-############################################

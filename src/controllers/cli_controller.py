@@ -96,7 +96,8 @@ def seed_tables():
         Doctor(
             name="Cleopatra",
             email="cleo@email.com",
-            password=bcrypt.generate_password_hash("password").decode("utf-8")
+            password=bcrypt.generate_password_hash("password").decode("utf-8"),
+            is_admin=True
         ),
         Doctor(
             name="Steve Jobs",

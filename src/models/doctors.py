@@ -11,6 +11,7 @@ class Doctor(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
 
     # does this need to be nested? to avoid circular chaos?
     # check if this makes sense as cascade
@@ -29,7 +30,7 @@ class DoctorSchema(ma.Schema):
 
     
     class Meta:
-        fields = ("doctor_id", "name", "email", "password", "treatments")
+        fields = ("doctor_id", "name", "email", "password", "is_admin", "treatments")
 
 
 doctor_schema = DoctorSchema(exclude=["password"])

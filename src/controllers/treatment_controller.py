@@ -1,7 +1,9 @@
 from init import db
 from models import Treatment, treatment_schema, treatments_schema
- 
+from utils import authorise_as_admin
+
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required
 
 
 #####################################################
@@ -10,8 +12,9 @@ treatments_bp = Blueprint("treatments", __name__, url_prefix="/treatments")
 
 #####################################################
 
-# @app.route("/treatments/")
+# http://localhost:5000/treatments/
 @treatments_bp.route("/")
+@jwt_required()
 def get_all_treatments():
     """
     Get all treatments
@@ -33,8 +36,9 @@ def get_all_treatments():
 
 #####################################################
 
-# @app.route("/treatments/<int:treatment_id>")
+# http://localhost:5000/treatments/<int:treatment_id>
 @treatments_bp.route("/<int:treatment_id>")
+@jwt_required()
 def get_a_treatment(treatment_id):
     """
     Get a specific treatment using the id
@@ -56,8 +60,10 @@ def get_a_treatment(treatment_id):
 
 #####################################################
 
-# @app.route("/treatments/patients/<int:patient_id>")
+# is this URL backwards?
+
 @treatments_bp.route("/patients/<int:patient_id>")
+@jwt_required()
 def get_patient_treatments(patient_id):
     """
     Get all treatment details for a particular patient
@@ -76,9 +82,10 @@ def get_patient_treatments(patient_id):
 
 #####################################################
 
+# is this URL backwards?
 
-# @app.route("/treatments/doctors/<int:doctor_id>")
 @treatments_bp.route("/doctors/<int:doctor_id>")
+@jwt_required()
 def get_doctor_treatments(doctor_id):
     """
     Get all treatment details for a particular doctor
@@ -99,8 +106,8 @@ def get_doctor_treatments(doctor_id):
 #####################################################
 
 
-# @app.route("/treatments/", methods=["POST"])
 @treatments_bp.route("/", methods=["POST"])
+@jwt_required()
 def create_treatment():
     """
     Add a new treatment between doctor and patient
@@ -129,8 +136,8 @@ def create_treatment():
 #####################################################
 
 
-# @app.route("/treatments/<int:treatment_id>", methods=["PUT", "PATCH"])
 @treatments_bp.route("/<int:treatment_id>", methods=["PUT", "PATCH"])
+@jwt_required()
 def update_treatment(treatment_id):
     
     # still need to authorise!!
@@ -162,8 +169,9 @@ def update_treatment(treatment_id):
 #####################################################
 
 
-# @app.route("/treatments/<int:treatment_id>", methods=["DELETE"])
 @treatments_bp.route("/<int:treatment_id>", methods=["DELETE"])
+@jwt_required()
+@authorise_as_admin
 def delete_treatment(treatment_id):
     
     # still need to authorise!!

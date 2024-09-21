@@ -1,7 +1,9 @@
 from init import db
 from models import Patient, patient_schema, patients_schema
- 
+from utils import authorise_as_admin
+
 from flask import jsonify, request, Blueprint
+from flask_jwt_extended import jwt_required
 
 
 ##################################################
@@ -13,8 +15,8 @@ patients_bp = Blueprint("patients", __name__, url_prefix="/patients")
 ##################################################
 
 
-# @app.route("/patients/")
 @patients_bp.route("/")
+# @jwt_required()
 def get_all_patients():
     # create SQL statement
     
@@ -31,8 +33,8 @@ def get_all_patients():
 ##################################################
 
 
-# @app.route("/patients/<int:patient_id>")
 @patients_bp.route("/<int:patient_id>")
+# @jwt_required()
 def get_a_patient(patient_id):
     # create SQL statement
 
@@ -48,38 +50,10 @@ def get_a_patient(patient_id):
 
     # NEED to prevent empty {} being returned for if not patient!... fetchall()?
 
-
 ##################################################
 
-# this is moved to auth_controller.py
-
-# @patients_bp.route("/", methods=["POST"])
-# def create_patient():
-#     # fetch data, deserialise it, store in variable
-#     body_data = request.get_json()
-    
-#     # remember to validate input!
-#     # define new instance of Patient class
-#     patient = Patient(
-#         name=body_data.get("name"),
-#         email=body_data.get("email"),
-#         password=body_data.get("password"),
-#         dob=body_data.get("dob"),
-#         sex=body_data.get("sex"),
-#         is_admin=body_data.get("is_admin"),
-#     )
-
-#     db.session.add(patient)
-#     db.session.commit()
-
-#     return patient_schema.dump(patient), 201
-
-
-##################################################
-
-
-# @app.route("/patients/<int:patient_id>", methods=["PUT", "PATCH"])
 @patients_bp.route("/<int:patient_id>", methods=["PUT", "PATCH"])
+@jwt_required()
 def update_patient(patient_id):
     # fetch ...
     body_data = request.get_json()
@@ -112,8 +86,9 @@ def update_patient(patient_id):
 ##################################################
 
 
-# @app.route("/patients/<int:patient_id>", methods=["DELETE"])
 @patients_bp.route("/<int:patient_id>", methods=["DELETE"])
+@jwt_required()
+@authorise_as_admin
 def delete_patient(patient_id):
     
     # create SQL statement
@@ -121,17 +96,16 @@ def delete_patient(patient_id):
     # SELECT patients.patient_id, patients.name, patients.email, patients.password, patients.dob, patients.sex, patients.is_admin 
     # FROM patients 
     # WHERE patients.patient_id = :patient_id_1
-    
+
     stmt = db.select(Patient).filter_by(patient_id=patient_id)
     # print(stmt)
 
     patient = db.session.scalar(stmt)
+    
     if patient:
         db.session.delete(patient)
         db.session.commit()
         return jsonify({"message": f"Patient {patient_id} deleted."})  # , 200
+    
     else:
         return jsonify({"error": f"Patient {patient_id} not found."}), 404
-
-
-##################################################

@@ -1,7 +1,9 @@
 from init import db
 from models import Appointment, appointment_schema, appointments_schema, Treatment
- 
+from utils import authorise_as_admin
+
 from flask import request, jsonify, Blueprint
+from flask_jwt_extended import jwt_required
 
 
 ##################################################
@@ -13,8 +15,8 @@ appointments_bp = Blueprint("appointments", __name__, url_prefix="/appointments"
 ##################################################
 
 
-# @app.route("/appointments/")
 @appointments_bp.route("/")
+# @jwt_required()
 def get_all_appointments():
     """_summary_
 
@@ -38,8 +40,8 @@ def get_all_appointments():
 ##################################################
 
 
-# @app.route("/appointments/<int:appt_id>")
 @appointments_bp.route("/<int:appt_id>")
+# @jwt_required()
 def get_an_appointment(appt_id):
     """_summary_
 
@@ -63,8 +65,8 @@ def get_an_appointment(appt_id):
 ##################################################
 
 
-# @app.route("/appointments/patients/<int:patient_id>")
 @appointments_bp.route("/patients/<int:patient_id>")
+# @jwt_required()
 def get_patient_appointments(patient_id):
     """
     Get all appointments for a particular patient
@@ -102,8 +104,8 @@ def get_patient_appointments(patient_id):
 ##################################################
 
 
-# @app.route("/appointments/doctors/<int:doctor_id>")
 @appointments_bp.route("/doctors/<int:doctor_id>")
+# @jwt_required()
 def get_doctor_appointments(doctor_id):
     """
     Get all appointments for a particular doctor
@@ -142,8 +144,8 @@ def get_doctor_appointments(doctor_id):
 ##################################################
 
 
-# @app.route("/appointments/", methods=["POST"])
 @appointments_bp.route("/", methods=["POST"])
+@jwt_required()
 def create_appointment():
     # try:
     body_data = request.get_json()
@@ -178,8 +180,10 @@ def create_appointment():
 ##################################################
 
 
-# @app.route("/appointments/<int:appt_id>", methods=["PUT", "PATCH"])
 @appointments_bp.route("/<int:appt_id>", methods=["PUT", "PATCH"])
+@jwt_required()
+# @authorise_as_admin
+# @authorise_participant
 def update_appointment(appt_id):
     body_data = request.get_json()
 
@@ -206,8 +210,10 @@ def update_appointment(appt_id):
 ##################################################
 
 
-# @app.route("/appointments/<int:appt_id>", methods=["DELETE"])
 @appointments_bp.route("/<int:appt_id>", methods=["DELETE"])
+@jwt_required()
+# @authorise_as_admin
+# @authorise_participant
 def delete_appointment(appt_id):
     # create SQL statement
     # SELECT * FROM appointments WHERE ... ?;

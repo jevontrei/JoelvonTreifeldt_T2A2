@@ -16,7 +16,7 @@ Table of Contents
 
 - [Title](#title)
 - [do i need to grant permissions in psql?](#do-i-need-to-grant-permissions-in-psql)
-- [doctor and patient emails must be unique within one type of model, but a doctor can duplicate themselves as a patient with the same email no worries. BUT! that will cause confusion with logging in. how do you know](#doctor-and-patient-emails-must-be-unique-within-one-type-of-model-but-a-doctor-can-duplicate-themselves-as-a-patient-with-the-same-email-no-worries-but-that-will-cause-confusion-with-logging-in-how-do-you-know)
+- [doctor and patient emails must be unique within one type of model, but a doctor can duplicate themselves as a patient with the same email no worries. BUT! that will cause confusion with logging in. how do you know what someone is trying to log in as? use roles?](#doctor-and-patient-emails-must-be-unique-within-one-type-of-model-but-a-doctor-can-duplicate-themselves-as-a-patient-with-the-same-email-no-worries-but-that-will-cause-confusion-with-logging-in-how-do-you-know-what-someone-is-trying-to-log-in-as-use-roles)
     - [R0 - Setup](#r0---setup)
     - [R1 - Explain the problem that this app will solve, and explain how this app solves or addresses the problem.](#r1---explain-the-problem-that-this-app-will-solve-and-explain-how-this-app-solves-or-addresses-the-problem)
     - [R2 - Describe the way tasks are allocated and tracked in your project.](#r2---describe-the-way-tasks-are-allocated-and-tracked-in-your-project)
@@ -34,6 +34,7 @@ Table of Contents
       - [Log model](#log-model)
       - [Relationships: move R6 answers here](#relationships-move-r6-answers-here)
     - [R8 - Explain how to use this application’s API endpoints.](#r8---explain-how-to-use-this-applications-api-endpoints)
+- [header data = auth / bearer token?](#header-data--auth--bearer-token)
       - [patient\_controller.py](#patient_controllerpy)
         - [Example JSON response](#example-json-response)
 - [Design Requirements](#design-requirements)
@@ -311,6 +312,8 @@ Each endpoint should be explained, including the following data for each endpoin
 - Any required body or header data
 - Response / Expected response data
 - Authentication methods where applicable
+
+# header data = auth / bearer token?
 
 <!-- CMP1001-1.4: IDENTIFY AND DESCRIBE the application’s API endpoints.
 
