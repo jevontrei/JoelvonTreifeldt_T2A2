@@ -1,6 +1,7 @@
 from init import db
- 
 from models import Log, log_schema, logs_schema
+from utils import authorise_as_patient_creator
+
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
 from datetime import date
@@ -24,7 +25,6 @@ def get_all_logs():
 
 ############################################
 
-# @app.route("/logs/<int:log_id>")
 @logs_bp.route("/<int:log_id>")
 @jwt_required()
 # @authorise_as_participant
@@ -40,11 +40,9 @@ def get_a_log(log_id):
 
 # FIX THIS!
 # change route to /patients/<int:patient_id>/logs/?
-
-# @app.route("/logs/patients/<int:patient_id>")
 @logs_bp.route("/patients/<int:patient_id>")
 @jwt_required()
-# @authorise_as_participant # just patient? or use @authorise_as_creator
+# @authorise_as_participant # just patient? or use @authorise_as_patient_creator
 def get_patient_logs(patient_id):
     """
     Get all logs for a particular patient
@@ -100,7 +98,7 @@ def get_patient_logs(patient_id):
 
 # @logs_bp.route("/<int:log_id>", methods=["PUT", "PATCH"])
 # @jwt_required()
-# @authorise_as_creator
+# @authorise_as_patient_creator
 # def update_log(log_id):
 #     body_data = request.get_json()
     
@@ -126,21 +124,23 @@ def get_patient_logs(patient_id):
 
 # change route to /patients/<int:patient_id>/logs/?
 
-
+# http://localhost:5000/logs/<int:log_id>
 @logs_bp.route("/<int:log_id>", methods=["DELETE"])
 @jwt_required()
-# @authorise_as_creator
+@authorise_as_patient_creator  # need to pass in log_id?
 def delete_log(log_id):
-    # check for authorisation
+    
     # SELECT * FROM logs WHERE log_id = log_id ... ?;
     stmt = db.select(Log).filter_by(log_id=log_id)
     print(stmt)
 
     log = db.session.scalar(stmt)
+    
     if log:
         db.session.delete(log)
         db.session.commit()
         return jsonify({"message": f"Log {log_id} deleted."})  # , 200
+    
     else:
         return jsonify({"error": f"Log {log_id} not found."}), 404
 

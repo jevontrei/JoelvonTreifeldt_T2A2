@@ -42,7 +42,6 @@ def get_a_doctor(doctor_id):
 
 ##################################################
 
-# @app.route("/doctors/<int:doctor_id>", methods=["PUT", "PATCH"])
 @doctors_bp.route("/<int:doctor_id>", methods=["PUT", "PATCH"])
 @jwt_required()
 def update_doctor(doctor_id):
@@ -71,7 +70,6 @@ def update_doctor(doctor_id):
 
 ##################################################
 
-# @app.route("/doctors/<int:doctor_id>", methods=["DELETE"])
 @doctors_bp.route("/<int:doctor_id>", methods=["DELETE"])
 @jwt_required()
 @authorise_as_admin

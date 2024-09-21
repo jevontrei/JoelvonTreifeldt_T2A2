@@ -69,12 +69,12 @@ def register_user(user_type):
             )
 
             schema = doctor_schema
-            
+
         # hash password separately
         if password:
             user.password = bcrypt.generate_password_hash(
                 password).decode("utf-8")
-            
+
         else:
             return jsonify({"error": "Password required."}), 400
 
@@ -130,7 +130,6 @@ def login_user(user_type):
         user_id = user.patient_id
         schema = patient_schema
 
-
     elif user_type == "doctor":
         stmt = db.select(Doctor).filter_by(email=email)
         user = db.session.scalar(stmt)
@@ -143,24 +142,22 @@ def login_user(user_type):
     # is 'password' a keyword for this function? will this give me issues?:
     if not bcrypt.check_password_hash(user.password, password):
         return jsonify({"error": "Invalid password."}), 401
-            
+
     token = create_access_token(
         identity=str(user_id),
         additional_claims={
             "email": user.email,
             "user_type": user_type,
             "is_admin": user.is_admin
-            },
+        },
         expires_delta=timedelta(days=1)
     )
 
-    response = {
+    return jsonify({
         "email": email,
         "is_admin": user.is_admin,
         "user_type": user_type,
         "token": token
-    }
-
-    return jsonify(response)
+    })
 
     # except ... as ?:

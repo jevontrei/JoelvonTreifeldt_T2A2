@@ -12,10 +12,10 @@ db_commands = Blueprint("db", __name__)
 ##################################################
 
 
-# drop tables
 @db_commands.cli.command("drop")
 def drop_tables():
-    """_summary_
+    """
+    drop all tables
     """
     # delete all tables from the database (even if FK constraints are present? how to do this?)
     db.drop_all()
@@ -25,10 +25,10 @@ def drop_tables():
 ##################################################
 
 
-# create tables
 @db_commands.cli.command("create")
 def create_tables():
-    """_summary_
+    """
+    create all tables
     """
     db.create_all()
     print("Tables created.")
@@ -37,10 +37,10 @@ def create_tables():
 ##################################################
 
 
-# seed tables with patients, doctors, treatments, logs and appointments
 @db_commands.cli.command("seed")
 def seed_tables():
-    """_summary_
+    """
+    seed tables with patients, doctors, treatments, logs and appointments
     """
     
     # seed patients
@@ -139,6 +139,11 @@ def seed_tables():
             patient = patients[3],
             doctor = doctors[2],
             start_date="1923-03-01"
+        ),
+        Treatment(
+            patient = patients[3],
+            doctor = doctors[3],
+            start_date="1823-11-21"
         ),
         Treatment(
             patient = patients[1],
@@ -253,6 +258,11 @@ def seed_tables():
             date = "2222-12-30",
             symptom = "finished antibiotics course; feeling better",
             patient_id = 4
+        ),
+        Log(
+            date = "4442-12-30",
+            symptom = "my Neuralink fell out",
+            patient_id = 1
         ),
         Log(
             date = "2023-12-3",
