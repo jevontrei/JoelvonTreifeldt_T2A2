@@ -38,11 +38,15 @@ def get_a_log(log_id):
 
 ############################################
 
-# FIX THIS!
-# change route to /patients/<int:patient_id>/logs/?
+
+  
+# need an "if not ..." statement here somewhere (done for this one) (and in all other routes) to avoid returning an empty list for e.g. patient_id=9999 
+    
+    
+# http://localhost:5000/logs/patients/<int:patient_id>
 @logs_bp.route("/patients/<int:patient_id>")
 @jwt_required()
-# @authorise_as_participant # just patient? or use @authorise_as_patient_creator
+# @authorise_as_participant
 def get_patient_logs(patient_id):
     """
     Get all logs for a particular patient
@@ -57,39 +61,38 @@ def get_patient_logs(patient_id):
     stmt = db.select(Log).filter_by(patient_id=patient_id)
     print(stmt)
 
+    logs = db.session.scalars(stmt).fetchall()
     
-    # need an if statement here somewhere (and in all other routes) to avoid returning an empty list for e.g. patient_id=9999 
-    
-    
-    logs = db.session.scalars(stmt)
+    # guard clause
+    if not logs:
+        return jsonify({"message": f"No logs found for patient {patient_id}."}), 404
     
     return logs_schema.dump(logs)
 
 ############################################
 
-# NEED TO FIX THIS! CHANGE ROUTE
-# @logs_bp.route("/patients/<int:patient_id>/logs/", methods=["POST"])
-# @jwt_required()
-# def create_log(patient_id):
-#     body_data = request.get_json()
+@logs_bp.route("/patients/<int:patient_id>/", methods=["POST"])
+@jwt_required()
+def create_log(patient_id):
+    body_data = request.get_json()
     
-#     # remember to validate input!
-#     # define new instance of Log class
-#     log = Log(
-#         date=body_data.get("date") or date.today(),
-#         symptom=body_data.get("symptom"),
-#         duration=body_data.get("duration"),
-#         severity=body_data.get("severity"),
+    # remember to validate input!
+    # define new instance of Log class
+    log = Log(
+        date=body_data.get("date") or date.today(),
+        symptom=body_data.get("symptom"),
+        duration=body_data.get("duration"),
+        severity=body_data.get("severity"),
         
-#         # validate this!
-#         # change this to match create_app()... change route, incl in Insomnia
-#         patient_id=patient_id
-#     )
+        # validate this!
+        # change this to match create_app()... change route, incl in Insomnia
+        patient_id=patient_id
+    )
 
-#     db.session.add(log)
-#     db.session.commit()
+    db.session.add(log)
+    db.session.commit()
 
-#     return log_schema.dump(log), 201
+    return log_schema.dump(log), 201
 
 ############################################
 
