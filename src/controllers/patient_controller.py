@@ -120,3 +120,33 @@ def delete_patient(patient_id):
     db.session.commit()
     
     return jsonify({"message": f"Patient {patient_id} deleted."})
+
+
+#####################################################
+
+# CHANGE THIS ROUTE TO BE NESTED
+# http://localhost:5000/patients/<int:patient_id>/treatments/
+
+@treatments_bp.route("/patients/<int:patient_id>")
+@jwt_required()
+# justify why i chose this particular auth decorator
+@authorise_as_admin
+def get_patient_treatments(patient_id):
+    """
+    Get all treatment details for a particular patient
+
+    Args:
+        patient_id (_type_): _description_
+    """
+    # create SQL statement
+    # SELECT * FROM treatments WHERE patient_id=patient_id ...?
+    stmt = db.select(Treatment).filter_by(patient_id=patient_id)#.order_by()
+    print(stmt)
+    
+    treatments = db.session.scalars(stmt).fetchall()
+    
+    # guard clause
+    if not treatments:
+        return jsonify({"error": f"No treatments found for patient {patient_id}."}), 404
+    
+    return treatments_schema.dump(treatments)

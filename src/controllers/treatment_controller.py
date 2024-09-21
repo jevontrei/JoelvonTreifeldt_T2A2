@@ -68,63 +68,8 @@ def get_a_treatment(treatment_id):
     
     return treatment_schema.dump(treatment)
 
-#####################################################
 
-# http://localhost:5000/treatments/patients/<int:patient_id>
-# is this URL backwards?
-@treatments_bp.route("/patients/<int:patient_id>")
-@jwt_required()
-# justify why i chose this particular auth decorator
-@authorise_as_admin
-def get_patient_treatments(patient_id):
-    """
-    Get all treatment details for a particular patient
 
-    Args:
-        patient_id (_type_): _description_
-    """
-    # create SQL statement
-    # SELECT * FROM treatments WHERE patient_id=patient_id ...?
-    stmt = db.select(Treatment).filter_by(patient_id=patient_id)#.order_by()
-    print(stmt)
-    
-    treatments = db.session.scalars(stmt).fetchall()
-    
-    # guard clause
-    if not treatments:
-        return jsonify({"error": f"No treatments found for patient {patient_id}."}), 404
-    
-    return treatments_schema.dump(treatments)
-
-#####################################################
-
-# http://localhost:5000/treatments/doctors/<int:doctor_id>
-# is this URL backwards?
-@treatments_bp.route("/doctors/<int:doctor_id>")
-@jwt_required()
-# justify why i chose this particular auth decorator
-@authorise_as_admin
-def get_doctor_treatments(doctor_id):
-    """
-    Get all treatment details for a particular doctor
-
-    Args:
-        doctor_id (_type_): _description_
-    """
-    # create SQL statement
-    # SELECT * FROM treatments WHERE doctor_id=doctor_id ...?
-    
-    stmt = db.select(Treatment).filter_by(doctor_id=doctor_id)#.order_by()
-    print(stmt)
-
-    # need to use .fetchall() for scalars plural (write this comment everywhere, and remove fetchall() from any singular ones?!)
-    treatments = db.session.scalars(stmt).fetchall()
-    
-    # guard clause
-    if not treatments:
-        return jsonify({"error": f"No treatments found for doctor {doctor_id}."}), 404
-    
-    return treatments_schema.dump(treatments)
 
 #####################################################
 
