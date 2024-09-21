@@ -1,5 +1,6 @@
 from init import db
 from models import Treatment, treatment_schema, treatments_schema
+from models.appointments import Appointment, appointment_schema
 from utils import authorise_as_admin
 
 from flask import Blueprint, request, jsonify
@@ -7,69 +8,9 @@ from flask_jwt_extended import jwt_required
 
 # TO DO: verify that end date is AFTER start date?!
 
-
 #####################################################
 
 treatments_bp = Blueprint("treatments", __name__, url_prefix="/treatments")
-
-#####################################################
-
-# http://localhost:5000/treatments/
-@treatments_bp.route("/")
-@jwt_required()
-# justify why i chose this particular auth decorator
-@authorise_as_admin
-def get_all_treatments():
-    """
-    Get all treatments
-
-    Returns:
-        _type_: _description_
-    """
-    # create SQL statement
-    # SELECT * FROM treatments;
-    stmt = db.select(Treatment)#.order_by()
-    print(stmt)
-
-    # execute statement, store in an iterable object
-    treatments = db.session.scalars(stmt)
-    
-    # serialise object to JSON, return it
-    return treatments_schema.dump(treatments)
-
-
-#####################################################
-
-# http://localhost:5000/treatments/<int:treatment_id>
-@treatments_bp.route("/<int:treatment_id>")
-@jwt_required()
-# justify why i chose this particular auth decorator
-@authorise_as_admin
-def get_a_treatment(treatment_id):
-    """
-    Get a specific treatment using the id
-
-    Args:
-        treatment_id (_type_): _description_
-
-    Returns:
-        _type_: _description_
-    """
-    # create SQL statement
-    # SELECT * FROM treatments WHERE treatment_id=treatment_id ... ?;
-    stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
-    print(stmt)
-    
-    treatment = db.session.scalar(stmt)
-    
-    # guard clause
-    if not treatment:
-        return jsonify({"error": f"Treatment {treatment_id} not found."}), 404
-    
-    return treatment_schema.dump(treatment)
-
-
-
 
 #####################################################
 
@@ -103,6 +44,96 @@ def create_treatment():
 
     return treatment_schema.dump(treatment), 201
 
+##################################################
+
+# @appointments_bp.route("/", methods=["POST"])
+@treatments_bp.route("/<int:treatment_id>/appointments/", methods=["POST"])
+@jwt_required()
+def create_appointment(treatment_id):
+    # try:
+    body_data = request.get_json()
+    
+    # remember to validate input!
+    # define new instance of Appointment class
+    appointment = Appointment(
+        datetime=body_data.get("datetime"),
+        # datetime=body_data["datetime"],  # use this version instead? does it matter?
+        
+        place=body_data.get("place"),
+        # place=body_data["place"],
+        
+        cost=body_data.get("cost"),
+        # cost=body_data["cost"],
+        
+        status=body_data.get("status"),
+        # status=body_data["status"],
+        
+        # validate this! check it exists. with a guard clause?
+        treatment_id=body_data.get("treatment_id")
+        # treatment_id=body_data["treatment_id"]
+    )
+    
+    db.session.add(appointment)
+    db.session.commit()
+    
+    return appointment_schema.dump(appointment), 201
+    # except IntegrityError?:
+
+#####################################################
+
+# http://localhost:5000/treatments/
+@treatments_bp.route("/")
+@jwt_required()
+# justify why i chose this particular auth decorator
+@authorise_as_admin
+def get_all_treatments():
+    """
+    Get all treatments
+
+    Returns:
+        _type_: _description_
+    """
+    # create SQL statement
+    # SELECT * FROM treatments;
+    stmt = db.select(Treatment)#.order_by()
+    print(stmt)
+
+    # execute statement, store in an iterable object
+    treatments = db.session.scalars(stmt)
+    
+    # serialise object to JSON, return it
+    return treatments_schema.dump(treatments)
+
+#####################################################
+
+# http://localhost:5000/treatments/<int:treatment_id>
+@treatments_bp.route("/<int:treatment_id>")
+@jwt_required()
+# justify why i chose this particular auth decorator
+@authorise_as_admin
+def get_a_treatment(treatment_id):
+    """
+    Get a specific treatment using the id
+
+    Args:
+        treatment_id (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    # create SQL statement
+    # SELECT * FROM treatments WHERE treatment_id=treatment_id ... ?;
+    stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
+    print(stmt)
+    
+    treatment = db.session.scalar(stmt)
+    
+    # guard clause
+    if not treatment:
+        return jsonify({"error": f"Treatment {treatment_id} not found."}), 404
+    
+    return treatment_schema.dump(treatment)
+
 #####################################################
 
 # http://localhost:5000/treatments/<int:treatment_id>
@@ -135,8 +166,7 @@ def update_treatment(treatment_id):
     db.session.commit()
     
     return treatment_schema.dump(treatment)
-    
-    
+
 #####################################################
 
 # http://localhost:5000/treatments/<int:treatment_id>

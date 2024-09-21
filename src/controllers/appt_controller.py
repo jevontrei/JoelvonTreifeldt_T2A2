@@ -6,7 +6,6 @@ from flask import request, jsonify, Blueprint
 from flask_jwt_extended import jwt_required
 from sqlalchemy.exc import IntegrityError
 
-
 ##################################################
 
 # create blueprint with url prefix
@@ -37,7 +36,6 @@ def get_all_appointments():
     # serialise and return
     return appointments_schema.dump(appointments)
 
-
 ##################################################
 
 # http://localhost:5000/appointments/<int:appt_id>
@@ -67,121 +65,6 @@ def get_an_appointment(appt_id):
             }), 404
     
     return appointment_schema.dump(appointment)
-
-
-##################################################
-
-
-@appointments_bp.route("/patients/<int:patient_id>")
-# @jwt_required()
-def get_patient_appointments(patient_id):
-    """
-    Get all appointments for a particular patient
-
-    Args:
-        patient_id (_type_): _description_
-
-    Returns:
-        JSON: a list of appointments for the given patient
-    """
-    
-    # create SQL statement
-
-    # SELECT appointments.appt_id, appointments.datetime, appointments.place, appointments.cost, appointments.status, appointments.treatment_id 
-    # FROM appointments JOIN treatments ON treatments.treatment_id = appointments.treatment_id 
-    # WHERE treatments.patient_id = :patient_id_1
-    
-    stmt = db.select(Appointment).join(Treatment).filter(
-        Treatment.patient_id == patient_id
-        )#.order_by()
-
-    # print(stmt)
-    
-    # execute SQL statement using scalars(), and return a list of scalar values with fetchall()
-    appointments = db.session.scalars(stmt).fetchall()
-    
-    # guard clause
-    if not appointments:
-        return jsonify({"error": f"No appointments found for patient {patient_id}."}), 404
-
-    # serialise and return
-    return appointments_schema.dump(appointments)
-
-
-##################################################
-
-
-@appointments_bp.route("/doctors/<int:doctor_id>")
-# @jwt_required()
-def get_doctor_appointments(doctor_id):
-    """
-    Get all appointments for a particular doctor
-
-    Args:
-        doctor_id (_type_): _description_
-
-    Returns:
-        JSON: a list of appointments for the given doctor
-    """
-    
-    # create SQL statement
-
-    # SELECT appointments.appt_id, appointments.datetime, appointments.place, appointments.cost, appointments.status, appointments.treatment_id 
-    # FROM appointments JOIN treatments ON treatments.treatment_id = appointments.treatment_id 
-    # WHERE treatments.doctor_id = :doctor_id_1
-
-    stmt = db.select(Appointment).join(Treatment).filter(
-        Treatment.doctor_id==doctor_id
-        )#.order_by()
-
-    # print(stmt)
-    
-    # execute SQL statement using scalars()
-    # use fetchall() to return scalar values, which avoids returning an empty list for queries for nonexistent doctors (e.g. doctor_id=9999)
-    appointments = db.session.scalars(stmt).fetchall()
-
-    # guard clause
-    if not appointments:
-        return jsonify({"error": f"No appointments found for doctor {doctor_id}."}), 404
-
-    # serialise and return
-    return appointments_schema.dump(appointments)
-
-
-##################################################
-
-
-@appointments_bp.route("/", methods=["POST"])
-@jwt_required()
-def create_appointment():
-    # try:
-    body_data = request.get_json()
-    
-    # remember to validate input!
-    # define new instance of Appointment class
-    appointment = Appointment(
-        datetime=body_data.get("datetime"),
-        # datetime=body_data["datetime"],  # use this version instead? does it matter?
-        
-        place=body_data.get("place"),
-        # place=body_data["place"],
-        
-        cost=body_data.get("cost"),
-        # cost=body_data["cost"],
-        
-        status=body_data.get("status"),
-        # status=body_data["status"],
-        
-        # validate this! check it exists. with a guard clause?
-        treatment_id=body_data.get("treatment_id")
-        # treatment_id=body_data["treatment_id"]
-    )
-    
-    db.session.add(appointment)
-    db.session.commit()
-    
-    return appointment_schema.dump(appointment), 201
-    # except IntegrityError?:
 
 ##################################################
 

@@ -1,8 +1,7 @@
 from init import db, bcrypt
- 
 from models import Patient, Doctor, Treatment, Appointment, Log
-from flask import Blueprint
 
+from flask import Blueprint
 
 ##################################################
 
@@ -10,7 +9,6 @@ from flask import Blueprint
 db_commands = Blueprint("db", __name__)
 
 ##################################################
-
 
 @db_commands.cli.command("drop")
 def drop_tables():
@@ -21,9 +19,7 @@ def drop_tables():
     db.drop_all()
     print("Tables dropped.")
 
-
 ##################################################
-
 
 @db_commands.cli.command("create")
 def create_tables():
@@ -33,9 +29,7 @@ def create_tables():
     db.create_all()
     print("Tables created.")
 
-
 ##################################################
-
 
 @db_commands.cli.command("seed")
 def seed_tables():
@@ -81,7 +75,6 @@ def seed_tables():
     db.session.add_all(patients)
     db.session.commit()
 
-
     # seed doctors
     doctors = [
         Doctor(
@@ -121,7 +114,6 @@ def seed_tables():
     db.session.add_all(doctors)
     db.session.commit()
 
-
     # seed treatments
     treatments = [
         Treatment(
@@ -156,7 +148,6 @@ def seed_tables():
     # add seeded treatments to database session and commit
     db.session.add_all(treatments)
     db.session.commit()
-
 
     # seed appointments
     appointments = [
@@ -226,8 +217,6 @@ def seed_tables():
     db.session.add_all(appointments)
     db.session.commit()
     
-
-    
     # seed logs
     logs = [
         Log(
@@ -267,14 +256,9 @@ def seed_tables():
         )
     ]
     
-
     # add seeded logs to database session and commit
     db.session.add_all(logs)
     db.session.commit()
-    
 
     # print success message
     print("Tables seeded.")
-
-##################################################
-

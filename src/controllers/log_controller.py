@@ -15,6 +15,42 @@ logs_bp = Blueprint("logs", __name__, url_prefix="/patients/<int:patient_id>/log
 ############################################
 
 # http://localhost:5000/patients/<int:patient_id>/logs/
+@logs_bp.route("/", methods=["POST"])
+@jwt_required()
+def create_log(patient_id):
+    """Create a new patient log
+
+    Args:
+        patient_id (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    try:
+        body_data = request.get_json()
+        
+        # remember to validate input!
+        # define new instance of Log class
+        log = Log(
+            date=body_data.get("date") or date.today(),
+            notes=body_data.get("notes"),
+            
+            # validate this!
+            # change this to match create_app()... change route, incl in Insomnia
+            patient_id=patient_id
+        )
+
+        db.session.add(log)
+        db.session.commit()
+
+        return log_schema.dump(log), 201
+    
+    except IntegrityError as e:
+        return jsonify({"error": f"Patient id {patient_id} not found."}), 404
+
+############################################
+
+# http://localhost:5000/patients/<int:patient_id>/logs/
 @logs_bp.route("/")
 @jwt_required()
 # justify deco choice
@@ -79,42 +115,6 @@ def get_a_log(patient_id, log_id):
         return jsonify({"error": f"Patient {patient_id} or log {log_id} not found."}), 404
     
     return log_schema.dump(log)
-
-############################################
-
-# http://localhost:5000/patients/<int:patient_id>/logs/
-@logs_bp.route("/", methods=["POST"])
-@jwt_required()
-def create_log(patient_id):
-    """Create a new patient log
-
-    Args:
-        patient_id (_type_): _description_
-
-    Returns:
-        _type_: _description_
-    """
-    try:
-        body_data = request.get_json()
-        
-        # remember to validate input!
-        # define new instance of Log class
-        log = Log(
-            date=body_data.get("date") or date.today(),
-            notes=body_data.get("notes"),
-            
-            # validate this!
-            # change this to match create_app()... change route, incl in Insomnia
-            patient_id=patient_id
-        )
-
-        db.session.add(log)
-        db.session.commit()
-
-        return log_schema.dump(log), 201
-    
-    except IntegrityError as e:
-        return jsonify({"error": f"Patient id {patient_id} not found."}), 404
 
 ############################################
 

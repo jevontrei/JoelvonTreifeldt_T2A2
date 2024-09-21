@@ -24,8 +24,6 @@ auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 ###########################################################################
 
 # http://localhost:5000/auth/register/<user_type>
-
-
 @auth_bp.route("/register/<user_type>", methods=["POST"])
 def register_user(user_type):
     try:
@@ -104,8 +102,6 @@ def register_user(user_type):
 # doctor and patient emails must be unique within one type of model, but a doctor can duplicate themselves as a patient with the same email no worries. BUT! that will cause confusion with logging in. how do you know what someone is trying to log in as? use roles?
 
 # http://localhost:5000/auth/login/<user_type>
-
-
 @auth_bp.route("/login/<user_type>", methods=["POST"])
 def login_user(user_type):
     # try:
