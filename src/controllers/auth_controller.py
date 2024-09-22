@@ -38,7 +38,7 @@ def register_user(user_type):
         _type_: _description_
     """
 
-    # guard clause to escape function early if user type is invalid
+    # Guard clause to escape function early if user type is invalid
     if user_type not in ["patient", "doctor"]:
         return jsonify(
             {
@@ -58,7 +58,7 @@ def register_user(user_type):
             user = Doctor(**body_data)
             schema = doctor_schema
 
-        # guard clause
+        # Guard clause
         password = body_data.get("password")  # use .pop() instead for security?
         if not password:
             return jsonify({"error": "Password required."}), 400
@@ -134,32 +134,39 @@ def login_user(user_type):
     email = body_data.get("email")
     password = body_data.get("password")  # use .pop() instead for security?
 
-    # guard clause
+    # Guard clause
     if not email or not password:
         return jsonify({"error": "Email and password required."}), 400
 
     if user_type == "patient":
-        # create SQL statement
+        
+        # Create SQLAlchemy query statement
+        
         # SELECT ...
+        
         stmt = db.select(Patient).filter_by(email=email)
         user = db.session.scalar(stmt)
         user_id = user.patient_id
         schema = patient_schema
 
     elif user_type == "doctor":
-        # create SQL statement
+        
+        # Create SQLAlchemy query statement
+        
         # SELECT ...
+        # ;
+        
         stmt = db.select(Doctor).filter_by(email=email)
         user = db.session.scalar(stmt)
         user_id = user.doctor_id
         schema = doctor_schema
 
-    # guard clause
+    # Guard clause
     if not user:
         return jsonify({"error": f"User account '{email}' not found. Please register user or initialise database."}), 404
 
     # is 'password' a keyword for this function? will this give me issues?:
-    # guard clause
+    # Guard clause
     if not bcrypt.check_password_hash(user.password, password):
         return jsonify({"error": "Invalid password."}), 401
 

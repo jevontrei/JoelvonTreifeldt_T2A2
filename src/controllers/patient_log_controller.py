@@ -9,7 +9,7 @@ from datetime import date
 
 ############################################
 
-# create blueprint with url prefix
+# Create blueprint with URL prefix
 # all logs (child) are located under the patient (parent) resource
 logs_bp = Blueprint("logs", __name__, url_prefix="/patients/<int:patient_id>/logs")
 
@@ -19,7 +19,7 @@ logs_bp = Blueprint("logs", __name__, url_prefix="/patients/<int:patient_id>/log
 @logs_bp.route("/", methods=["POST"])
 @jwt_required()
 def create_log(patient_id):
-    """Create a new patient log
+    """Create a new patient log.
 
     Args:
         patient_id (_type_): _description_
@@ -58,7 +58,7 @@ def create_log(patient_id):
 # @authorise_as_patient_creator
 # @authorise_as_participant
 def get_patient_logs(patient_id):
-    """Get all logs for a particular patient
+    """Get all logs for a particular patient.
 
     Args:
         patient_id (_type_): _description_
@@ -66,18 +66,19 @@ def get_patient_logs(patient_id):
     Returns:
         _type_: _description_
     """
-    # create SQL statement
+    
+    # Create SQLAlchemy query statement
 
     # stmt: SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
     # FROM logs 
-    # WHERE logs.patient_id = :patient_id_1
+    # WHERE logs.patient_id = :patient_id_1;
 
     stmt = db.select(Log).filter_by(patient_id=patient_id)#.order_by()
 
     # defs need fetchall() here?
     logs = db.session.scalars(stmt).fetchall()
     
-    # guard clause
+    # Guard clause
     if not logs:
         return jsonify({"error": f"Patient {patient_id} not found, or they have no logs."}), 404
     
@@ -91,7 +92,7 @@ def get_patient_logs(patient_id):
 # justify this decorator auth choice
 # @authorise_as_participant
 def get_a_log(patient_id, log_id):
-    """Get a particular log
+    """Get a particular log.
 
     Args:
         patient_id (_type_): _description_
@@ -101,17 +102,18 @@ def get_a_log(patient_id, log_id):
         _type_: _description_
     """
 
-    # create SQL statement
+    # Create SQLAlchemy query statement
 
     # SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
     # FROM logs 
-    # WHERE logs.patient_id = :patient_id_1 AND logs.log_id = :log_id_1
+    # WHERE logs.patient_id = :patient_id_1 
+    # AND logs.log_id = :log_id_1;
 
     stmt = db.select(Log).filter_by(patient_id=patient_id, log_id=log_id)
 
     log = db.session.scalar(stmt)
     
-    # guard clause
+    # Guard clause
     if not log:
         return jsonify({"error": f"Patient {patient_id} or log {log_id} not found."}), 404
     
@@ -124,7 +126,7 @@ def get_a_log(patient_id, log_id):
 @jwt_required()
 # @authorise_as_patient_creator
 def update_log(patient_id, log_id):
-    """Edit a log
+    """Edit a log.
 
     Args:
         patient_id (_type_): _description_
@@ -136,17 +138,18 @@ def update_log(patient_id, log_id):
     # fetch content of request
     body_data = request.get_json()
     
-    # create SQL statement
+    # Create SQLAlchemy query statement
     
     # SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
     # FROM logs 
-    # WHERE logs.patient_id = :patient_id_1 AND logs.log_id = :log_id_1
+    # WHERE logs.patient_id = :patient_id_1 
+    # AND logs.log_id = :log_id_1;
     
     stmt = db.select(Log).filter_by(patient_id=patient_id, log_id=log_id)
     
     log = db.session.scalar(stmt)
     
-    # guard clause
+    # Guard clause
     if not log:
         return jsonify({"error": f"Patient {patient_id} or log {log_id} not found."}), 404
         
@@ -164,7 +167,7 @@ def update_log(patient_id, log_id):
 # FIX THIS DECO?!:
 # @authorise_as_patient_creator  # need to pass in log_id?
 def delete_log(patient_id, log_id):
-    """Delete a log
+    """Delete a log.
 
     Args:
         log_id (_type_): _description_
@@ -172,17 +175,19 @@ def delete_log(patient_id, log_id):
     Returns:
         _type_: _description_
     """
-    # create SQL statement
+    
+    # Create SQLAlchemy query statement
 
     # SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
     # FROM logs 
-    # WHERE logs.patient_id = :patient_id_1 AND logs.log_id = :log_id_1
+    # WHERE logs.patient_id = :patient_id_1 
+    # AND logs.log_id = :log_id_1;
 
     stmt = db.select(Log).filter_by(patient_id=patient_id, log_id=log_id)
 
     log = db.session.scalar(stmt)
 
-    # guard clause
+    # Guard clause
     if not log:
         return jsonify({"error": f"Patient {patient_id} or log {log_id} not found."}), 404
 

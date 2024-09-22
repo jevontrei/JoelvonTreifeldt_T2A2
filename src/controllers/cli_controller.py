@@ -6,7 +6,7 @@ from flask import Blueprint
 ##################################################
 
 # change this, remove "db", save time typing?!
-# create blueprint with url prefix
+# Create blueprint with URL prefix
 db_commands = Blueprint("db", __name__)
 
 ##################################################

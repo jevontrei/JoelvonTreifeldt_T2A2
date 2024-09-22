@@ -11,7 +11,7 @@ from flask_jwt_extended import jwt_required
 
 #####################################################
 
-# create blueprint with url prefix
+# Create blueprint with URL prefix
 treatments_bp = Blueprint("treatments", __name__, url_prefix="/treatments")
 
 #####################################################
@@ -105,7 +105,7 @@ def get_treatment_appointments(treatment_id):
         _type_: _description_
     """
 
-    # create SQL statement
+    # Create SQLAlchemy query statement
     
     # SELECT appointments.appt_id, appointments.datetime, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 
     # FROM appointments 
@@ -130,15 +130,17 @@ def get_treatment_appointments(treatment_id):
 # justify why i chose this particular auth decorator
 @authorise_as_admin
 def get_all_treatments():
-    """
-    Get all treatments
+    """Get all treatments
 
     Returns:
         _type_: _description_
     """
-    # create SQL statement
     
-    # SELECT * FROM treatments;
+    # Create SQLAlchemy query statement
+    
+    # SELECT * 
+    # FROM treatments
+    # ;
     
     stmt = db.select(Treatment)#.order_by()
     print()
@@ -158,8 +160,7 @@ def get_all_treatments():
 # justify why i chose this particular auth decorator
 @authorise_as_admin
 def get_a_treatment(treatment_id):
-    """
-    Get a specific treatment using the id
+    """Get a specific treatment using the id
 
     Args:
         treatment_id (_type_): _description_
@@ -167,9 +168,13 @@ def get_a_treatment(treatment_id):
     Returns:
         _type_: _description_
     """
-    # create SQL statement
     
-    # SELECT * FROM treatments WHERE treatment_id=treatment_id ... ?;
+    # Create SQLAlchemy query statement
+    
+    # SELECT * 
+    # FROM treatments 
+    # WHERE treatment_id=treatment_id ... ?
+    # ;
     
     stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
     print()
@@ -177,7 +182,7 @@ def get_a_treatment(treatment_id):
     
     treatment = db.session.scalar(stmt)
     
-    # guard clause
+    # Guard clause
     if not treatment:
         return jsonify({"error": f"Treatment {treatment_id} not found."}), 404
     
@@ -203,9 +208,12 @@ def update_treatment(treatment_id):
     
     body_data = request.get_json()
     
-    # create SQL statement
+    # Create SQLAlchemy query statement
     
-    # SELECT * FROM treatments WHERE treatment_id = treatment_id ... ?;
+    # SELECT * 
+    # FROM treatments 
+    # WHERE treatment_id = treatment_id ... ?
+    # ;
     
     stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
     print()
@@ -214,7 +222,7 @@ def update_treatment(treatment_id):
     # execute ...
     treatment = db.session.scalar(stmt)
     
-    # guard clause
+    # Guard clause
     if not treatment:
         return jsonify({"error": f"Treatment {treatment_id} not found."}), 404
     
@@ -244,9 +252,11 @@ def delete_treatment(treatment_id):
         _type_: _description_
     """
     
-    # create SQL statement
+    # Create SQLAlchemy query statement
     
-    # SELECT ?;
+    # SELECT ?
+    # FROM
+    # ;
     
     stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
     print()
@@ -255,7 +265,7 @@ def delete_treatment(treatment_id):
     # execute statement and ...
     treatment = db.session.scalar(stmt)
     
-    # guard clause
+    # Guard clause
     if not treatment:
         return jsonify({"error": f"Treatment {treatment_id} not found."}), 404
         

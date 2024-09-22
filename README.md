@@ -3,8 +3,6 @@
 Joel von Treifeldt
 Student no. 15517
 
-# do i need to grant permissions in psql?
-
 # doctor and patient emails must be unique within one type of model, but a doctor can duplicate themselves as a patient with the same email no worries. BUT! that will cause confusion with logging in. how do you know what someone is trying to log in as? use roles?
 
 Note:
@@ -15,7 +13,6 @@ Note:
 Table of Contents
 
 - [Title](#title)
-- [do i need to grant permissions in psql?](#do-i-need-to-grant-permissions-in-psql)
 - [doctor and patient emails must be unique within one type of model, but a doctor can duplicate themselves as a patient with the same email no worries. BUT! that will cause confusion with logging in. how do you know what someone is trying to log in as? use roles?](#doctor-and-patient-emails-must-be-unique-within-one-type-of-model-but-a-doctor-can-duplicate-themselves-as-a-patient-with-the-same-email-no-worries-but-that-will-cause-confusion-with-logging-in-how-do-you-know-what-someone-is-trying-to-log-in-as-use-roles)
     - [R0 - Setup](#r0---setup)
     - [R1 - Explain the problem that this app will solve, and explain how this app solves or addresses the problem.](#r1---explain-the-problem-that-this-app-will-solve-and-explain-how-this-app-solves-or-addresses-the-problem)
@@ -48,11 +45,17 @@ Table of Contents
 
 ### R0 - Setup
 
-.
+- need to write about creating `medical` database manually in psql?
+  - creating tables?
+  - users?
+  - granting permissions?
+- activate venv
 
 ```sh
 pip install -r requirements.txt
 ```
+
+- run `flask run` or `flask run --debug` to run server
 
 ### R1 - Explain the problem that this app will solve, and explain how this app solves or addresses the problem.
 
@@ -111,7 +114,7 @@ The description provided is DETAILED, and the description details ALL of the ser
   - flask_jwt_extended:
   - JWT Manager?
   - flask_bcrypt:
-  - python-dotenv:
+  - python-dotenv: for loading environment variables into the Flask app
   - datetime:
 - Insomnia: API client for
 - PostgreSQL: DBMS for

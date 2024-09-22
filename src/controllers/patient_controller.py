@@ -7,7 +7,7 @@ from flask_jwt_extended import jwt_required
 
 ##################################################
 
-# create blueprint with url prefix
+# Create blueprint with URL prefix
 patients_bp = Blueprint("patients", __name__, url_prefix="/patients")
 
 ##################################################
@@ -22,10 +22,12 @@ def get_all_patients():
     Returns:
         _type_: _description_
     """
-    # create SQL statement
+    
+    # Create SQLAlchemy query statement
     
     # SELECT patients.patient_id, patients.name, patients.email, patients.password, patients.dob, patients.sex, patients.is_admin 
-    # FROM patients ORDER BY patients.name
+    # FROM patients 
+    # ORDER BY patients.name;
     
     stmt = db.select(Patient).order_by(Patient.name)
     # print(stmt)
@@ -48,11 +50,12 @@ def get_a_patient(patient_id):
     Returns:
         _type_: _description_
     """
-    # create SQL statement
+    
+    # Create SQLAlchemy query statement
 
     # SELECT patients.patient_id, patients.name, patients.email, patients.password, patients.dob, patients.sex, patients.is_admin 
     # FROM patients 
-    # WHERE patients.patient_id = :patient_id_1
+    # WHERE patients.patient_id = :patient_id_1;
 
     stmt = db.select(Patient).filter_by(patient_id=patient_id)
     # print(stmt)
@@ -61,7 +64,7 @@ def get_a_patient(patient_id):
     
     # NEED to prevent empty {} being returned for if not patient!... fetchall()? as well as guard clause? idk. maybe fetchall() doesn't apply for singular scalar
     
-    # guard clause
+    # Guard clause
     if not patient:
         return jsonify({"error": f"Patient {patient_id} not found."}), 404
     
@@ -73,8 +76,7 @@ def get_a_patient(patient_id):
 @patients_bp.route("/<int:patient_id>/appointments/")
 @jwt_required()
 def get_patient_appointments(patient_id):
-    """
-    Get all appointments for a particular patient
+    """Get all appointments for a particular patient
 
     Args:
         patient_id (_type_): _description_
@@ -83,11 +85,13 @@ def get_patient_appointments(patient_id):
         JSON: a list of appointments for the given patient
     """
     
-    # create SQL statement
+    # Create SQLAlchemy query statement
 
     # SELECT appointments.appt_id, appointments.datetime, appointments.place, appointments.cost, appointments.status, appointments.treatment_id 
-    # FROM appointments JOIN treatments ON treatments.treatment_id = appointments.treatment_id 
-    # WHERE treatments.patient_id = :patient_id_1
+    # FROM appointments 
+    # JOIN treatments 
+    # ON treatments.treatment_id = appointments.treatment_id 
+    # WHERE treatments.patient_id = :patient_id_1;
     
     stmt = db.select(Appointment).join(Treatment).filter(
         Treatment.patient_id == patient_id
@@ -98,7 +102,7 @@ def get_patient_appointments(patient_id):
     # execute SQL statement using scalars(), and return a list of scalar values with fetchall()
     appointments = db.session.scalars(stmt).fetchall()
     
-    # guard clause
+    # Guard clause
     if not appointments:
         return jsonify({"error": f"No appointments found for patient {patient_id}."}), 404
 
@@ -113,24 +117,24 @@ def get_patient_appointments(patient_id):
 # justify why i chose this particular auth decorator
 @authorise_as_admin
 def get_patient_treatments(patient_id):
-    """
-    Get all treatment details for a particular patient
+    """Get all treatment details for a particular patient
 
     Args:
         patient_id (_type_): _description_
     """
-    # create SQL statement
+    
+    # Create SQLAlchemy query statement
 
     # SELECT treatments.treatment_id, treatments.start_date, treatments.end_date, treatments.patient_id, treatments.doctor_id 
     # FROM treatments 
-    # WHERE treatments.patient_id = :patient_id_1
+    # WHERE treatments.patient_id = :patient_id_1;
 
     stmt = db.select(Treatment).filter_by(patient_id=patient_id)#.order_by()
     
     # need to use .fetchall() for scalars plural (write this comment everywhere, and remove fetchall() from any singular ones?!)
     treatments = db.session.scalars(stmt).fetchall()
     
-    # guard clause
+    # Guard clause
     if not treatments:
         return jsonify({"error": f"No treatments found for patient {patient_id}."}), 404
     
@@ -153,18 +157,18 @@ def update_patient(patient_id):
     # fetch ...
     body_data = request.get_json()
     
-    # create SQL statement
+    # Create SQLAlchemy query statement
     
     # SELECT patients.patient_id, patients.name, patients.email, patients.password, patients.dob, patients.sex, patients.is_admin 
     # FROM patients 
-    # WHERE patients.patient_id = :patient_id_1
+    # WHERE patients.patient_id = :patient_id_1;
     
     stmt = db.select(Patient).filter_by(patient_id=patient_id)
     # print(stmt)
 
     patient = db.session.scalar(stmt)
     
-    # guard clause
+    # Guard clause
     if not patient:
         return jsonify({"error": f"Patient {patient_id} not found."}), 404
     
@@ -195,18 +199,18 @@ def delete_patient(patient_id):
         _type_: _description_
     """
     
-    # create SQL statement
+    # Create SQLAlchemy query statement
 
     # SELECT patients.patient_id, patients.name, patients.email, patients.password, patients.dob, patients.sex, patients.is_admin 
     # FROM patients 
-    # WHERE patients.patient_id = :patient_id_1
+    # WHERE patients.patient_id = :patient_id_1;
 
     stmt = db.select(Patient).filter_by(patient_id=patient_id)
     # print(stmt)
 
     patient = db.session.scalar(stmt)
     
-    # guard clause
+    # Guard clause
     if not patient:
         return jsonify({"error": f"Patient {patient_id} not found."}), 404
     
