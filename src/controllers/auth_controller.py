@@ -10,16 +10,18 @@
 from datetime import timedelta
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
+from marshmallow.exceptions import ValidationError
 
 from init import db, bcrypt
-from models import Patient, patient_schema, Doctor, doctor_schema
+from models import Patient, PatientSchema, patient_schema, Doctor, DoctorSchema, doctor_schema
 
-from sqlalchemy.exc import IntegrityError
+
+from sqlalchemy.exc import IntegrityError, DataError
 from psycopg2 import errorcodes
 
 ###########################################################################
 
-# create blueprint with url prefix
+# create auth blueprint with url prefix
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 ###########################################################################
@@ -27,52 +29,40 @@ auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 # http://localhost:5000/auth/register/<user_type>
 @auth_bp.route("/register/<user_type>", methods=["POST"])
 def register_user(user_type):
+    """_summary_
+
+    Args:
+        user_type (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
+    # guard clause to escape function early if user type is invalid
+    if user_type not in ["patient", "doctor"]:
+        return jsonify(
+            {
+                "error": f"User type '{user_type}' not valid. URL must include '/auth/register/patient' or '/auth/register/doctor'."
+            }
+        ), 400
+        
     try:
-        # fetch data, deserialise it, store in variable
-        body_data = request.get_json()
-
-        if user_type not in ["patient", "doctor"]:
-            return jsonify(
-                {
-                    "error": f"User type '{user_type}' not valid. URL must include '/auth/register/patient' or '/auth/register/doctor'."
-                }
-            ), 400
-
-        # fields common to both patient and doctor
-        email = body_data.get("email")
-        password = body_data.get("password")
-        name = body_data.get("name")
-        sex = body_data.get("sex")
-        is_admin = body_data.get("is_admin", False)
-
+        # load data according to schema (this allows email regex to work), deserialise it, store in variable
         if user_type == "patient":
-            # remember to validate input!
-            # define new instance of Patient class
-            user = Patient(
-                name=name,
-                email=email,
-                dob=body_data.get("dob"),
-                sex=sex,
-                is_admin=is_admin
-            )
-
+            body_data = PatientSchema().load(request.get_json())
+            user = Patient(**body_data)
             schema = patient_schema
-
+            
         elif user_type == "doctor":
-            user = Doctor(
-                name=name,
-                email=email,
-                sex=sex,
-                specialty=body_data.get("specialty"),
-                is_admin=is_admin
-            )
-
+            body_data = DoctorSchema().load(request.get_json())
+            user = Doctor(**body_data)
             schema = doctor_schema
 
         # guard clause
+        password = body_data.get("password")  # use .pop() instead for security?
         if not password:
             return jsonify({"error": "Password required."}), 400
-        
+
         # hash password separately
         user.password = bcrypt.generate_password_hash(
             password).decode("utf-8")
@@ -82,21 +72,38 @@ def register_user(user_type):
 
         return schema.dump(user), 201
 
-    except IntegrityError as err:
-        if err.orig.pgcode == errorcodes.NOT_NULL_VIOLATION:
+    # when would this one actually arise? do i need it? i've already handled invalid emails haven't I?
+    # except ValidationError as e:
+    #     return jsonify(e.messages), 400
+
+    # if the date entered is invalid e.g. "2024-0101"
+    except DataError as e:
+        return jsonify({"error": "Invalid date formatting."}), 400
+
+    # if the 
+    except IntegrityError as e:
+        if e.orig.pgcode == errorcodes.NOT_NULL_VIOLATION:
             # return jsonify({"error": "Email address is required"}), 400
             return jsonify(
                 {
-                    "error": f"The column {err.orig.diag.column_name} is required."
+                    "error": f"The column {e.orig.diag.column_name} is required."
                 }
             ), 400
 
-        if err.orig.pgcode == errorcodes.UNIQUE_VIOLATION:
+        if e.orig.pgcode == errorcodes.UNIQUE_VIOLATION:
             return jsonify(
                 {
                     "error": "Email address must be unique."
                 }
             ), 400
+
+    # except Exception as e:
+    #     return jsonify(
+    #         {
+    #             "error": "...?"
+    #         }
+    #     ), 400  # ?
+
 
 ###########################################################################
 
@@ -105,6 +112,15 @@ def register_user(user_type):
 # http://localhost:5000/auth/login/<user_type>
 @auth_bp.route("/login/<user_type>", methods=["POST"])
 def login_user(user_type):
+    """_summary_
+
+    Args:
+        user_type (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     # try:
 
     # fetch data, deserialise it, store in variable
@@ -116,7 +132,7 @@ def login_user(user_type):
         }), 400
 
     email = body_data.get("email")
-    password = body_data.get("password")
+    password = body_data.get("password")  # use .pop() instead for security?
 
     # guard clause
     if not email or not password:

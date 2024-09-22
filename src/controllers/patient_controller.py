@@ -1,8 +1,5 @@
 from init import db
 from models import Patient, patient_schema, patients_schema, Appointment, appointments_schema, Treatment, treatments_schema
-# may have to uncomment these (but understand why!?):
-# from models.appointments import Appointment, appointments_schema
-# from models.treatments import Treatment, treatments_schema
 from utils import authorise_as_admin
 
 from flask import jsonify, request, Blueprint
@@ -17,8 +14,14 @@ patients_bp = Blueprint("patients", __name__, url_prefix="/patients")
 
 # http://localhost:5000/patients/
 @patients_bp.route("/")
-# @jwt_required()
+@jwt_required()
+@authorise_as_admin
 def get_all_patients():
+    """Get details for all patients
+
+    Returns:
+        _type_: _description_
+    """
     # create SQL statement
     
     # SELECT patients.patient_id, patients.name, patients.email, patients.password, patients.dob, patients.sex, patients.is_admin 
@@ -34,8 +37,17 @@ def get_all_patients():
 
 # http://localhost:5000/patients/<int:patient_id>
 @patients_bp.route("/<int:patient_id>")
-# @jwt_required()
+@jwt_required()
+@authorise_as_admin
 def get_a_patient(patient_id):
+    """Get a particular patient's details
+
+    Args:
+        patient_id (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     # create SQL statement
 
     # SELECT patients.patient_id, patients.name, patients.email, patients.password, patients.dob, patients.sex, patients.is_admin 
@@ -130,6 +142,14 @@ def get_patient_treatments(patient_id):
 @patients_bp.route("/<int:patient_id>", methods=["PUT", "PATCH"])
 @jwt_required()
 def update_patient(patient_id):
+    """_summary_
+
+    Args:
+        patient_id (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     # fetch ...
     body_data = request.get_json()
     
@@ -166,6 +186,14 @@ def update_patient(patient_id):
 @jwt_required()
 @authorise_as_admin
 def delete_patient(patient_id):
+    """_summary_
+
+    Args:
+        patient_id (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     
     # create SQL statement
 

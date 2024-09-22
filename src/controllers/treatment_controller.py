@@ -1,11 +1,11 @@
 from init import db
 from models import Treatment, treatment_schema, treatments_schema, Appointment, appointment_schema, appointments_schema
-# may have to uncomment these... understand why?!
-# from models.appointments import Appointment, appointment_schema, appointments_schema
 from utils import authorise_as_admin#, authorise_as_participant
 
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
+
+#####################################################
 
 # TO DO: verify that end date is AFTER start date?!
 
@@ -54,6 +54,17 @@ def create_treatment():
 @treatments_bp.route("/<int:treatment_id>/appointments/", methods=["POST"])
 @jwt_required()
 def create_appointment(treatment_id):
+    """_summary_
+
+    Args:
+        treatment_id (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    
+    # apply integrity error except blox to ALL CREATE FUNCTIONS?!
+    
     # try:
     body_data = request.get_json()
     
@@ -62,19 +73,12 @@ def create_appointment(treatment_id):
     appointment = Appointment(
         datetime=body_data.get("datetime"),
         # datetime=body_data["datetime"],  # use this version instead? does it matter?
-        
-        place=body_data.get("place"),
-        # place=body_data["place"],
-        
-        cost=body_data.get("cost"),
-        # cost=body_data["cost"],
-        
+        place=body_data.get("place"),        
+        cost=body_data.get("cost"),        
         status=body_data.get("status"),
-        # status=body_data["status"],
-        
+                
         # validate this! check it exists. with a guard clause?
         treatment_id=body_data.get("treatment_id")
-        # treatment_id=body_data["treatment_id"]
     )
     
     db.session.add(appointment)
@@ -105,7 +109,7 @@ def get_treatment_appointments(treatment_id):
     
     # SELECT appointments.appt_id, appointments.datetime, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 
     # FROM appointments 
-    # WHERE appointments.treatment_id = :treatment_id_1
+    # WHERE appointments.treatment_id = :treatment_id_1;
 
     stmt = db.select(Appointment).filter_by(treatment_id=treatment_id).order_by(Appointment.datetime)
     print()
@@ -133,7 +137,9 @@ def get_all_treatments():
         _type_: _description_
     """
     # create SQL statement
+    
     # SELECT * FROM treatments;
+    
     stmt = db.select(Treatment)#.order_by()
     print()
     print(stmt)
@@ -162,7 +168,9 @@ def get_a_treatment(treatment_id):
         _type_: _description_
     """
     # create SQL statement
+    
     # SELECT * FROM treatments WHERE treatment_id=treatment_id ... ?;
+    
     stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
     print()
     print(stmt)
@@ -184,11 +192,21 @@ def get_a_treatment(treatment_id):
 # justify why i chose this particular auth decorator
 # @authorise_as_participant
 def update_treatment(treatment_id):
+    """_summary_
+
+    Args:
+        treatment_id (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     
     body_data = request.get_json()
     
     # create SQL statement
+    
     # SELECT * FROM treatments WHERE treatment_id = treatment_id ... ?;
+    
     stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
     print()
     print(stmt)
@@ -217,9 +235,19 @@ def update_treatment(treatment_id):
 # justify why i chose this particular auth decorator
 @authorise_as_admin
 def delete_treatment(treatment_id):
+    """_summary_
+
+    Args:
+        treatment_id (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     
     # create SQL statement
-    # SELECT ?
+    
+    # SELECT ?;
+    
     stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
     print()
     print(stmt)

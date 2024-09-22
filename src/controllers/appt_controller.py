@@ -49,8 +49,11 @@ def get_an_appointment(appt_id):
     Returns:
         _type_: _description_
     """
+    
     # create SQL statement
+    
     # SELECT * FROM appointments WHERE ... = appt_id?;
+    
     stmt = db.select(Appointment).filter_by(appt_id=appt_id)
     print()
     print(stmt)
@@ -72,9 +75,19 @@ def get_an_appointment(appt_id):
 # @authorise_as_admin
 # @authorise_as_participant
 def update_appointment(appt_id):
+    """_summary_
+
+    Args:
+        appt_id (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    
     body_data = request.get_json()
 
     # create SQL statement
+    
     # SELECT * FROM appointments WHERE appointment_id = appointment_id ... ?;
     stmt = db.select(Appointment).filter_by(appt_id=appt_id)
     print()
@@ -101,6 +114,15 @@ def update_appointment(appt_id):
 # @authorise_as_admin
 # @authorise_as_participant
 def delete_appointment(appt_id):
+    """_summary_
+
+    Args:
+        appt_id (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    
     # create SQL statement
     
     # SELECT * FROM appointments WHERE ... ?;

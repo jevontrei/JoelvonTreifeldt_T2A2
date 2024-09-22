@@ -1,8 +1,5 @@
 from init import db
 from models import Doctor, doctor_schema, doctors_schema, Appointment, appointments_schema, Treatment, treatments_schema
-# may have to uncomment these (but understand why!?):
-# from models.appointments import Appointment, appointments_schema
-# from models.treatments import Treatment, treatments_schema
 from utils import authorise_as_admin
 
  
@@ -20,8 +17,16 @@ doctors_bp = Blueprint("doctors", __name__, url_prefix="/doctors")
 @doctors_bp.route("/")
 # @jwt_required()
 def get_all_doctors():
+    """_summary_
+
+    Returns:
+        _type_: _description_
+    """
+    
     # create SQL statement
+    
     # SELECT * FROM doctors ORDER BY ...?;
+    
     stmt = db.select(Doctor).order_by(Doctor.name)
     print()
     print(stmt)
@@ -131,11 +136,21 @@ def get_doctor_treatments(doctor_id):
 @doctors_bp.route("/<int:doctor_id>", methods=["PUT", "PATCH"])
 @jwt_required()
 def update_doctor(doctor_id):
+    """_summary_
+
+    Args:
+        doctor_id (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     
     body_data = request.get_json()
     
     # create SQL statement
+    
     # SELECT * FROM doctors WHERE ... = doctor_id?;
+    
     stmt = db.select(Doctor).filter_by(doctor_id=doctor_id)
     print(stmt)
 
@@ -161,6 +176,14 @@ def update_doctor(doctor_id):
 @jwt_required()
 @authorise_as_admin
 def delete_doctor(doctor_id):
+    """_summary_
+
+    Args:
+        doctor_id (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     
     # create SQL statement
     

@@ -2,6 +2,7 @@ from init import db, ma
 from models.treatments import TreatmentSchema
 
 from marshmallow import fields
+from marshmallow.validate import Regexp
 
 
 class Patient(db.Model):
@@ -25,9 +26,8 @@ class Patient(db.Model):
 
 
 class PatientSchema(ma.Schema):
-    # email = fields.Email(required=True)
-    # email = fields.String(required=True, validate=Regexp(
-    #     "^\S+@\S+\.\S+$", error="Invalid email format"))
+    # use regex to ...
+    email = fields.Email(required=True, default_error_messages = {"invalid": "Not a valid email address."})
 
     # review and understand this deeply
     treatments = fields.Nested(TreatmentSchema, many=True, exclude=("patient_id",))  # this exclude part prevents circular refs

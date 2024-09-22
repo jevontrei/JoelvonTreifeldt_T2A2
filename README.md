@@ -34,7 +34,7 @@ Table of Contents
       - [Log model](#log-model)
       - [Relationships: move R6 answers here](#relationships-move-r6-answers-here)
     - [R8 - Explain how to use this application’s API endpoints.](#r8---explain-how-to-use-this-applications-api-endpoints)
-- [TALK ABOUT REST AND HOW I MOVED some ROUTES TO BE UNDER OTHER resources... like patients/x/treatments/ etc, while general treatment stuff is still under /treatments/](#talk-about-rest-and-how-i-moved-some-routes-to-be-under-other-resources-like-patientsxtreatments-etc-while-general-treatment-stuff-is-still-under-treatments)
+- [TALK ABOUT RESTful AND HOW I MOVED some ROUTES TO BE UNDER OTHER resources... like patients/x/treatments/ etc, while general treatment stuff is still under /treatments/](#talk-about-restful-and-how-i-moved-some-routes-to-be-under-other-resources-like-patientsxtreatments-etc-while-general-treatment-stuff-is-still-under-treatments)
 - [header data = auth / bearer token?](#header-data--auth--bearer-token)
       - [patient\_controller.py](#patient_controllerpy)
         - [Example JSON response](#example-json-response)
@@ -49,6 +49,10 @@ Table of Contents
 ### R0 - Setup
 
 .
+
+```sh
+pip install -r requirements.txt
+```
 
 ### R1 - Explain the problem that this app will solve, and explain how this app solves or addresses the problem.
 
@@ -306,7 +310,7 @@ The relationships ...
 
 ### R8 - Explain how to use this application’s API endpoints.
 
-# TALK ABOUT REST AND HOW I MOVED some ROUTES TO BE UNDER OTHER resources... like patients/x/treatments/ etc, while general treatment stuff is still under /treatments/
+# TALK ABOUT RESTful AND HOW I MOVED some ROUTES TO BE UNDER OTHER resources... like patients/x/treatments/ etc, while general treatment stuff is still under /treatments/
 
 Each endpoint should be explained, including the following data for each endpoint:
 
