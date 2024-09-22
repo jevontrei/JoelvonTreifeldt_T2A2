@@ -1,6 +1,6 @@
 from init import db
 from models import Patient, patient_schema, patients_schema, Appointment, appointments_schema, Treatment, treatments_schema
-# prob have to uncomment these (but understand why!?):
+# may have to uncomment these (but understand why!?):
 # from models.appointments import Appointment, appointments_schema
 # from models.treatments import Treatment, treatments_schema
 from utils import authorise_as_admin
@@ -10,6 +10,7 @@ from flask_jwt_extended import jwt_required
 
 ##################################################
 
+# create blueprint with url prefix
 patients_bp = Blueprint("patients", __name__, url_prefix="/patients")
 
 ##################################################
@@ -56,9 +57,9 @@ def get_a_patient(patient_id):
 
 ##################################################
 
-
-@appointments_bp.route("/patients/<int:patient_id>")
-# @jwt_required()
+# http://localhost:5000/patients/<int:patient_id>/appointments/
+@patients_bp.route("/<int:patient_id>/appointments/")
+@jwt_required()
 def get_patient_appointments(patient_id):
     """
     Get all appointments for a particular patient

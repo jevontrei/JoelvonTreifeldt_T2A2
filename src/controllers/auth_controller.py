@@ -19,6 +19,7 @@ from psycopg2 import errorcodes
 
 ###########################################################################
 
+# create blueprint with url prefix
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 ###########################################################################

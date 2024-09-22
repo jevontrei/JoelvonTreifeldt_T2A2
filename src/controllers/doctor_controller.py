@@ -1,6 +1,6 @@
 from init import db
 from models import Doctor, doctor_schema, doctors_schema, Appointment, appointments_schema, Treatment, treatments_schema
-# prob have to uncomment these (but understand why!?):
+# may have to uncomment these (but understand why!?):
 # from models.appointments import Appointment, appointments_schema
 # from models.treatments import Treatment, treatments_schema
 from utils import authorise_as_admin
@@ -11,6 +11,7 @@ from flask_jwt_extended import jwt_required
 
 ##################################################
 
+# create blueprint with url prefix
 doctors_bp = Blueprint("doctors", __name__, url_prefix="/doctors")
 
 ##################################################
@@ -22,6 +23,7 @@ def get_all_doctors():
     # create SQL statement
     # SELECT * FROM doctors ORDER BY ...?;
     stmt = db.select(Doctor).order_by(Doctor.name)
+    print()
     print(stmt)
 
     doctors = db.session.scalars(stmt)
@@ -39,6 +41,7 @@ def get_a_doctor(doctor_id):
     # SELECT * FROM doctors WHERE ... = doctor_id?;
     
     stmt = db.select(Doctor).filter_by(doctor_id=doctor_id)
+    print()
     print(stmt)
 
     doctor = db.session.scalar(stmt)
@@ -51,8 +54,9 @@ def get_a_doctor(doctor_id):
 
 ##################################################
 
-@appointments_bp.route("/doctors/<int:doctor_id>")
-# @jwt_required()
+# http://localhost:5000/doctors/<int:doctor_id>/appointments/
+@doctors_bp.route("/<int:doctor_id>/appointments/")
+@jwt_required()
 def get_doctor_appointments(doctor_id):
     """
     Get all appointments for a particular doctor
@@ -74,6 +78,7 @@ def get_doctor_appointments(doctor_id):
         Treatment.doctor_id==doctor_id
         )#.order_by()
 
+    # print()
     # print(stmt)
     
     # execute SQL statement using scalars()
@@ -108,6 +113,7 @@ def get_doctor_treatments(doctor_id):
     # WHERE treatments.doctor_id = :doctor_id_1
     
     stmt = db.select(Treatment).filter_by(doctor_id=doctor_id)#.order_by()
+    print()
     print(stmt)
 
     # need to use .fetchall() for scalars plural (write this comment everywhere, and remove fetchall() from any singular ones?!)
@@ -161,6 +167,7 @@ def delete_doctor(doctor_id):
     # SELECT * FROM doctors WHERE doctor_id = doctor_id?;
     
     stmt = db.select(Doctor).filter_by(doctor_id=doctor_id)
+    print()
     print(stmt)
 
     doctor = db.session.scalar(stmt)

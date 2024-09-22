@@ -9,6 +9,7 @@ from datetime import date
 
 ############################################
 
+# create blueprint with url prefix
 # all logs (child) are located under the patient (parent) resource
 logs_bp = Blueprint("logs", __name__, url_prefix="/patients/<int:patient_id>/logs")
 
@@ -160,7 +161,8 @@ def update_log(patient_id, log_id):
 # http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>
 @logs_bp.route("/<int:log_id>", methods=["DELETE"])
 @jwt_required()
-@authorise_as_patient_creator  # need to pass in log_id?
+# FIX THIS DECO?!:
+# @authorise_as_patient_creator  # need to pass in log_id?
 def delete_log(patient_id, log_id):
     """Delete a log
 

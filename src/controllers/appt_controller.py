@@ -11,7 +11,6 @@ from sqlalchemy.exc import IntegrityError
 # create blueprint with url prefix
 appointments_bp = Blueprint("appointments", __name__, url_prefix="/appointments")
 
-
 ##################################################
 
 # http://localhost:5000/appointments/
@@ -26,8 +25,8 @@ def get_all_appointments():
     
     # create SQL statement
     # SELECT * FROM appointments;
-    stmt = db.select(Appointment)  # .order_by(Appointment.datetime)
-    
+    stmt = db.select(Appointment)#.order_by(Appointment.datetime)
+    print()
     print(stmt)
 
     # execute statement
@@ -42,7 +41,7 @@ def get_all_appointments():
 @appointments_bp.route("/<int:appt_id>")
 # @jwt_required()
 def get_an_appointment(appt_id):
-    """_summary_
+    """Find an appointment using its unique ID
 
     Args:
         appt_id (_type_): _description_
@@ -53,7 +52,7 @@ def get_an_appointment(appt_id):
     # create SQL statement
     # SELECT * FROM appointments WHERE ... = appt_id?;
     stmt = db.select(Appointment).filter_by(appt_id=appt_id)
-    
+    print()
     print(stmt)
     
     appointment = db.session.scalar(stmt)
@@ -78,6 +77,7 @@ def update_appointment(appt_id):
     # create SQL statement
     # SELECT * FROM appointments WHERE appointment_id = appointment_id ... ?;
     stmt = db.select(Appointment).filter_by(appt_id=appt_id)
+    print()
     print(stmt)
 
     appointment = db.session.scalar(stmt)
