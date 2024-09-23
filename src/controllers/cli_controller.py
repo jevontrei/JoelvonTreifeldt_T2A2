@@ -7,38 +7,42 @@ from flask import Blueprint
 
 # change this, remove "db", save time typing?!
 # Create blueprint with URL prefix
-db_commands = Blueprint("db", __name__)
+db_commands = Blueprint(
+    "db", 
+    __name__
+)
 
 ##################################################
 
 @db_commands.cli.command("drop")
 def drop_tables():
+    """Drop all tables.
     """
-    drop all tables
-    """
-    # delete all tables from the database (even if FK constraints are present? how to do this?)
+    
+    # Delete all tables from the database (even if FK constraints are present? how to do this?)
     db.drop_all()
+    
     print("Tables dropped.")
 
 ##################################################
 
 @db_commands.cli.command("create")
 def create_tables():
+    """Create all tables.
     """
-    create all tables
-    """
+    
     db.create_all()
+    
     print("Tables created.")
 
 ##################################################
 
 @db_commands.cli.command("seed")
 def seed_tables():
-    """
-    seed tables with patients, doctors, treatments, logs and appointments
+    """Seed tables with details for patients, doctors, treatments, logs and appointments.
     """
     
-    # seed patients
+    # Seed patients
     patients = [
         Patient(
             name="Joel von Treifeldt",
@@ -72,11 +76,11 @@ def seed_tables():
         )
     ]
     
-    # add seeded patients to database session and commit
+    # Add seeded patients to session and commit changes to database
     db.session.add_all(patients)
     db.session.commit()
 
-    # seed doctors
+    # Seed doctors
     doctors = [
         Doctor(
             name="Cardi B",
@@ -111,11 +115,11 @@ def seed_tables():
         )
     ]
     
-    # add seeded doctors to database session and commit
+    # Add seeded doctors to session and commit changes to database
     db.session.add_all(doctors)
     db.session.commit()
 
-    # seed treatments
+    # Seed treatments
     treatments = [
         Treatment(
             patient = patients[0],
@@ -146,11 +150,11 @@ def seed_tables():
         )
     ]
     
-    # add seeded treatments to database session and commit
+    # Add seeded treatments to session and commit changes to database
     db.session.add_all(treatments)
     db.session.commit()
 
-    # seed appointments
+    # Seed appointments
     appointments = [
         Appointment(
             date="2000-12-12",
@@ -222,11 +226,11 @@ def seed_tables():
         )
     ]
     
-    # add seeded appointments to database session and commit
+    # Add seeded appointments to session and commit changes to database
     db.session.add_all(appointments)
     db.session.commit()
     
-    # seed logs
+    # Seed logs
     logs = [
         Log(
             date = "2024-09-16",
@@ -265,9 +269,9 @@ def seed_tables():
         )
     ]
     
-    # add seeded logs to database session and commit
+    # Add seeded logs to session and commit changes to database
     db.session.add_all(logs)
     db.session.commit()
 
-    # print success message
+    # Print success message
     print("Tables seeded.")

@@ -36,14 +36,14 @@ def get_all_appointments():
     # ORDER BY appointments.date, appointments.time;
     stmt = db.select(Appointment).order_by(Appointment.date, Appointment.time)
 
-    # Connect to database session, execute statement, return resulting values; fetchall() prevents returning an empty list/dict
+    # Connect to database session, execute statement, store resulting values; fetchall() prevents returning an empty list/dict
     appointments = db.session.scalars(stmt).fetchall()
     
     # Guard clause: return error if no appointments exist
     if not appointments:
         return jsonify({"error": "No appointments found."}), 404
     
-    # Serialise appointment objects according to the appointments schema and return
+    # Return appointment objects serialised according to the appointments schema 
     return appointments_schema.dump(appointments)
 
 ##################################################
@@ -67,7 +67,7 @@ def get_an_appointment(appt_id):
     # WHERE appointments.appt_id = :appt_id_1;
     stmt = db.select(Appointment).filter_by(appt_id=appt_id)
     
-    # Connect to database session, execute statement, return resulting value
+    # Connect to database session, execute statement, store resulting value
     appointment = db.session.scalar(stmt)
     
     # Guard clause; return error if appointment doesn't exist
@@ -76,7 +76,7 @@ def get_an_appointment(appt_id):
             "error": f"Appointment {appt_id} not found."
             }), 404
     
-    # Serialise appointment object according to the appointment schema and return
+    # Return appointment object serialised according to the appointment schema 
     return appointment_schema.dump(appointment)
 
 ##################################################
@@ -104,7 +104,7 @@ def update_appointment(appt_id):
     # WHERE appointments.appt_id = :appt_id_1;
     stmt = db.select(Appointment).filter_by(appt_id=appt_id)
 
-    # Connect to database session, execute statement, return resulting value
+    # Connect to database session, execute statement, store resulting value
     appointment = db.session.scalar(stmt)
     
     # Guard clause; return error if appointment doesn't exist
@@ -121,7 +121,7 @@ def update_appointment(appt_id):
     # Commit changes to database
     db.session.commit()
     
-    # Serialise updated appointment object according to appointment schema and return
+    # Return updated appointment object serialised according to the appointment schema 
     return appointment_schema.dump(appointment)
 
 ##################################################
@@ -131,13 +131,13 @@ def update_appointment(appt_id):
 # @authorise_as_admin
 # @authorise_as_participant
 def delete_appointment(appt_id):
-    """_summary_
+    """Delete any appointment.
 
     Args:
-        appt_id (_type_): _description_
+        appt_id (int): Appointment primary key.
 
     Returns:
-        _type_: _description_
+        JSON: Success message.
     """
     
     # Create SQLAlchemy query statement
@@ -146,14 +146,16 @@ def delete_appointment(appt_id):
     # WHERE appointments.appt_id = :appt_id_1;
     stmt = db.select(Appointment).filter_by(appt_id=appt_id)
 
+    # Connect to database session, execute statement, store resulting value
     appointment = db.session.scalar(stmt)
     
     # Guard clause; return error if no appointment exists
     if not appointment:
         return jsonify({"error": f"Appointment {appt_id} not found."}), 404
         
+    # Delete appointment and commit changes to database
     db.session.delete(appointment)
-    
     db.session.commit()
     
+    # Return serialised success message
     return jsonify({"message": f"Appointment {appt_id} deleted."})

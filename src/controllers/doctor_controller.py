@@ -9,7 +9,11 @@ from flask_jwt_extended import jwt_required
 ##################################################
 
 # Create blueprint with URL prefix
-doctors_bp = Blueprint("doctors", __name__, url_prefix="/doctors")
+doctors_bp = Blueprint(
+    "doctors", 
+    __name__, 
+    url_prefix="/doctors"
+)
 
 ##################################################
 
@@ -36,6 +40,7 @@ def get_all_doctors():
     if not doctors:
         return jsonify({"error": "No doctors found."}), 404
 
+    # Return doctor objects serialised according to the doctors schema 
     return doctors_schema.dump(doctors)
 
 ##################################################
@@ -59,12 +64,14 @@ def get_a_doctor(doctor_id):
     # WHERE doctors.doctor_id = :doctor_id_1;
     stmt = db.select(Doctor).filter_by(doctor_id=doctor_id)
 
+    # Connect to database session, execute statement, store resulting value
     doctor = db.session.scalar(stmt)
     
     # Guard clause; return error if doctor doesn't exist
     if not doctor:
         return jsonify({"error": f"Doctor {doctor_id} not found."}), 404
     
+    # # Return doctor object serialised according to the doctor schema 
     return doctor_schema.dump(doctor)
 
 ##################################################
@@ -102,7 +109,7 @@ def get_doctor_appointments(doctor_id):
         if not appointments:
             return jsonify({"error": f"No appointments found for doctor {doctor_id}."}), 404
 
-        # Serialise and return
+        # Return appointment objects serialised according to the appointments schema 
         return appointments_schema.dump(appointments)
     
     # In case a queried-for entity is nonexistent or has been deleted
@@ -138,6 +145,7 @@ def get_doctor_treatments(doctor_id):
     if not treatments:
         return jsonify({"error": f"No treatments found for doctor {doctor_id}."}), 404
     
+    # Return treatment objects serialised according to the treatments schema 
     return treatments_schema.dump(treatments)
 
 ##################################################
@@ -164,6 +172,7 @@ def update_doctor(doctor_id):
     # WHERE doctors.doctor_id = :doctor_id_1;
     stmt = db.select(Doctor).filter_by(doctor_id=doctor_id)
 
+    # Connect to database session, execute statement, store resulting value
     doctor = db.session.scalar(stmt)
     
     # Guard clause; return error if doctor doesn't exist
@@ -175,8 +184,10 @@ def update_doctor(doctor_id):
     doctor.password = body_data.get("password") or doctor.password
     # patients and appointments? no, do this through treatments and appointments, respectively?
 
+    # Commit changes to database
     db.session.commit()
     
+    # Return updated doctor object serialised according to the doctor schema
     return doctor_schema.dump(doctor)
 
 ##################################################
@@ -201,12 +212,16 @@ def delete_doctor(doctor_id):
     # WHERE doctors.doctor_id = :doctor_id_1;
     stmt = db.select(Doctor).filter_by(doctor_id=doctor_id)
 
+    # Connect to database session, execute statement, store resulting value
     doctor = db.session.scalar(stmt)
 
     # Guard clause; return error if doctor doesn't exist
     if not doctor:
         return jsonify({"error": f"Doctor {doctor_id} not found."}), 404
 
+    # Delete doctor and commit changes to database
     db.session.delete(doctor)
     db.session.commit()
+    
+    # Return serialised success message
     return jsonify({"message": f"Doctor {doctor_id} deleted."})

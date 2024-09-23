@@ -11,7 +11,11 @@ from datetime import date
 
 # Create blueprint with URL prefix
 # all logs (child) are located under the patient (parent) resource
-logs_bp = Blueprint("logs", __name__, url_prefix="/patients/<int:patient_id>/logs")
+logs_bp = Blueprint(
+    "logs", 
+    __name__, 
+    url_prefix="/patients/<int:patient_id>/logs"
+)
 
 ############################################
 
@@ -41,11 +45,14 @@ def create_log(patient_id):
             patient_id=patient_id
         )
 
+        # Add log to session and commit changes to database
         db.session.add(log)
         db.session.commit()
 
+        # Return log object serialised according to the log schema
         return log_schema.dump(log), 201
     
+    # If the ?
     except IntegrityError as e:
         return jsonify({"error": f"Patient id {patient_id} not found."}), 404
 
@@ -80,6 +87,7 @@ def get_patient_logs(patient_id):
     if not logs:
         return jsonify({"error": f"Patient {patient_id} not found, or they have no logs."}), 404
     
+    # Return log objects serialised according to the logs schema
     return logs_schema.dump(logs)
 
 ############################################
@@ -101,20 +109,20 @@ def get_a_log(patient_id, log_id):
     """
 
     # Create SQLAlchemy query statement
-
     # SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
     # FROM logs 
     # WHERE logs.patient_id = :patient_id_1 
     # AND logs.log_id = :log_id_1;
-
     stmt = db.select(Log).filter_by(patient_id=patient_id, log_id=log_id)
 
+    # Connect to database session, execute statement, store resulting value
     log = db.session.scalar(stmt)
     
     # Guard clause; return error if log doesn't exist
     if not log:
         return jsonify({"error": f"Patient {patient_id} or log {log_id} not found."}), 404
     
+    # Return log object serialised according to the log schema
     return log_schema.dump(log)
 
 ############################################
@@ -137,24 +145,28 @@ def update_log(patient_id, log_id):
     body_data = request.get_json()
     
     # Create SQLAlchemy query statement
-    
     # SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
     # FROM logs 
     # WHERE logs.patient_id = :patient_id_1 
     # AND logs.log_id = :log_id_1;
-    
     stmt = db.select(Log).filter_by(patient_id=patient_id, log_id=log_id)
     
+    # Connect to database session, execute statement, store resulting value
     log = db.session.scalar(stmt)
     
     # Guard clause; return error if log doesn't exist
     if not log:
         return jsonify({"error": f"Patient {patient_id} or log {log_id} not found."}), 404
         
+    # ?
     log.date = body_data.get("date") or log.date
     log.notes = body_data.get("notes") or log.notes
     # Do it for FK too? No. A log is not realistically going to change patients.
+    
+    # Commit changes to database
     db.session.commit()
+    
+    # Return updated log object serialised according to the log schema
     return log_schema.dump(log)
     
 ############################################
@@ -175,23 +187,23 @@ def delete_log(patient_id, log_id):
     """
     
     # Create SQLAlchemy query statement
-
     # SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
     # FROM logs 
     # WHERE logs.patient_id = :patient_id_1 
     # AND logs.log_id = :log_id_1;
-
     stmt = db.select(Log).filter_by(patient_id=patient_id, log_id=log_id)
 
+    # Connect to database session, execute statement, store resulting value
     log = db.session.scalar(stmt)
 
     # Guard clause; return error if log doesn't exist
     if not log:
         return jsonify({"error": f"Patient {patient_id} or log {log_id} not found."}), 404
 
+    # Delete log and commit changes to database
     db.session.delete(log)
-    
     db.session.commit()
     
+    # Return serialised success message
     return jsonify({"message": f"Log {log_id} deleted."})
     

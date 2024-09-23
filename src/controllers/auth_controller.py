@@ -22,7 +22,11 @@ from psycopg2 import errorcodes
 ###########################################################################
 
 # create auth blueprint with url prefix
-auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
+auth_bp = Blueprint(
+    "auth", 
+    __name__, 
+    url_prefix="/auth"
+)
 
 ###########################################################################
 
@@ -47,7 +51,7 @@ def register_user(user_type):
         ), 400
         
     try:
-        # load data according to schema (this allows email regex to work), deserialise it, store in variable
+        # Load data according to schema (this allows email regex to work), deserialise it, store in variable; create user instance with kwargs; assign correct schema
         if user_type == "patient":
             body_data = PatientSchema().load(request.get_json())
             user = Patient(**body_data)
@@ -58,29 +62,31 @@ def register_user(user_type):
             user = Doctor(**body_data)
             schema = doctor_schema
 
-        # Guard clause; return error if ?
+        # Guard clause; return error if no password provided
         password = body_data.get("password")  # use .pop() instead for security?
         if not password:
             return jsonify({"error": "Password required."}), 400
 
-        # hash password separately
+        # Hash password
         user.password = bcrypt.generate_password_hash(
             password).decode("utf-8")
 
+        # Add user to session and commit changes to database
         db.session.add(user)
         db.session.commit()
 
+        # Return user object serialised according to the corresponding schema 
         return schema.dump(user), 201
 
     # when would this one actually arise? do i need it? i've already handled invalid emails haven't I?
     # except ValidationError as e:
     #     return jsonify(e.messages), 400
 
-    # if the date entered is invalid e.g. "2024-0101"
+    # In case the date entered has invalid format, e.g. "2024-0101"
     except DataError as e:
         return jsonify({"error": "Invalid date formatting."}), 400
 
-    # if the 
+    # If the email address (or ___?) is missing or already taken
     except IntegrityError as e:
         if e.orig.pgcode == errorcodes.NOT_NULL_VIOLATION:
             # return jsonify({"error": "Email address is required"}), 400
@@ -97,13 +103,13 @@ def register_user(user_type):
                 }
             ), 400
 
+    # If ... other errors arise?
     # except Exception as e:
     #     return jsonify(
     #         {
     #             "error": "...?"
     #         }
     #     ), 400  # ?
-
 
 ###########################################################################
 
@@ -146,6 +152,7 @@ def login_user(user_type):
             # SELECT ...
             
             stmt = db.select(Patient).filter_by(email=email)
+            # Connect to database session, execute statement, store resulting value
             user = db.session.scalar(stmt)
             user_id = user.patient_id
             schema = patient_schema
@@ -158,6 +165,7 @@ def login_user(user_type):
             # ;
             
             stmt = db.select(Doctor).filter_by(email=email)
+            # Connect to database session, execute statement, store resulting value
             user = db.session.scalar(stmt)
             user_id = user.doctor_id
             schema = doctor_schema
@@ -187,6 +195,7 @@ def login_user(user_type):
         expires_delta=timedelta(days=1)
     )
 
+    # Return serialised login details?
     return jsonify({
         "email": email,
         "is_admin": user.is_admin,
