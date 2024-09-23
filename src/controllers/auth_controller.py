@@ -45,9 +45,7 @@ def register_user(user_type):
     # Guard clause to escape function early if user type is invalid
     if user_type not in ["patient", "doctor"]:
         return jsonify(
-            {
-                "error": f"User type '{user_type}' not valid. URL must include '/auth/register/patient' or '/auth/register/doctor'."
-            }
+            {"error": f"User type '{user_type}' not valid. URL must include '/auth/register/patient' or '/auth/register/doctor'."}
         ), 400
         
     try:
@@ -84,16 +82,16 @@ def register_user(user_type):
 
     # In case the date entered has invalid format, e.g. "2024-0101"
     except DataError as e:
-        return jsonify({"error": "Invalid date formatting."}), 400
+        return jsonify(
+            {"error": "Invalid date formatting."}
+        ), 400
 
     # If the email address (or ___?) is missing or already taken
     except IntegrityError as e:
         if e.orig.pgcode == errorcodes.NOT_NULL_VIOLATION:
-            # return jsonify({"error": "Email address is required"}), 400
+            # return jsonify({"error": "Email address is required"}), 400  # ?
             return jsonify(
-                {
-                    "error": f"The column {e.orig.diag.column_name} is required."
-                }
+                {"error": f"The column {e.orig.diag.column_name} is required."}
             ), 400
 
         if e.orig.pgcode == errorcodes.UNIQUE_VIOLATION:
@@ -133,25 +131,32 @@ def login_user(user_type):
     body_data = request.get_json()
 
     if user_type not in ["patient", "doctor"]:
-        return jsonify({
-            "error": f"User type '{user_type}' not valid. URL must include '/auth/login/patient' or '/auth/login/doctor'."
-        }), 400
+        return jsonify(
+            {"error": f"User type '{user_type}' not valid. URL must include '/auth/login/patient' or '/auth/login/doctor'."}
+        ), 400
 
     email = body_data.get("email")
     password = body_data.get("password")  # use .pop() instead for security?
 
     # Guard clause; return error if ?
     if not email or not password:
-        return jsonify({"error": "Email and password required."}), 400
+        return jsonify(
+            {"error": "Email and password required."}
+        ), 400
 
     try:
         if user_type == "patient":
             
-            # Create SQLAlchemy query statement
+            # Create SQLAlchemy query statement:
             
             # SELECT ...
             
-            stmt = db.select(Patient).filter_by(email=email)
+            stmt = db.select(
+                Patient
+            ).filter_by(
+                email=email
+            )
+            
             # Connect to database session, execute statement, store resulting value
             user = db.session.scalar(stmt)
             user_id = user.patient_id
@@ -159,7 +164,7 @@ def login_user(user_type):
 
         elif user_type == "doctor":
             
-            # Create SQLAlchemy query statement
+            # Create SQLAlchemy query statement:
             
             # SELECT ...
             # ;
@@ -172,7 +177,9 @@ def login_user(user_type):
             
     # Return error if user doesn't exist
     except AttributeError as e:
-        return jsonify({"error": "Email address not found. Please register user or initialise database."}), 404
+        return jsonify(
+            {"error": "Email address not found. Please register user or initialise database."}
+        ), 404
 
     # ^^ which one to use here? the below guard clause doesn't actually catch logins with unrecognised email addresses vv
 
@@ -183,7 +190,9 @@ def login_user(user_type):
     # is 'password' a keyword for this function? will this give me issues?:
     # Guard clause; return error if ?
     if not bcrypt.check_password_hash(user.password, password):
-        return jsonify({"error": "Invalid password."}), 401
+        return jsonify(
+            {"error": "Invalid password."}
+        ), 401
 
     token = create_access_token(
         identity=str(user_id),
@@ -196,11 +205,13 @@ def login_user(user_type):
     )
 
     # Return serialised login details?
-    return jsonify({
+    return jsonify(
+        {
         "email": email,
         "is_admin": user.is_admin,
         "user_type": user_type,
         "token": token
-    })
+        }
+    )
 
     # except ... as ?:

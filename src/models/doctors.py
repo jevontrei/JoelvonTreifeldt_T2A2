@@ -18,19 +18,38 @@ class Doctor(db.Model):
     # does this need to be nested? to avoid circular chaos?
     # check if this makes sense as cascade
     treatments = db.relationship(
-        "Treatment", back_populates="doctor", cascade="all, delete")
+        "Treatment", 
+        back_populates="doctor", 
+        cascade="all, delete"
+    )
 
 
 class DoctorSchema(ma.Schema):
     # use regex to ...
-    email = fields.Email(required=True, default_error_messages = {"invalid": "Not a valid email address."})
+    email = fields.Email(
+        required=True, 
+        default_error_messages = {"invalid": "Not a valid email address."}
+    )
 
     # review and understand this deeply
-    treatments = fields.Nested(TreatmentSchema, many=True, exclude=("doctor_id",))  # this exclude part prevents circular refs
+    treatments = fields.Nested(
+        TreatmentSchema, 
+        many=True, 
+        exclude=("doctor_id",)
+    )  # the exclude part prevents circular refs
 
     
     class Meta:
-        fields = ("doctor_id", "name", "email", "password", "sex", "specialty", "is_admin", "treatments")
+        fields = (
+            "doctor_id", 
+            "name", 
+            "email", 
+            "password", 
+            "sex", 
+            "specialty", 
+            "is_admin", 
+            "treatments"
+        )
 
 
 doctor_schema = DoctorSchema(exclude=["password"])

@@ -162,7 +162,7 @@ def seed_tables():
             place="Frog's Hollow Medical Centre",
             cost="100",
             status="Completed",
-            treatment_id=treatments[0].treatment_id  # should change these so that i'm querying treatment for a particular patient and doctor combo
+            treatment_id=treatments[0].treatment_id  # should change these so that i'm querying treatment for a particular patient and doctor combo?
         ),
         Appointment(
             date="1999-06-13",

@@ -17,25 +17,46 @@ class Patient(db.Model):
     is_admin = db.Column(db.Boolean, default=False)
 
     logs = db.relationship(
-        "Log", back_populates="patient", cascade="all, delete")
+        "Log", 
+        back_populates="patient", 
+        cascade="all, delete"
+    )
 
     # one-to-many
     # check if this makes sense as cascade?! i think it does bc this is the parent?
     treatments = db.relationship(
-        "Treatment", back_populates="patient", cascade="all, delete")
+        "Treatment", 
+        back_populates="patient", 
+        cascade="all, delete"
+    )
 
 
 class PatientSchema(ma.Schema):
     # use regex to ...
-    email = fields.Email(required=True, default_error_messages = {"invalid": "Not a valid email address."})
+    email = fields.Email(
+        required=True, 
+        default_error_messages = {"invalid": "Not a valid email address."}
+    )
 
     # review and understand this deeply
-    treatments = fields.Nested(TreatmentSchema, many=True, exclude=("patient_id",))  # this exclude part prevents circular refs
+    treatments = fields.Nested(
+        TreatmentSchema, 
+        many=True, 
+        exclude=("patient_id",)
+    )  # the exclude part prevents circular refs
 
     
     class Meta:
-        fields = ("patient_id", "name", "email", "password",
-                  "dob", "sex", "is_admin", "treatments")
+        fields = (
+            "patient_id", 
+            "name", 
+            "email", 
+            "password",
+            "dob", 
+            "sex", 
+            "is_admin", 
+            "treatments"
+        )
 
 
 patient_schema = PatientSchema(exclude=["password"])

@@ -30,18 +30,25 @@ def get_all_appointments():
         JSON: All appointment details, serialised according to appointments schema.
     """
     
-    # Create SQLAlchemy query statement
+    # Create SQLAlchemy query statement:
     # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 
     # FROM appointments 
     # ORDER BY appointments.date, appointments.time;
-    stmt = db.select(Appointment).order_by(Appointment.date, Appointment.time)
+    stmt = db.select(
+        Appointment
+    ).order_by(
+        Appointment.date, 
+        Appointment.time
+    )
 
     # Connect to database session, execute statement, store resulting values; fetchall() prevents returning an empty list/dict
     appointments = db.session.scalars(stmt).fetchall()
     
     # Guard clause: return error if no appointments exist
     if not appointments:
-        return jsonify({"error": "No appointments found."}), 404
+        return jsonify(
+            {"error": "No appointments found."}
+        ), 404
     
     # Return appointment objects serialised according to the appointments schema 
     return appointments_schema.dump(appointments)
@@ -61,20 +68,24 @@ def get_an_appointment(appt_id):
         JSON: Appointment details, serialised according to appointments schema.
     """
 
-    # Create SQLAlchemy query statement
+    # Create SQLAlchemy query statement:
     # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 
     # FROM appointments 
     # WHERE appointments.appt_id = :appt_id_1;
-    stmt = db.select(Appointment).filter_by(appt_id=appt_id)
+    stmt = db.select(
+        Appointment
+    ).filter_by(
+        appt_id=appt_id
+    )
     
     # Connect to database session, execute statement, store resulting value
     appointment = db.session.scalar(stmt)
     
     # Guard clause; return error if appointment doesn't exist
     if not appointment:
-        return jsonify({
-            "error": f"Appointment {appt_id} not found."
-            }), 404
+        return jsonify(
+            {"error": f"Appointment {appt_id} not found."}
+        ), 404
     
     # Return appointment object serialised according to the appointment schema 
     return appointment_schema.dump(appointment)
@@ -98,18 +109,24 @@ def update_appointment(appt_id):
     # Fetch body of HTTP request
     body_data = request.get_json()
 
-    # Create SQLAlchemy query statement
+    # Create SQLAlchemy query statement:
     # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 
     # FROM appointments 
     # WHERE appointments.appt_id = :appt_id_1;
-    stmt = db.select(Appointment).filter_by(appt_id=appt_id)
+    stmt = db.select(
+        Appointment
+    ).filter_by(
+        appt_id=appt_id
+    )
 
     # Connect to database session, execute statement, store resulting value
     appointment = db.session.scalar(stmt)
     
     # Guard clause; return error if appointment doesn't exist
     if not appointment:
-        return jsonify({"error": f"Appointment {appt_id} not found."}), 404
+        return jsonify(
+            {"error": f"Appointment {appt_id} not found."}
+        ), 404
     
     # Assign updated details to appointment if provided, otherwise use pre-existing defaults
     appointment.date = body_data.get("date", appointment.date)
@@ -140,22 +157,30 @@ def delete_appointment(appt_id):
         JSON: Success message.
     """
     
-    # Create SQLAlchemy query statement
+    # Create SQLAlchemy query statement:
     # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 
     # FROM appointments 
     # WHERE appointments.appt_id = :appt_id_1;
-    stmt = db.select(Appointment).filter_by(appt_id=appt_id)
+    stmt = db.select(
+        Appointment
+    ).filter_by(
+        appt_id=appt_id
+    )
 
     # Connect to database session, execute statement, store resulting value
     appointment = db.session.scalar(stmt)
     
     # Guard clause; return error if no appointment exists
     if not appointment:
-        return jsonify({"error": f"Appointment {appt_id} not found."}), 404
+        return jsonify(
+            {"error": f"Appointment {appt_id} not found."}
+        ), 404
         
     # Delete appointment and commit changes to database
     db.session.delete(appointment)
     db.session.commit()
     
     # Return serialised success message
-    return jsonify({"message": f"Appointment {appt_id} deleted."})
+    return jsonify(
+        {"message": f"Appointment {appt_id} deleted."}
+    )

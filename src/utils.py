@@ -58,7 +58,7 @@ def authorise_as_patient_creator(fn):
         if jwt.get("user_type") != "patient":
             return jsonify({"error": "Only patients can manage logs."}), 403
         
-        # Create SQLAlchemy query statement
+        # Create SQLAlchemy query statement:
         
         # SELECT ...
         # ;

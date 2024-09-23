@@ -8,22 +8,43 @@ class Log(db.Model):
     
     # make sure i allow duplicate dates... so a patient can make multiple logs in one day. but how to prevent stupid identical duplicates?
 
-    log_id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date, default=date.today, nullable=False)  # is it redundant to use nullable=False AND a default date? -> seems okay/good
+    log_id = db.Column(
+        db.Integer, 
+        primary_key=True
+    )
+    date = db.Column(
+        db.Date, 
+        default=date.today, 
+        nullable=False
+    )  # is it redundant to use nullable=False AND a default date? -> seems okay/good
     
     notes = db.Column(db.String(1000), nullable=False)
 
     # FK from patient (many-to-one)
-    patient_id = db.Column(db.Integer, db.ForeignKey(
-        "patients.patient_id", ondelete="CASCADE"), nullable=False)
+    patient_id = db.Column(
+        db.Integer, 
+        db.ForeignKey(
+            "patients.patient_id", 
+            ondelete="CASCADE"
+        ), 
+        nullable=False
+    )
 
     # many-to-one?
-    patient = db.relationship("Patient", back_populates="logs")
+    patient = db.relationship(
+        "Patient", 
+        back_populates="logs"
+    )
 
 
 class LogSchema(ma.Schema):
     class Meta:
-        fields = ("log_id", "date", "notes", "patient_id")
+        fields = (
+            "log_id", 
+            "date", 
+            "notes", 
+            "patient_id"
+        )
 
 
 log_schema = LogSchema()
