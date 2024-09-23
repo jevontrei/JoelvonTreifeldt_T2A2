@@ -34,7 +34,7 @@ Table of Contents
 - [TALK ABOUT RESTful AND HOW I MOVED some ROUTES TO BE UNDER OTHER resources... like patients/x/treatments/ etc, while general treatment stuff is still under /treatments/](#talk-about-restful-and-how-i-moved-some-routes-to-be-under-other-resources-like-patientsxtreatments-etc-while-general-treatment-stuff-is-still-under-treatments)
 - [header data = auth / bearer token?](#header-data--auth--bearer-token)
       - [patient\_controller.py](#patient_controllerpy)
-        - [Example JSON response](#example-json-response)
+        - [Example JSON response (regenerate this? it's out of date)](#example-json-response-regenerate-this-its-out-of-date)
 - [Design Requirements](#design-requirements)
 - [Code Requirements](#code-requirements)
 - [Coding requirements](#coding-requirements)
@@ -351,7 +351,7 @@ Route: `http://localhost:5000/patients/`
 - Required header data: ?
 - Response: should include... JSON? SHOW EXAMPLE? HTTP STATUS CODE 200? Will respond with 404 Not Found if patient ID does not exist
 
-##### Example JSON response
+##### Example JSON response (regenerate this? it's out of date)
 
 HTTP status code: 200 OK
 

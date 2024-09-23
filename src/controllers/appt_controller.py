@@ -31,15 +31,17 @@ def get_all_appointments():
     """
     
     # Create SQLAlchemy query statement
-    # SELECT appointments.appt_id, appointments.datetime, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 
-    # FROM appointments
-    # ORDER BY appointments.datetime;
-    stmt = db.select(Appointment).order_by(Appointment.datetime)
+    # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 
+    # FROM appointments 
+    # ORDER BY appointments.date, appointments.time;
+    stmt = db.select(Appointment).order_by(Appointment.date, Appointment.time)
 
-    # Connect to database session, execute statement, return resulting values
-    appointments = db.session.scalars(stmt)
+    # Connect to database session, execute statement, return resulting values; fetchall() prevents returning an empty list/dict
+    appointments = db.session.scalars(stmt).fetchall()
     
-    # do i need a guard clause for if there are no appointments?
+    # Guard clause: return error if no appointments exist
+    if not appointments:
+        return jsonify({"error": "No appointments found."}), 404
     
     # Serialise appointment objects according to the appointments schema and return
     return appointments_schema.dump(appointments)
@@ -60,7 +62,7 @@ def get_an_appointment(appt_id):
     """
 
     # Create SQLAlchemy query statement
-    # SELECT appointments.appt_id, appointments.datetime, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 
+    # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 
     # FROM appointments 
     # WHERE appointments.appt_id = :appt_id_1;
     stmt = db.select(Appointment).filter_by(appt_id=appt_id)
@@ -97,7 +99,7 @@ def update_appointment(appt_id):
     body_data = request.get_json()
 
     # Create SQLAlchemy query statement
-    # SELECT appointments.appt_id, appointments.datetime, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 
+    # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 
     # FROM appointments 
     # WHERE appointments.appt_id = :appt_id_1;
     stmt = db.select(Appointment).filter_by(appt_id=appt_id)
@@ -110,7 +112,8 @@ def update_appointment(appt_id):
         return jsonify({"error": f"Appointment {appt_id} not found."}), 404
     
     # Assign updated details to appointment if provided, otherwise use pre-existing defaults
-    appointment.datetime = body_data.get("datetime", appointment.datetime)
+    appointment.date = body_data.get("date", appointment.date)
+    appointment.time = body_data.get("time", appointment.time)
     appointment.place = body_data.get("place", appointment.place)
     appointment.cost = body_data.get("cost", appointment.cost)
     appointment.status = body_data.get("status", appointment.status)
@@ -138,21 +141,18 @@ def delete_appointment(appt_id):
     """
     
     # Create SQLAlchemy query statement
-    
-    # SELECT * FROM appointments WHERE ... ?
-    # ;
-    
+    # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 
+    # FROM appointments 
+    # WHERE appointments.appt_id = :appt_id_1;
     stmt = db.select(Appointment).filter_by(appt_id=appt_id)
-    print()
-    print(stmt)
 
-    appt = db.session.scalar(stmt)
+    appointment = db.session.scalar(stmt)
     
-    # Guard clause
-    if not appt:
+    # Guard clause; return error if no appointment exists
+    if not appointment:
         return jsonify({"error": f"Appointment {appt_id} not found."}), 404
         
-    db.session.delete(appt)
+    db.session.delete(appointment)
     
     db.session.commit()
     

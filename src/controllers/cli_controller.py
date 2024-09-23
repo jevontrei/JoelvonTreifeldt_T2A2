@@ -153,21 +153,24 @@ def seed_tables():
     # seed appointments
     appointments = [
         Appointment(
-            datetime="2000-12-12",
+            date="2000-12-12",
+            time="07:00",
             place="Frog's Hollow Medical Centre",
             cost="100",
             status="Completed",
             treatment_id=treatments[0].treatment_id  # should change these so that i'm querying treatment for a particular patient and doctor combo
         ),
         Appointment(
-            datetime="1999-06-13",
+            date="1999-06-13",
+            time="12:00",
             place="Spring Hill Medical Centre",
             cost="206",
             status="Completed",
             treatment_id=treatments[0].treatment_id
         ),
         Appointment(
-            datetime="1989-06-13",
+            date="1989-06-13",
+            time="16:00",
             place="Spring Hill Medical Centre",
             cost="99",
             status="Cancelled",
@@ -175,14 +178,16 @@ def seed_tables():
             treatment_id=treatments[0].treatment_id
         ),
         Appointment(
-            datetime="2024-12-01",
+            date="2024-12-01",
+            time="11:30",
             place="UQ Medical Centre",
             cost="58",
             status="Scheduled",
             treatment_id=treatments[1].treatment_id
         ),
         Appointment(
-            datetime="2025-06-08",
+            date="2025-06-08",
+            time="09:00",
             place="UQ Medical Centre",
             cost="52",
             status="Scheduled",
@@ -190,14 +195,16 @@ def seed_tables():
             treatment_id=treatments[2].treatment_id
         ),
         Appointment(
-            datetime="2023-10-01",
+            date="2023-10-01",
+            time="13:00",
             place="UQ Medical Centre",
             cost="77",
             status="Completed",
             treatment_id=treatments[1].treatment_id
         ),
         Appointment(
-            datetime="1463-09-02",
+            date="1463-09-02",
+            time="12:00",
             place="London Medical Centre",
             cost="32",
             status="Completed",
@@ -205,7 +212,8 @@ def seed_tables():
             treatment_id=treatments[2].treatment_id
         ),
         Appointment(
-            datetime="1463-09-11",
+            date="1463-09-11",
+            time="14:30",
             place="London Medical Centre",
             cost="21",
             status="Completed",

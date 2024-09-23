@@ -10,12 +10,12 @@ class Appointment(db.Model):
     __tablename__ = "appointments"
 
     appt_id = db.Column(db.Integer, primary_key=True)
-    # changed to datetime, and remember to change seed values etc to include time
-    datetime = db.Column(db.DateTime, nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    time = db.Column(db.Time, nullable=False)
     place = db.Column(db.String(50), nullable=False)
     cost = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String, nullable=False)
-    notes = db.Column(db.String(50))
+    notes = db.Column(db.String(1000))
 
     treatment_id = db.Column(db.Integer, db.ForeignKey(
         "treatments.treatment_id", ondelete="CASCADE"), nullable=False)
@@ -27,7 +27,7 @@ class AppointmentSchema(ma.Schema):
     status = fields.String(validate=OneOf(VALID_STATUSES))
 
     class Meta:
-        fields = ("appt_id", "datetime", "place", "cost", "status", "notes", "treatment_id")
+        fields = ("appt_id", "date", "time", "place", "cost", "status", "notes", "treatment_id")
 
 
 appointment_schema = AppointmentSchema()

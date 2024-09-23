@@ -58,7 +58,7 @@ def register_user(user_type):
             user = Doctor(**body_data)
             schema = doctor_schema
 
-        # Guard clause
+        # Guard clause; return error if ?
         password = body_data.get("password")  # use .pop() instead for security?
         if not password:
             return jsonify({"error": "Password required."}), 400
@@ -134,39 +134,46 @@ def login_user(user_type):
     email = body_data.get("email")
     password = body_data.get("password")  # use .pop() instead for security?
 
-    # Guard clause
+    # Guard clause; return error if ?
     if not email or not password:
         return jsonify({"error": "Email and password required."}), 400
 
-    if user_type == "patient":
-        
-        # Create SQLAlchemy query statement
-        
-        # SELECT ...
-        
-        stmt = db.select(Patient).filter_by(email=email)
-        user = db.session.scalar(stmt)
-        user_id = user.patient_id
-        schema = patient_schema
+    try:
+        if user_type == "patient":
+            
+            # Create SQLAlchemy query statement
+            
+            # SELECT ...
+            
+            stmt = db.select(Patient).filter_by(email=email)
+            user = db.session.scalar(stmt)
+            user_id = user.patient_id
+            schema = patient_schema
 
-    elif user_type == "doctor":
-        
-        # Create SQLAlchemy query statement
-        
-        # SELECT ...
-        # ;
-        
-        stmt = db.select(Doctor).filter_by(email=email)
-        user = db.session.scalar(stmt)
-        user_id = user.doctor_id
-        schema = doctor_schema
+        elif user_type == "doctor":
+            
+            # Create SQLAlchemy query statement
+            
+            # SELECT ...
+            # ;
+            
+            stmt = db.select(Doctor).filter_by(email=email)
+            user = db.session.scalar(stmt)
+            user_id = user.doctor_id
+            schema = doctor_schema
+            
+    # Return error if user doesn't exist
+    except AttributeError as e:
+        return jsonify({"error": "Email address not found. Please register user or initialise database."}), 404
 
-    # Guard clause
-    if not user:
-        return jsonify({"error": f"User account '{email}' not found. Please register user or initialise database."}), 404
+    # ^^ which one to use here? the below guard clause doesn't actually catch logins with unrecognised email addresses vv
+
+    # Guard clause; return error if user doesn't exist
+    # if not user:
+    #     return jsonify({"error": f"User account '{email}' not found. Please register user or initialise database."}), 404
 
     # is 'password' a keyword for this function? will this give me issues?:
-    # Guard clause
+    # Guard clause; return error if ?
     if not bcrypt.check_password_hash(user.password, password):
         return jsonify({"error": "Invalid password."}), 401
 

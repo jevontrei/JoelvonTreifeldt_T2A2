@@ -68,17 +68,15 @@ def get_patient_logs(patient_id):
     """
     
     # Create SQLAlchemy query statement
-
-    # stmt: SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
+    # SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
     # FROM logs 
-    # WHERE logs.patient_id = :patient_id_1;
+    # WHERE logs.patient_id = :patient_id_1 ORDER BY logs.date;
+    stmt = db.select(Log).filter_by(patient_id=patient_id).order_by(Log.date)
 
-    stmt = db.select(Log).filter_by(patient_id=patient_id)#.order_by()
-
-    # defs need fetchall() here?
+    # Execute statement, fetch all resulting values(?)
     logs = db.session.scalars(stmt).fetchall()
     
-    # Guard clause
+    # Guard clause; return error if no logs exist
     if not logs:
         return jsonify({"error": f"Patient {patient_id} not found, or they have no logs."}), 404
     
@@ -113,7 +111,7 @@ def get_a_log(patient_id, log_id):
 
     log = db.session.scalar(stmt)
     
-    # Guard clause
+    # Guard clause; return error if log doesn't exist
     if not log:
         return jsonify({"error": f"Patient {patient_id} or log {log_id} not found."}), 404
     
@@ -149,7 +147,7 @@ def update_log(patient_id, log_id):
     
     log = db.session.scalar(stmt)
     
-    # Guard clause
+    # Guard clause; return error if log doesn't exist
     if not log:
         return jsonify({"error": f"Patient {patient_id} or log {log_id} not found."}), 404
         
@@ -187,7 +185,7 @@ def delete_log(patient_id, log_id):
 
     log = db.session.scalar(stmt)
 
-    # Guard clause
+    # Guard clause; return error if log doesn't exist
     if not log:
         return jsonify({"error": f"Patient {patient_id} or log {log_id} not found."}), 404
 

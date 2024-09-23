@@ -64,10 +64,8 @@ def authorise_as_patient_creator(fn):
         # ;
         
         stmt = db.select(Log).filter_by(patient_id=patient_id)
-        print(f"utils stmt: {stmt}")
         
         log = db.session.scalars(stmt).fetchall()
-        print(f"log: {log}")
 
         # Guard clause; return error if log doesn't exist
         if not log:

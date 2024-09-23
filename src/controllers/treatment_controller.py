@@ -71,8 +71,8 @@ def create_appointment(treatment_id):
     # remember to validate input!
     # define new instance of Appointment class
     appointment = Appointment(
-        datetime=body_data.get("datetime"),
-        # datetime=body_data["datetime"],  # use this version instead? does it matter?
+        date=body_data.get("date"),
+        time=body_data.get("time"),
         place=body_data.get("place"),        
         cost=body_data.get("cost"),        
         status=body_data.get("status"),
@@ -106,17 +106,14 @@ def get_treatment_appointments(treatment_id):
     """
 
     # Create SQLAlchemy query statement
-    
-    # SELECT appointments.appt_id, appointments.datetime, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 
+    # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 
     # FROM appointments 
-    # WHERE appointments.treatment_id = :treatment_id_1;
-
-    stmt = db.select(Appointment).filter_by(treatment_id=treatment_id).order_by(Appointment.datetime)
-    print()
-    print(stmt)
+    # WHERE appointments.treatment_id = :treatment_id_1 ORDER BY appointments.date;
+    stmt = db.select(Appointment).filter_by(treatment_id=treatment_id).order_by(Appointment.date)#.order_by(Appointment.time)
     
     appointments = db.session.scalars(stmt).fetchall()
     
+    # Guard clause; return error if no appointments exist
     if not appointments:
         return jsonify({"error": f"No appointments found for treatment {treatment_id}."}), 404
     
@@ -137,17 +134,17 @@ def get_all_treatments():
     """
     
     # Create SQLAlchemy query statement
-    
-    # SELECT * 
-    # FROM treatments
-    # ;
-    
-    stmt = db.select(Treatment)#.order_by()
-    print()
-    print(stmt)
+    # SELECT treatments.treatment_id, treatments.start_date, treatments.end_date, treatments.patient_id, treatments.doctor_id 
+    # FROM treatments 
+    # ORDER BY treatments.start_date;
+    stmt = db.select(Treatment).order_by(Treatment.start_date)
 
-    # execute statement, store in an iterable object
-    treatments = db.session.scalars(stmt)
+    # Execute statement, store in an iterable object(?)
+    treatments = db.session.scalars(stmt).fetchall()
+    
+    # Guard clause; return error if no treatments exist
+    if not treatments:
+        return jsonify({"error": "No treatments found."}), 404
     
     # serialise object to JSON, return it
     return treatments_schema.dump(treatments)
@@ -170,19 +167,14 @@ def get_a_treatment(treatment_id):
     """
     
     # Create SQLAlchemy query statement
-    
-    # SELECT * 
+    # SELECT treatments.treatment_id, treatments.start_date, treatments.end_date, treatments.patient_id, treatments.doctor_id 
     # FROM treatments 
-    # WHERE treatment_id=treatment_id ... ?
-    # ;
-    
+    # WHERE treatments.treatment_id = :treatment_id_1;
     stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
-    print()
-    print(stmt)
     
     treatment = db.session.scalar(stmt)
     
-    # Guard clause
+    # Guard clause; return error if log doesn't exist
     if not treatment:
         return jsonify({"error": f"Treatment {treatment_id} not found."}), 404
     
@@ -209,20 +201,15 @@ def update_treatment(treatment_id):
     body_data = request.get_json()
     
     # Create SQLAlchemy query statement
-    
-    # SELECT * 
+    # SELECT treatments.treatment_id, treatments.start_date, treatments.end_date, treatments.patient_id, treatments.doctor_id 
     # FROM treatments 
-    # WHERE treatment_id = treatment_id ... ?
-    # ;
-    
+    # WHERE treatments.treatment_id = :treatment_id_1;
     stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
-    print()
-    print(stmt)
     
-    # execute ...
+    # Execute ...
     treatment = db.session.scalar(stmt)
     
-    # Guard clause
+    # Guard clause; return error if log doesn't exist
     if not treatment:
         return jsonify({"error": f"Treatment {treatment_id} not found."}), 404
     
@@ -253,23 +240,21 @@ def delete_treatment(treatment_id):
     """
     
     # Create SQLAlchemy query statement
-    
-    # SELECT ?
-    # FROM
-    # ;
-    
+    # SELECT treatments.treatment_id, treatments.start_date, treatments.end_date, treatments.patient_id, treatments.doctor_id 
+    # FROM treatments 
+    # WHERE treatments.treatment_id = :treatment_id_1;
     stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
-    print()
-    print(stmt)
     
-    # execute statement and ...
+    # Execute statement and ...
     treatment = db.session.scalar(stmt)
     
-    # Guard clause
+    # Guard clause; return error if log doesn't exist
     if not treatment:
         return jsonify({"error": f"Treatment {treatment_id} not found."}), 404
         
+    # Delete treatment and commit to database
     db.session.delete(treatment)
     db.session.commit()
+    
     return jsonify({"message": f"Treatment {treatment_id} deleted."})
     
