@@ -8,9 +8,10 @@ from flask_jwt_extended import get_jwt_identity, get_jwt, get_jwt_header
 
 ##############################################################
 
+# how to implement this without preventing non-admins from accessing the function?
 
 def authorise_as_admin(fn):
-    """Decorator that authorises administrators to perform sensitive/important tasks. Admins can ..., ? is there anything they can't do?
+    """Decorator that authorises administrators to perform sensitive/important tasks.
 
     Args:
         fn (function): _description_
@@ -22,11 +23,6 @@ def authorise_as_admin(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         jwt = get_jwt()
-
-        # delet:
-        print()
-        print(jwt)
-        print()
 
         # Guard clause; return error if user is not an admin
         if not jwt.get("is_admin"):
@@ -111,6 +107,22 @@ def authorise_as_log_owner(fn):
         fn (function): _description_
     """
 
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        # Fetch patient_id, current user type and ID
+        jwt = get_jwt()
+        patient_id = kwargs.get("patient_id")
+        logged_in_id = get_jwt_identity()
+
+        # Guard clause; return error if patient_id does not match logged_in_id
+        if str(patient_id) != logged_in_id:
+            return jsonify({"error": "Only the log owner has manage access."}), 403
+
+        # Allow function to execute
+        return fn(*args, **kwargs)
+
+    # Return wrapper function
+    return wrapper
 
 # ##############################################################
 

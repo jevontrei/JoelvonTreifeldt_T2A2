@@ -1,7 +1,7 @@
 from sqlalchemy.exc import IntegrityError
 from init import db
 from models import Log, log_schema, logs_schema
-from utils import authorise_as_log_viewer#, authorise_as_appt_participant
+from utils import authorise_as_log_viewer, authorise_as_log_owner, authorise_as_admin#, authorise_as_appt_participant
 
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt
@@ -83,7 +83,6 @@ def create_log(patient_id):
 @jwt_required()
 # justify decorator choice
 @authorise_as_log_viewer
-# @authorise_as_appt_participant
 def get_patient_logs(patient_id):
     """Get all logs for a particular patient.
 
@@ -125,7 +124,7 @@ def get_patient_logs(patient_id):
 @logs_bp.route("/<int:log_id>")
 @jwt_required()
 # justify this decorator auth choice
-# @authorise_as_appt_participant
+@authorise_as_log_viewer
 def get_a_log(patient_id, log_id):
     """Get a particular log.
 
@@ -166,7 +165,7 @@ def get_a_log(patient_id, log_id):
 # http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>
 @logs_bp.route("/<int:log_id>", methods=["PUT", "PATCH"])
 @jwt_required()
-# @authorise_as_log_viewer
+@authorise_as_log_owner
 def update_log(patient_id, log_id):
     """Edit a log.
 
@@ -218,8 +217,8 @@ def update_log(patient_id, log_id):
 # http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>
 @logs_bp.route("/<int:log_id>", methods=["DELETE"])
 @jwt_required()
-# FIX THIS DECO?!:
-# @authorise_as_log_viewer  # need to pass in log_id?
+# justify this decorator auth choice
+@authorise_as_log_owner
 def delete_log(patient_id, log_id):
     """Delete a log.
 
