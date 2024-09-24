@@ -10,6 +10,7 @@ from flask_jwt_extended import get_jwt_identity, get_jwt, get_jwt_header
 
 # how to implement this without preventing non-admins from accessing the function?
 
+
 def authorise_as_admin(fn):
     """Decorator that authorises administrators to perform sensitive/important tasks.
 
@@ -69,11 +70,11 @@ def authorise_as_log_viewer(fn):
 
         elif user_type == "doctor":
             # doctor_id must be associated with the log's patient_id through the Treatments table
-            
+
             # Create SQLAlchemy query statement:
-            # SELECT * 
-            # FROM treatments 
-            # WHERE patient_id = :patient_id_1 
+            # SELECT *
+            # FROM treatments
+            # WHERE patient_id = :patient_id_1
             # AND doctor_id = :doctor_id_1;
             stmt = db.select(
                 Treatment
@@ -84,7 +85,7 @@ def authorise_as_log_viewer(fn):
             # Execute statement, fetch all resulting values
             # change this? only need one positive result
             treatment = db.session.scalars(stmt).fetchall()
-            
+
             # Guard clause; return error if no such doctor-patient relationship exists
             if not treatment:
                 return jsonify(
@@ -126,10 +127,8 @@ def authorise_as_log_owner(fn):
 
 # ##############################################################
 
-# FINISH THIS?!
 
-
-def authorise_as_appt_participant(fn):
+def authorise_treatment_participant(fn):
     """Decorator that authorises patients OR doctors (as specified in Treatments tables) to view logs and manage appointments
 
     Args:
@@ -138,4 +137,51 @@ def authorise_as_appt_participant(fn):
 
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
+        # Fetch user_id, user_type
         user_id = get_jwt_identity()
+        user_type = get_jwt().get("user_type")
+
+        # Fetch treatment_id from kwargs
+        treatment_id = kwargs.get("treatment_id")
+
+        # Create SQLAlchemy query statement:
+        # SELECT *
+        # FROM treatments
+        # WHERE treatment_id = :treatment_id_1;
+        stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
+
+        # Execute statement, fetch all resulting values
+        treatment = db.session.scalars(stmt).first()
+
+        # Guard clause; return error if no such doctor-patient relationship exists
+
+        # Guard clause; return error if no such treatment exists
+        if not treatment:
+            return jsonify(
+                {"error": "Treatment not found."}
+            ), 404
+
+        # Fetch patient_id and doctor_id from treatment
+        patient_id = treatment.patient_id
+        doctor_id = treatment.doctor_id
+
+        # Check user type
+        if user_type == "patient":
+            # patient_id must match the user_id
+            if str(patient_id) != user_id:
+                return jsonify(
+                    {"error": "Only authorised patients can access this resource."}
+                ), 403
+
+        elif user_type == "doctor":
+            # doctor_id must match the user_id
+            if str(doctor_id) != user_id:
+                return jsonify(
+                    {"error": "Only authorised doctors can access this resource."}
+                ), 403
+
+        # Allow function to execute
+        return fn(*args, **kwargs)
+
+    # Return wrapper function
+    return wrapper

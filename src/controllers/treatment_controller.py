@@ -1,6 +1,6 @@
 from init import db
 from models import Treatment, treatment_schema, treatments_schema, Appointment, appointment_schema, appointments_schema
-from utils import authorise_as_admin  # , authorise_as_appt_participant
+from utils import authorise_as_admin, authorise_treatment_participant
 
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
@@ -64,6 +64,8 @@ def create_treatment():
 
 @treatments_bp.route("/<int:treatment_id>/appointments/", methods=["POST"])
 @jwt_required()
+# @authorise_as_admin  # how to implement this without preventing patients from creating appointments for themselves etc?
+@authorise_treatment_participant
 def create_appointment(treatment_id):
     """_summary_
 
@@ -109,8 +111,8 @@ def create_appointment(treatment_id):
 @treatments_bp.route("/<int:treatment_id>/appointments/")
 @jwt_required()
 # justify deco choice?!
-# @authorise_as_admin
-# @authorise_as_appt_participant
+# @authorise_as_admin  # how to implement this without preventing patients from viewing their own appointments etc?
+@authorise_treatment_participant
 def get_treatment_appointments(treatment_id):
     """Get all appointments for a particular treatment relationship
 
@@ -152,6 +154,7 @@ def get_treatment_appointments(treatment_id):
 @treatments_bp.route("/")
 @jwt_required()
 # justify why i chose this particular auth decorator
+# This is a high-level endpoint that should be accessible to admins only
 @authorise_as_admin
 def get_all_treatments():
     """Get all treatments
@@ -190,9 +193,10 @@ def get_all_treatments():
 @treatments_bp.route("/<int:treatment_id>")
 @jwt_required()
 # justify why i chose this particular auth decorator
-@authorise_as_admin
+# @authorise_as_admin  # how to implement this without preventing patients from viewing their own treatment details etc?
+@authorise_treatment_participant
 def get_a_treatment(treatment_id):
-    """Get a specific treatment using the id
+    """Get details for a specific treatment using the id
 
     Args:
         treatment_id (_type_): _description_
@@ -230,9 +234,9 @@ def get_a_treatment(treatment_id):
 
 @treatments_bp.route("/<int:treatment_id>", methods=["PUT", "PATCH"])
 @jwt_required()
-# @authorise_as_admin
+# @authorise_as_admin  # how to implement this without preventing patients from viewing their own treatment details etc?
 # justify why i chose this particular auth decorator
-# @authorise_as_appt_participant
+@authorise_treatment_participant
 def update_treatment(treatment_id):
     """_summary_
 
@@ -284,7 +288,8 @@ def update_treatment(treatment_id):
 @treatments_bp.route("/<int:treatment_id>", methods=["DELETE"])
 @jwt_required()
 # justify why i chose this particular auth decorator
-@authorise_as_admin
+# @authorise_as_admin  # how to implement this without preventing patients from deleting their own treatment details etc?
+@authorise_treatment_participant
 def delete_treatment(treatment_id):
     """_summary_
 

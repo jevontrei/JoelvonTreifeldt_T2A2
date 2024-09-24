@@ -1,7 +1,7 @@
 from sqlalchemy.exc import IntegrityError
 from init import db
 from models import Log, log_schema, logs_schema
-from utils import authorise_as_log_viewer, authorise_as_log_owner, authorise_as_admin#, authorise_as_appt_participant
+from utils import authorise_as_log_viewer, authorise_as_log_owner, authorise_as_admin#, authorise_treatment_participant
 
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt

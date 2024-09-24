@@ -1,7 +1,7 @@
 # Internal imports
 from init import db
 from models import Appointment, appointment_schema, appointments_schema, Treatment
-from utils import authorise_as_admin
+from utils import authorise_as_admin, authorise_treatment_participant
 
 # External imports
 from flask import request, jsonify, Blueprint
@@ -22,6 +22,7 @@ appointments_bp = Blueprint(
 # http://localhost:5000/appointments/
 @appointments_bp.route("/")
 @jwt_required()
+# This is a high-level endpoint that should be accessible to admins only
 @authorise_as_admin
 def get_all_appointments():
     """Get a comprehensive view of all appointments. User must have a current valid JWT and be an admin.
@@ -58,6 +59,8 @@ def get_all_appointments():
 # http://localhost:5000/appointments/<int:appt_id>
 @appointments_bp.route("/<int:appt_id>")
 @jwt_required()
+# @authorise_as_admin  # how to implement this without preventing patients from viewing their own appointment details etc?
+@authorise_treatment_participant
 def get_an_appointment(appt_id):
     """Find any appointment using its unique ID. User must have a current valid JWT and be an admin.
 
@@ -94,8 +97,8 @@ def get_an_appointment(appt_id):
 
 @appointments_bp.route("/<int:appt_id>", methods=["PUT", "PATCH"])
 @jwt_required()
-# @authorise_as_admin
-# @authorise_as_appt_participant
+# @authorise_as_admin  # how to implement this without preventing patients from editing their own appointment details etc?
+@authorise_treatment_participant
 def update_appointment(appt_id):
     """Edit appointment details. User must have a current valid JWT and be an admin (or participant?).
 
@@ -145,8 +148,8 @@ def update_appointment(appt_id):
 
 @appointments_bp.route("/<int:appt_id>", methods=["DELETE"])
 @jwt_required()
-# @authorise_as_admin
-# @authorise_as_appt_participant
+# @authorise_as_admin  # how to implement this without preventing patients from deleting their own appointment details etc?
+@authorise_treatment_participant
 def delete_appointment(appt_id):
     """Delete any appointment.
 
