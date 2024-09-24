@@ -21,16 +21,18 @@ from psycopg2 import errorcodes
 
 ###########################################################################
 
-# create auth blueprint with url prefix
+# Create auth blueprint with URL prefix
 auth_bp = Blueprint(
-    "auth", 
-    __name__, 
+    "auth",
+    __name__,
     url_prefix="/auth"
 )
 
 ###########################################################################
 
 # http://localhost:5000/auth/register/<user_type>
+
+
 @auth_bp.route("/register/<user_type>", methods=["POST"])
 def register_user(user_type):
     """_summary_
@@ -42,28 +44,31 @@ def register_user(user_type):
         _type_: _description_
     """
 
-    # Guard clause to escape function early if user type is invalid
+    # Guard clause; escape function early if user type is invalid
     if user_type not in ["patient", "doctor"]:
         return jsonify(
             {"error": f"User type '{user_type}' not valid. URL must include '/auth/register/patient' or '/auth/register/doctor'."}
         ), 400
-        
+
     try:
         # Load data according to schema (this allows email regex to work), deserialise it, store in variable; create user instance with kwargs; assign correct schema
         if user_type == "patient":
             body_data = PatientSchema().load(request.get_json())
             user = Patient(**body_data)
             schema = patient_schema
-            
+
         elif user_type == "doctor":
             body_data = DoctorSchema().load(request.get_json())
             user = Doctor(**body_data)
             schema = doctor_schema
 
         # Guard clause; return error if no password provided
-        password = body_data.get("password")  # use .pop() instead for security?
+        # use .pop() instead for security?
+        password = body_data.get("password")
         if not password:
-            return jsonify({"error": "Password required."}), 400
+            return jsonify(
+                {"error": "Password required."}
+            ), 400
 
         # Hash password
         user.password = bcrypt.generate_password_hash(
@@ -73,7 +78,7 @@ def register_user(user_type):
         db.session.add(user)
         db.session.commit()
 
-        # Return user object serialised according to the corresponding schema 
+        # Return user object serialised according to the corresponding schema
         return schema.dump(user), 201
 
     # when would this one actually arise? do i need it? i've already handled invalid emails haven't I?
@@ -89,7 +94,9 @@ def register_user(user_type):
     # If the email address (or ___?) is missing or already taken
     except IntegrityError as e:
         if e.orig.pgcode == errorcodes.NOT_NULL_VIOLATION:
-            # return jsonify({"error": "Email address is required"}), 400  # ?
+            # return jsonify(
+            # {"error": "Email address is required"}
+            # ), 400  # ?
             return jsonify(
                 {"error": f"The column {e.orig.diag.column_name} is required."}
             ), 400
@@ -114,6 +121,8 @@ def register_user(user_type):
 # doctor and patient emails must be unique within one type of model, but a doctor can duplicate themselves as a patient with the same email no worries. BUT! that will cause confusion with logging in. how do you know what someone is trying to log in as? use roles?
 
 # http://localhost:5000/auth/login/<user_type>
+
+
 @auth_bp.route("/login/<user_type>", methods=["POST"])
 def login_user(user_type):
     """_summary_
@@ -127,9 +136,10 @@ def login_user(user_type):
 
     # try:
 
-    # fetch data, deserialise it, store in variable
+    # Fetch data, deserialise it, store in variable
     body_data = request.get_json()
 
+    # Guard clause; return error if ?
     if user_type not in ["patient", "doctor"]:
         return jsonify(
             {"error": f"User type '{user_type}' not valid. URL must include '/auth/login/patient' or '/auth/login/doctor'."}
@@ -146,35 +156,37 @@ def login_user(user_type):
 
     try:
         if user_type == "patient":
-            
             # Create SQLAlchemy query statement:
-            
-            # SELECT ...
-            
+            # SELECT patients.patient_id, patients.name, patients.email, patients.password, patients.dob, patients.sex, patients.is_admin
+            # FROM patients
+            # WHERE patients.email = :email_1;
             stmt = db.select(
                 Patient
             ).filter_by(
                 email=email
             )
-            
+
             # Connect to database session, execute statement, store resulting value
             user = db.session.scalar(stmt)
             user_id = user.patient_id
             schema = patient_schema
 
         elif user_type == "doctor":
-            
             # Create SQLAlchemy query statement:
-            
-            # SELECT ...
-            # ;
-            
-            stmt = db.select(Doctor).filter_by(email=email)
+            # SELECT doctors.doctor_id, doctors.name, doctors.email, doctors.password, doctors.sex, doctors.specialty, doctors.is_admin 
+            # FROM doctors 
+            # WHERE doctors.email = :email_1;
+            stmt = db.select(
+                Doctor
+            ).filter_by(
+                email=email
+            )
+
             # Connect to database session, execute statement, store resulting value
             user = db.session.scalar(stmt)
             user_id = user.doctor_id
             schema = doctor_schema
-            
+
     # Return error if user doesn't exist
     except AttributeError as e:
         return jsonify(
@@ -185,15 +197,18 @@ def login_user(user_type):
 
     # Guard clause; return error if user doesn't exist
     # if not user:
-    #     return jsonify({"error": f"User account '{email}' not found. Please register user or initialise database."}), 404
+    #     return jsonify(
+        # {"error": f"User account '{email}' not found. Please register user or initialise database."}
+        # ), 404
 
     # is 'password' a keyword for this function? will this give me issues?:
-    # Guard clause; return error if ?
+    # Guard clause; return error if password doesn't match stored hash?
     if not bcrypt.check_password_hash(user.password, password):
         return jsonify(
             {"error": "Invalid password."}
         ), 401
 
+    # Create JWT
     token = create_access_token(
         identity=str(user_id),
         additional_claims={
@@ -207,10 +222,10 @@ def login_user(user_type):
     # Return serialised login details?
     return jsonify(
         {
-        "email": email,
-        "is_admin": user.is_admin,
-        "user_type": user_type,
-        "token": token
+            "email": email,
+            "is_admin": user.is_admin,
+            "user_type": user_type,
+            "token": token
         }
     )
 

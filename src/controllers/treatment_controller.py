@@ -1,6 +1,6 @@
 from init import db
 from models import Treatment, treatment_schema, treatments_schema, Appointment, appointment_schema, appointments_schema
-from utils import authorise_as_admin  # , authorise_as_participant
+from utils import authorise_as_admin  # , authorise_as_appt_participant
 
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
@@ -110,7 +110,7 @@ def create_appointment(treatment_id):
 @jwt_required()
 # justify deco choice?!
 # @authorise_as_admin
-# @authorise_as_participant
+# @authorise_as_appt_participant
 def get_treatment_appointments(treatment_id):
     """Get all appointments for a particular treatment relationship
 
@@ -214,7 +214,7 @@ def get_a_treatment(treatment_id):
     # Connect to database session, execute statement, store resulting value
     treatment = db.session.scalar(stmt)
 
-    # Guard clause; return error if log doesn't exist
+    # Guard clause; return error if treatment doesn't exist
     if not treatment:
         return jsonify(
             {"error": f"Treatment {treatment_id} not found."}
@@ -232,7 +232,7 @@ def get_a_treatment(treatment_id):
 @jwt_required()
 # @authorise_as_admin
 # justify why i chose this particular auth decorator
-# @authorise_as_participant
+# @authorise_as_appt_participant
 def update_treatment(treatment_id):
     """_summary_
 
@@ -258,7 +258,7 @@ def update_treatment(treatment_id):
     # Connect to database session, execute statement, store resulting value
     treatment = db.session.scalar(stmt)
 
-    # Guard clause; return error if log doesn't exist
+    # Guard clause; return error if treatment doesn't exist
     if not treatment:
         return jsonify(
             {"error": f"Treatment {treatment_id} not found."}
@@ -308,7 +308,7 @@ def delete_treatment(treatment_id):
     # Connect to database session, execute statement, store resulting value
     treatment = db.session.scalar(stmt)
 
-    # Guard clause; return error if log doesn't exist
+    # Guard clause; return error if treatment doesn't exist
     if not treatment:
         return jsonify(
             {"error": f"Treatment {treatment_id} not found."}

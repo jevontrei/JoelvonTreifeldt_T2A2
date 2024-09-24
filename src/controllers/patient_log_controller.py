@@ -1,10 +1,10 @@
 from sqlalchemy.exc import IntegrityError
 from init import db
 from models import Log, log_schema, logs_schema
-from utils import authorise_as_patient_creator#, authorise_as_participant
+from utils import authorise_as_log_viewer#, authorise_as_appt_participant
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt
 from datetime import date
 
 ############################################
@@ -33,10 +33,27 @@ def create_log(patient_id):
     """
     
     try:
+        #############################################
+        # Should this be a decorator?
+        # Get the JWT
+        jwt = get_jwt()
+        # Guard clause; return error if user is not a patient
+        if jwt.get("user_type") != "patient":
+            return jsonify(
+                {"error": "Only patients can create logs."}
+            ), 403     
+        # Guard clause; return error if logged in patient does not match patient_id
+        if get_jwt_identity() != patient_id:
+            return jsonify(
+                {"error": "Logged in patient does not match patient_id."}
+            ), 403
+        #############################################
+        
+        # Fetch content of request
         body_data = request.get_json()
         
         # remember to validate input!
-        # define new instance of Log class
+        # Define new instance of Log class
         log = Log(
             date=body_data.get("date") or date.today(),
             notes=body_data.get("notes"),
@@ -64,9 +81,9 @@ def create_log(patient_id):
 # http://localhost:5000/patients/<int:patient_id>/logs/
 @logs_bp.route("/")
 @jwt_required()
-# justify deco choice
-# @authorise_as_patient_creator
-# @authorise_as_participant
+# justify decorator choice
+@authorise_as_log_viewer
+# @authorise_as_appt_participant
 def get_patient_logs(patient_id):
     """Get all logs for a particular patient.
 
@@ -80,7 +97,8 @@ def get_patient_logs(patient_id):
     # Create SQLAlchemy query statement:
     # SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
     # FROM logs 
-    # WHERE logs.patient_id = :patient_id_1 ORDER BY logs.date;
+    # WHERE logs.patient_id = :patient_id_1 
+    # ORDER BY logs.date;
     stmt = db.select(
         Log
     ).filter_by(
@@ -107,7 +125,7 @@ def get_patient_logs(patient_id):
 @logs_bp.route("/<int:log_id>")
 @jwt_required()
 # justify this decorator auth choice
-# @authorise_as_participant
+# @authorise_as_appt_participant
 def get_a_log(patient_id, log_id):
     """Get a particular log.
 
@@ -148,7 +166,7 @@ def get_a_log(patient_id, log_id):
 # http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>
 @logs_bp.route("/<int:log_id>", methods=["PUT", "PATCH"])
 @jwt_required()
-# @authorise_as_patient_creator
+# @authorise_as_log_viewer
 def update_log(patient_id, log_id):
     """Edit a log.
 
@@ -201,7 +219,7 @@ def update_log(patient_id, log_id):
 @logs_bp.route("/<int:log_id>", methods=["DELETE"])
 @jwt_required()
 # FIX THIS DECO?!:
-# @authorise_as_patient_creator  # need to pass in log_id?
+# @authorise_as_log_viewer  # need to pass in log_id?
 def delete_log(patient_id, log_id):
     """Delete a log.
 

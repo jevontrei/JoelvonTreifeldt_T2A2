@@ -7,6 +7,7 @@ from marshmallow.validate import Regexp
 class Doctor(db.Model):
     __tablename__ = "doctors"
 
+    # Attributes/columns
     doctor_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
@@ -16,12 +17,9 @@ class Doctor(db.Model):
     is_admin = db.Column(db.Boolean, default=False)
 
     # does this need to be nested? to avoid circular chaos?
-    # check if this makes sense as cascade
-    treatments = db.relationship(
-        "Treatment", 
-        back_populates="doctor", 
-        cascade="all, delete"
-    )
+    # check/TEST if this makes sense as cascade
+    # One-to-many relationship
+    treatments = db.relationship("Treatment", back_populates="doctor", cascade="all, delete")
 
 
 class DoctorSchema(ma.Schema):
@@ -52,5 +50,6 @@ class DoctorSchema(ma.Schema):
         )
 
 
+# Subclass schema for singular and plural cases
 doctor_schema = DoctorSchema(exclude=["password"])
 doctors_schema = DoctorSchema(many=True, exclude=["password"])

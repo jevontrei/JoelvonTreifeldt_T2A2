@@ -53,7 +53,9 @@ def create_app():
             _type_: _description_
         """
         # return welcome message
-        return jsonify({"message": "Welcome. Let's get healthy."})
+        return jsonify(
+            {"message": "Welcome. Let's get healthy."}
+        )
 
     # Globally handle generalised errors
     @app.errorhandler(ValidationError)
@@ -80,8 +82,8 @@ def create_app():
         Returns:
             _type_: _description_
         """
-        return jsonify({
-            "error": str(err)}
+        return jsonify(
+            {"error": str(err)}
         ), 400
 
     @app.errorhandler(401)

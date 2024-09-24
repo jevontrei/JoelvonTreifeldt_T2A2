@@ -95,7 +95,7 @@ def get_an_appointment(appt_id):
 @appointments_bp.route("/<int:appt_id>", methods=["PUT", "PATCH"])
 @jwt_required()
 # @authorise_as_admin
-# @authorise_as_participant
+# @authorise_as_appt_participant
 def update_appointment(appt_id):
     """Edit appointment details. User must have a current valid JWT and be an admin (or participant?).
 
@@ -146,7 +146,7 @@ def update_appointment(appt_id):
 @appointments_bp.route("/<int:appt_id>", methods=["DELETE"])
 @jwt_required()
 # @authorise_as_admin
-# @authorise_as_participant
+# @authorise_as_appt_participant
 def delete_appointment(appt_id):
     """Delete any appointment.
 

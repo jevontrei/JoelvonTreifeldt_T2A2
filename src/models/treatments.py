@@ -1,58 +1,29 @@
-
 from init import db, ma
 
 
 class Treatment(db.Model):
     __tablename__ = "treatments"
-    treatment_id = db.Column(
-        db.Integer, 
-        primary_key=True
-    )
     
-    start_date = db.Column(
-        db.Date, 
-        nullable=False
-    )
+    # Attributes/columns
+    treatment_id = db.Column(db.Integer, primary_key=True)
+    start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date)
     
-    patient_id = db.Column(
-        db.Integer, 
-        db.ForeignKey(
-            "patients.patient_id"
-        ), 
-        nullable=False
-    )
-    
-    doctor_id = db.Column(
-        db.Integer, 
-        db.ForeignKey(
-            "doctors.doctor_id"
-        ), 
-        nullable=False
-    )
+    # Foreign keys from parent tables
+    patient_id = db.Column(db.Integer, db.ForeignKey("patients.patient_id"), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey("doctors.doctor_id"), nullable=False)
 
-    # many-to-one
-    patient = db.relationship(
-        "Patient", 
-        back_populates="treatments"
-    )
-    doctor = db.relationship(
-        "Doctor", 
-        back_populates="treatments"
-    )
+    # Many-to-one relationships
+    patient = db.relationship("Patient", back_populates="treatments")
+    doctor = db.relationship("Doctor", back_populates="treatments")
     
-    # this allows us to view a treatment's appts... bi-directionally but no need for a line starting with appt_id = ... bc it's not actually a column in the treatments table, and bc treatments is the parent. this is just to establish the two-way connection
-    # one-to-many
-    appointments = db.relationship(
-        "Appointment", 
-        back_populates="treatment", 
-        cascade="all, delete"
-    )
+    # This relationship allows us to view a treatment's appts... bi-directionally but no need for a line starting with appt_id = ... bc it's not actually a column in the treatments table, and bc treatments is the parent. this is just to establish the two-way connection
+    # One-to-many relationship
+    appointments = db.relationship("Appointment", back_populates="treatment", cascade="all, delete")
 
 
 class TreatmentSchema(ma.Schema):
-
-    # remember to constrain each entry to be unique... right now you can create 100 different identical treatment entries?!
+    # remember to constrain each entry to be unique... right now you can create 100+ different identical treatment entries?!
     # remember to validate that end date, if it exists, is on or after start date:
 
     class Meta:
@@ -65,5 +36,6 @@ class TreatmentSchema(ma.Schema):
         )
 
 
+# Subclass schema for singular and plural cases
 treatment_schema = TreatmentSchema()
 treatments_schema = TreatmentSchema(many=True)

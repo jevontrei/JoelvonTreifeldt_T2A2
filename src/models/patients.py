@@ -8,6 +8,7 @@ from marshmallow.validate import Regexp
 class Patient(db.Model):
     __tablename__ = "patients"
 
+    # Attributes/columns
     patient_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
@@ -16,23 +17,14 @@ class Patient(db.Model):
     sex = db.Column(db.String(15))
     is_admin = db.Column(db.Boolean, default=False)
 
-    logs = db.relationship(
-        "Log", 
-        back_populates="patient", 
-        cascade="all, delete"
-    )
-
-    # one-to-many
-    # check if this makes sense as cascade?! i think it does bc this is the parent?
-    treatments = db.relationship(
-        "Treatment", 
-        back_populates="patient", 
-        cascade="all, delete"
-    )
+    # One-to-many relationships
+    logs = db.relationship("Log", back_populates="patient", cascade="all, delete")
+    # check/TEST if this makes sense as cascade?! i think it does bc this is the parent?
+    treatments = db.relationship("Treatment", back_populates="patient", cascade="all, delete")
 
 
 class PatientSchema(ma.Schema):
-    # use regex to ...
+    # Use regex to ...
     email = fields.Email(
         required=True, 
         default_error_messages = {"invalid": "Not a valid email address."}
@@ -59,6 +51,7 @@ class PatientSchema(ma.Schema):
         )
 
 
+# Subclass schema for singular and plural cases
 patient_schema = PatientSchema(exclude=["password"])
 patients_schema = PatientSchema(many=True, exclude=["password"])
 
