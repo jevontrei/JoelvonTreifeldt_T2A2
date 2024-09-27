@@ -70,6 +70,7 @@ def authorise_as_log_viewer(fn):
 
         elif user_type == "doctor":
             # doctor_id must be associated with the log's patient_id through the Treatments table
+            # PROBLEM: Doctor should not be able to see log if the treatment end date has passed?! Implement this.
 
             # Create SQLAlchemy query statement:
             # SELECT *

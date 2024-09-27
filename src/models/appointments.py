@@ -23,11 +23,9 @@ class Appointment(db.Model):
     notes = db.Column(db.String(1000))
 
     # Foreign key from parent table
-    # do i really need this ondelete thing here? understand this properly!
-    treatment_id = db.Column(db.Integer, db.ForeignKey(
-        "treatments.treatment_id", ondelete="CASCADE"), nullable=False)
+    treatment_id = db.Column(db.Integer, db.ForeignKey("treatments.treatment_id", ondelete="CASCADE"), nullable=False)
 
-    # Many-to-one relationship from the appointment's perspective
+    # Many-to-one relationship from the appointment's perspective (child)
     treatment = db.relationship("Treatment", back_populates="appointments")
 
 

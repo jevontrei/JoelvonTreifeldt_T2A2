@@ -114,7 +114,6 @@ def seed_tables():
             password=bcrypt.generate_password_hash("password").decode("utf-8")
         )
     ]
-    
     # Add seeded doctors to session and commit changes to database
     db.session.add_all(doctors)
     db.session.commit()

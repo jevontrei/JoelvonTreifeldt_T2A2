@@ -8,6 +8,8 @@ from marshmallow.validate import Length, Regexp
 class Patient(db.Model):
     __tablename__ = "patients"
 
+    # makr sure these details all match ERD! like char(50) etc
+
     # Attributes/columns
     patient_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -17,10 +19,9 @@ class Patient(db.Model):
     sex = db.Column(db.String(15))
     is_admin = db.Column(db.Boolean, default=False)
 
-    # One-to-many relationships from the patient's perspective
-    logs = db.relationship("Log", back_populates="patient", cascade="all, delete")
-    # check/TEST if this makes sense as cascade?! i think it does bc this is the parent?
-    treatments = db.relationship("Treatment", back_populates="patient", cascade="all, delete")
+    # One-to-many relationships from the patient's (parent) perspective
+    logs = db.relationship("Log", back_populates="patient", cascade="all, delete")  # Deleting a patient deletes their logs
+    treatments = db.relationship("Treatment", back_populates="patient", cascade="all, delete")  # Deleting a patient deletes their treatments
 
 
 class PatientSchema(ma.Schema):

@@ -12,14 +12,14 @@ class Doctor(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
+    # password = db.Column(db.String(50), nullable=False)
     sex = db.Column(db.String(15))
     specialty = db.Column(db.String(30))
     is_admin = db.Column(db.Boolean, default=False)
 
+    # One-to-many relationship from the doctor's (parent) perspective
     # does this need to be nested? to avoid circular chaos?
-    # check/TEST if this makes sense as cascade
-    # One-to-many relationship from the doctor's perspective
-    treatments = db.relationship("Treatment", back_populates="doctor", cascade="all, delete")
+    treatments = db.relationship("Treatment", back_populates="doctor")  # Don't cascade-delete; patients should retain treatment records
 
 
 class DoctorSchema(ma.Schema):
@@ -38,8 +38,11 @@ class DoctorSchema(ma.Schema):
 
     
     class Meta:
+        # need to create a guard clause / error handling for all this validation?
         name = fields.String(validate=Length(100))
         email = fields.String(validate=Length(100))
+        # How to do length requirement without breaking seed command? How does the hashing affect this?
+        # password = fields.String(validate=Length(50))
         sex = fields.String(validate=Length(15))
         specialty = fields.String(validate=Length(30))
         

@@ -62,13 +62,13 @@ def get_all_appointments():
 # @authorise_as_admin  # how to implement this without preventing patients from viewing their own appointment details etc?
 @authorise_treatment_participant
 def get_an_appointment(appt_id):
-    """Find any appointment using its unique ID. User must have a current valid JWT and be an admin.
+    """Find any appointment using its unique ID. User must have a current valid JWT and be a treatment participant or an admin.
 
     Args:
         appt_id (int): Appointment primary key.
 
     Returns:
-        JSON: Appointment details, serialised according to appointments schema.
+        JSON: Appointment details, serialised according to appointment schema.
     """
 
     # Create SQLAlchemy query statement:
@@ -100,7 +100,7 @@ def get_an_appointment(appt_id):
 # @authorise_as_admin  # how to implement this without preventing patients from editing their own appointment details etc?
 @authorise_treatment_participant
 def update_appointment(appt_id):
-    """Edit appointment details. User must have a current valid JWT and be an admin (or participant?).
+    """Edit appointment details. User must have a current valid JWT and be an admin or a treatment participant.
 
     Args:
         appt_id (int): Appointment primary key.
@@ -148,10 +148,10 @@ def update_appointment(appt_id):
 
 @appointments_bp.route("/<int:appt_id>", methods=["DELETE"])
 @jwt_required()
-# @authorise_as_admin  # how to implement this without preventing patients from deleting their own appointment details etc?
+# @authorise_as_admin  # how to implement this without preventing patients from deleting their own appointments etc?
 @authorise_treatment_participant
 def delete_appointment(appt_id):
-    """Delete any appointment.
+    """Delete any appointment. WARNING: This action will erase appointment notes. Consider saving notes before deleting.
 
     Args:
         appt_id (int): Appointment primary key.

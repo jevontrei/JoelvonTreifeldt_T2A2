@@ -291,7 +291,7 @@ def update_treatment(treatment_id):
 # @authorise_as_admin  # how to implement this without preventing patients from deleting their own treatment details etc?
 @authorise_treatment_participant
 def delete_treatment(treatment_id):
-    """_summary_
+    """Delete any treatment. WARNING: Not recommended. This action is destructive and will prevent patients and doctors from viewing ANY appointments associated with this treatment ID. I.e. the @authorise_treatment_participant decorator will not be functional. An admin should archive all related appointment details (especially notes) in the patient's log before deleting treatment.
 
     Args:
         treatment_id (_type_): _description_
