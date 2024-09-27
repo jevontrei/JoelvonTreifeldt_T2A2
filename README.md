@@ -31,8 +31,8 @@ Table of Contents
       - [Log model](#log-model)
       - [Relationships: move R6 answers here](#relationships-move-r6-answers-here)
     - [R8 - Explain how to use this application’s API endpoints.](#r8---explain-how-to-use-this-applications-api-endpoints)
-- [TALK ABOUT RESTful AND HOW I MOVED some ROUTES TO BE UNDER OTHER resources... like patients/x/treatments/ etc, while general treatment stuff is still under /treatments/](#talk-about-restful-and-how-i-moved-some-routes-to-be-under-other-resources-like-patientsxtreatments-etc-while-general-treatment-stuff-is-still-under-treatments)
-- [header data = auth / bearer token?](#header-data--auth--bearer-token)
+      - [TALK ABOUT RESTful AND HOW I MOVED some ROUTES TO BE UNDER OTHER resources... like patients/x/treatments/ etc, while general treatment stuff is still under /treatments/... mention nested resources](#talk-about-restful-and-how-i-moved-some-routes-to-be-under-other-resources-like-patientsxtreatments-etc-while-general-treatment-stuff-is-still-under-treatments-mention-nested-resources)
+      - [header data = auth / bearer token?](#header-data--auth--bearer-token)
       - [patient\_controller.py](#patient_controllerpy)
         - [Example JSON response (regenerate this? it's out of date)](#example-json-response-regenerate-this-its-out-of-date)
 - [Design Requirements](#design-requirements)
@@ -66,6 +66,8 @@ Provides a DETAILED explanation about the problem being solved by the developed 
 Medical tracker / planner? smooth and user-friendly interface between patients and doctors
 
 hopefully an improvement on My Health Record, the Australian ... with a focus on helping the patient / giving them more agency
+
+By tracking patients, doctors, treatment relationships, appointments, and patient logs,
 
 Things to add in future versions:
 
@@ -130,9 +132,9 @@ Identifies an appropriate database system and DESCRIBES SOME benefits and/or dra
 6 to >5 pts HD
 Meets D, and describes benefits AND drawbacks to a thorough level of detail. -->
 
-PostgreSQL
-DBMS
-ACID
+The DBMS PostgreSQL was chosen primarily because it is based on the relational model. A relational database is appropriate for this medical tracker app which has multiple entities related in definitive ways. Many-to-many and one-to-many relationships are effectively handled by PostgreSQL, which is also ACID-compliant (ref). Atomicity, consistency, integrity, durability?
+
+For this project in particular, PostgreSQL ...
 
 https://docs.digitalocean.com/glossary/acid/
 
@@ -152,7 +154,6 @@ SQLAlchemy
 
 9 to >8 pts C
 Provides a BASIC entity relationship diagram (ERD), with a BRIEF explanation of how ALL of the relations depicted in the ERD are normalised.
-
 
 10 to >9 pts D
 Meets CR, and the ERD includes a legend/key of the notation and styles matching a notation or style identified in the accompanying explanation.
@@ -313,7 +314,7 @@ The relationships ...
 
 ### R8 - Explain how to use this application’s API endpoints.
 
-# TALK ABOUT RESTful AND HOW I MOVED some ROUTES TO BE UNDER OTHER resources... like patients/x/treatments/ etc, while general treatment stuff is still under /treatments/
+#### TALK ABOUT RESTful AND HOW I MOVED some ROUTES TO BE UNDER OTHER resources... like patients/x/treatments/ etc, while general treatment stuff is still under /treatments/... mention nested resources
 
 Each endpoint should be explained, including the following data for each endpoint:
 
@@ -323,11 +324,18 @@ Each endpoint should be explained, including the following data for each endpoin
 - Response / Expected response data
 - Authentication methods where applicable
   - jwt_required()
-  - authorise_as_admin
-  - authorise_treatment_participant
-  - authorise_creator
 
-# header data = auth / bearer token?
+ALSO different authorisation levels:
+
+- Authorisation:
+  - authorise_as_admin
+  - authorise_as_log_viewer
+  - authorise_as_log_owner
+  - authorise_treatment_participant
+- Validation / sanitisation of input
+  - regex?
+
+#### header data = auth / bearer token?
 
 <!-- CMP1001-1.4: IDENTIFY AND DESCRIBE the application’s API endpoints.
 

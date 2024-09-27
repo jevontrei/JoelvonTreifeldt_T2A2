@@ -2,7 +2,7 @@ from init import db, ma
 from models.treatments import TreatmentSchema
 
 from marshmallow import fields
-from marshmallow.validate import Regexp
+from marshmallow.validate import Length, Regexp
 
 class Doctor(db.Model):
     __tablename__ = "doctors"
@@ -18,7 +18,7 @@ class Doctor(db.Model):
 
     # does this need to be nested? to avoid circular chaos?
     # check/TEST if this makes sense as cascade
-    # One-to-many relationship
+    # One-to-many relationship from the doctor's perspective
     treatments = db.relationship("Treatment", back_populates="doctor", cascade="all, delete")
 
 
@@ -38,6 +38,11 @@ class DoctorSchema(ma.Schema):
 
     
     class Meta:
+        name = fields.String(validate=Length(100))
+        email = fields.String(validate=Length(100))
+        sex = fields.String(validate=Length(15))
+        specialty = fields.String(validate=Length(30))
+        
         fields = (
             "doctor_id", 
             "name", 

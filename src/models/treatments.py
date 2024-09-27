@@ -13,12 +13,12 @@ class Treatment(db.Model):
     patient_id = db.Column(db.Integer, db.ForeignKey("patients.patient_id"), nullable=False)
     doctor_id = db.Column(db.Integer, db.ForeignKey("doctors.doctor_id"), nullable=False)
 
-    # Many-to-one relationships
-    patient = db.relationship("Patient", back_populates="treatments")
-    doctor = db.relationship("Doctor", back_populates="treatments")
+    # Many-to-one relationships from the treatment's perspective
+    patient = db.relationship("Patient", back_populates="treatments")  # why don't i have ondelete="CASCADE" here?
+    doctor = db.relationship("Doctor", back_populates="treatments")  # why don't i have ondelete="CASCADE" here?
     
     # This relationship allows us to view a treatment's appts... bi-directionally but no need for a line starting with appt_id = ... bc it's not actually a column in the treatments table, and bc treatments is the parent. this is just to establish the two-way connection
-    # One-to-many relationship
+    # One-to-many relationship from the treatment's perspective
     appointments = db.relationship("Appointment", back_populates="treatment", cascade="all, delete")
 
 

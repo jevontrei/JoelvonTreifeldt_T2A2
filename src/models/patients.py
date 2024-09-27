@@ -2,7 +2,7 @@ from init import db, ma
 from models.treatments import TreatmentSchema
 
 from marshmallow import fields
-from marshmallow.validate import Regexp
+from marshmallow.validate import Length, Regexp
 
 
 class Patient(db.Model):
@@ -17,13 +17,18 @@ class Patient(db.Model):
     sex = db.Column(db.String(15))
     is_admin = db.Column(db.Boolean, default=False)
 
-    # One-to-many relationships
+    # One-to-many relationships from the patient's perspective
     logs = db.relationship("Log", back_populates="patient", cascade="all, delete")
     # check/TEST if this makes sense as cascade?! i think it does bc this is the parent?
     treatments = db.relationship("Treatment", back_populates="patient", cascade="all, delete")
 
 
 class PatientSchema(ma.Schema):
+    name = fields.String(validate=Length(100))
+    sex = fields.String(validate=Length(15))
+    
+    # how to manage db.String(100) with fields.Email? (one is sqlalchemy, one is marshmallow?)
+    # email = fields.String(validate=Length(100))
     # Use regex to ...
     email = fields.Email(
         required=True, 

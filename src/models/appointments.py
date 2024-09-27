@@ -1,11 +1,11 @@
 from init import db, ma
 
 from marshmallow import fields
-from marshmallow.validate import OneOf
+from marshmallow.validate import OneOf, Length
 
 VALID_STATUSES = (
-    "Scheduled", 
-    "Completed", 
+    "Scheduled",
+    "Completed",
     "Cancelled"
 )
 
@@ -23,26 +23,36 @@ class Appointment(db.Model):
     notes = db.Column(db.String(1000))
 
     # Foreign key from parent table
-    treatment_id = db.Column(db.Integer, db.ForeignKey("treatments.treatment_id", ondelete="CASCADE"), nullable=False)
-    
-    # Many-to-one relationship
+    # do i really need this ondelete thing here? understand this properly!
+    treatment_id = db.Column(db.Integer, db.ForeignKey(
+        "treatments.treatment_id", ondelete="CASCADE"), nullable=False)
+
+    # Many-to-one relationship from the appointment's perspective
     treatment = db.relationship("Treatment", back_populates="appointments")
 
 
 class AppointmentSchema(ma.Schema):
+    place = fields.String(
+        validate=Length(50)
+    )
+    
     status = fields.String(
         validate=OneOf(VALID_STATUSES)
+    )
+    
+    notes = fields.String(
+        validate=Length(1000)
     )
 
     class Meta:
         fields = (
-            "appt_id", 
-            "date", 
-            "time", 
-            "place", 
-            "cost", 
-            "status", 
-            "notes", 
+            "appt_id",
+            "date",
+            "time",
+            "place",
+            "cost",
+            "status",
+            "notes",
             "treatment_id"
         )
 
