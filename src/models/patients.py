@@ -2,19 +2,18 @@ from init import db, ma
 from models.treatments import TreatmentSchema
 
 from marshmallow import fields
-from marshmallow.validate import Length, Regexp
+from marshmallow.validate import Length#, Regexp
 
 
 class Patient(db.Model):
     __tablename__ = "patients"
 
-    # makr sure these details all match ERD! like char(50) etc
-
     # Attributes/columns
     patient_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
-    password = db.Column(db.String, nullable=False)
+    # do i need password min/max length? or will the hashing make that freak out?
+    password = db.Column(db.String(100), nullable=False)
     dob = db.Column(db.Date, nullable=False)
     sex = db.Column(db.String(15))
     is_admin = db.Column(db.Boolean, default=False)
@@ -25,26 +24,27 @@ class Patient(db.Model):
 
 
 class PatientSchema(ma.Schema):
-    name = fields.String(validate=Length(100))
-    sex = fields.String(validate=Length(15))
+    # Validation
+    name = fields.String(validate=Length(max=100))
+    sex = fields.String(validate=Length(max=15))
+    password = fields.String(validate=Length(min=8, max=100), load_only=True)
     
-    # how to manage db.String(100) with fields.Email? (one is sqlalchemy, one is marshmallow?)
-    # email = fields.String(validate=Length(100))
-    # Use regex to ...
     email = fields.Email(
         required=True, 
+        validate=Length(max=100),
         default_error_messages = {"invalid": "Not a valid email address."}
     )
 
-    # review and understand this deeply
+    # Define nested field; each serialised patient output will have a sub-dictionary describing treatment details
     treatments = fields.Nested(
         TreatmentSchema, 
         many=True, 
-        exclude=("patient_id",)
-    )  # the exclude part prevents circular refs
-
+        exclude=("patient_id",)  # Excluding patient_id prevents circular references
+    )
     
     class Meta:
+        # do i need a guard clause / error handling for all this validation?
+        # Tell Marshmallow what to serialise / how to unpack the patient object / how to do indexing
         fields = (
             "patient_id", 
             "name", 

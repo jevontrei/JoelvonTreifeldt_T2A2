@@ -18,6 +18,7 @@ db_commands = Blueprint(
 def drop_tables():
     """Drop all tables.
     """
+    # try:
     
     # Delete all tables from the database (even if FK constraints are present? how to do this?)
     db.drop_all()
@@ -31,6 +32,8 @@ def create_tables():
     """Create all tables.
     """
     
+    # try:
+    
     db.create_all()
     
     print("Tables created.")
@@ -41,6 +44,8 @@ def create_tables():
 def seed_tables():
     """Seed tables with details for patients, doctors, treatments, logs and appointments.
     """
+    
+    # try:
     
     # Seed patients
     patients = [

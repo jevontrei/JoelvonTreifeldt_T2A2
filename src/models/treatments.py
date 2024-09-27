@@ -1,5 +1,5 @@
 from init import db, ma
-
+from marshmallow import fields
 
 class Treatment(db.Model):
     __tablename__ = "treatments"
@@ -11,7 +11,7 @@ class Treatment(db.Model):
     
     # Foreign keys from parent tables
     patient_id = db.Column(db.Integer, db.ForeignKey("patients.patient_id", ondelete="CASCADE"), nullable=False)  # Deleting a patient deletes their treatments
-    doctor_id = db.Column(db.Integer, db.ForeignKey("doctors.doctor_id"), nullable=False)  # Don't cascade; deleting a doctor sets the treatment end_date to yesterday if it hasn't already passed?!
+    doctor_id = db.Column(db.Integer, db.ForeignKey("doctors.doctor_id"), nullable=False)  # Don't cascade; deleting a doctor sets the treatment end_date to yesterday if it hasn't already passed?! Implement this
 
     # Many-to-one relationships from the treatment's perspective (child)
     patient = db.relationship("Patient", back_populates="treatments")
@@ -27,6 +27,7 @@ class TreatmentSchema(ma.Schema):
 
     class Meta:
         fields = (
+            # this should have patient, not patient_id etc?
             "treatment_id", 
             "patient_id", 
             "doctor_id", 

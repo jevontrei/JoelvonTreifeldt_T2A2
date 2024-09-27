@@ -15,14 +15,15 @@ def authorise_as_admin(fn):
     """Decorator that authorises administrators to perform sensitive/important tasks.
 
     Args:
-        fn (function): _description_
+        fn (function): A controller function for a particular endpoint.
 
     Returns:
-        _type_: _description_
+        function: The decorated controller function.
     """
-
+    # try:
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
+        # try:
         jwt = get_jwt()
 
         # Guard clause; return error if user is not an admin
@@ -42,14 +43,15 @@ def authorise_as_log_viewer(fn):
     """Decorator that authorises patients and doctors to view logs.
 
     Args:
-        fn (function): _description_
+        fn (function): A controller function for a particular endpoint.
 
     Returns:
-        _type_: _description_
+        function: The decorated controller function.
     """
-
+    # try:
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
+        # try:
 
         # Fetch patient_id, current user type and ID
         jwt = get_jwt()
@@ -106,11 +108,16 @@ def authorise_as_log_owner(fn):
     """Decorator that authorises the owner of the log to update and delete it.
 
     Args:
-        fn (function): _description_
+        fn (function): A controller function for a particular endpoint.
+        
+    Returns:
+        function: The decorated controller function.
     """
+    # try:
 
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
+        # try:
         # Fetch patient_id, current user type and ID
         jwt = get_jwt()
         patient_id = kwargs.get("patient_id")
@@ -133,11 +140,16 @@ def authorise_treatment_participant(fn):
     """Decorator that authorises patients OR doctors (as specified in Treatments tables) to view logs and manage appointments
 
     Args:
-        fn (function): _description_
+        fn (function): A controller function for a particular endpoint.
+        
+    Returns:
+        function: The decorated controller function.
     """
+    # try:
 
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
+        # try:
         # Fetch user_id, user_type
         user_id = get_jwt_identity()
         user_type = get_jwt().get("user_type")

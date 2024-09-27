@@ -31,7 +31,7 @@ class Appointment(db.Model):
 
 class AppointmentSchema(ma.Schema):
     place = fields.String(
-        validate=Length(50)
+        validate=Length(max=50)
     )
     
     status = fields.String(
@@ -39,7 +39,7 @@ class AppointmentSchema(ma.Schema):
     )
     
     notes = fields.String(
-        validate=Length(1000)
+        validate=Length(max=1000)
     )
 
     class Meta:

@@ -26,15 +26,14 @@ def create_log(patient_id):
     """Create a new patient log.
 
     Args:
-        patient_id (int): _description_
+        patient_id (int): Patient primary key.
 
     Returns:
-        _type_: _description_
+        tuple: New patient's details, serialised (JSON); a 201 HTTP response status code.
     """
     
     try:
-        #############################################
-        # Should this be a decorator?
+        # Turn this into a decorator if it gets used in multiple places in future
         # Get the JWT
         jwt = get_jwt()
         # Guard clause; return error if user is not a patient
@@ -47,7 +46,6 @@ def create_log(patient_id):
             return jsonify(
                 {"error": "Logged in patient does not match patient_id."}
             ), 403
-        #############################################
         
         # Fetch content of request
         body_data = request.get_json()
@@ -87,11 +85,13 @@ def get_patient_logs(patient_id):
     """Get all logs for a particular patient.
 
     Args:
-        patient_id (int): _description_
+        patient_id (int): Patient primary key.
 
     Returns:
-        _type_: _description_
+        JSON: All log details for the given patient.
     """
+    
+    # try:
     
     # Create SQLAlchemy query statement:
     # SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
@@ -129,12 +129,14 @@ def get_a_log(patient_id, log_id):
     """Get a particular log.
 
     Args:
-        patient_id (int): _description_
-        log_id (int): _description_
+        patient_id (int): Patient primary key.
+        log_id (int): Log primary key.
 
     Returns:
-        _type_: _description_
+        JSON: Serialised details of the patient log.
     """
+    
+    # try:
 
     # Create SQLAlchemy query statement:
     # SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
@@ -170,12 +172,14 @@ def update_log(patient_id, log_id):
     """Edit a log.
 
     Args:
-        patient_id (int): _description_
-        log_id (int): _description_
+        patient_id (int): Patient primary key.
+        log_id (int): Log primary key.
 
     Returns:
-        _type_: _description_
+        JSON: Serialised and updated log details.
     """
+    
+    # try:
     
     # Fetch content of request
     body_data = request.get_json()
@@ -223,11 +227,13 @@ def delete_log(patient_id, log_id):
     """Delete a log.
 
     Args:
-        log_id (int): _description_
+        log_id (int): Log primary key.
 
     Returns:
-        _type_: _description_
+        JSON: Success message.
     """
+    
+    # try:
     
     # Create SQLAlchemy query statement:
     # SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 

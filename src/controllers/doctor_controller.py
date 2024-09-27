@@ -21,11 +21,13 @@ doctors_bp = Blueprint(
 @doctors_bp.route("/")
 @jwt_required()
 def get_all_doctors():
-    """_summary_
+    """Fetch details for all doctors.
 
     Returns:
-        _type_: _description_
+        JSON: All doctor details, serialised.
     """
+    
+    # try:
     
     # Create SQLAlchemy query statement:
     # SELECT doctors.doctor_id, doctors.name, doctors.email, doctors.password, doctors.sex, doctors.specialty, doctors.is_admin 
@@ -55,14 +57,16 @@ def get_all_doctors():
 @doctors_bp.route("/<int:doctor_id>")
 @jwt_required()
 def get_a_doctor(doctor_id):
-    """_summary_
+    """Fetch details of a particular doctor.
 
     Args:
-        doctor_id (int): _description_
+        doctor_id (int): Doctor primary key.
 
     Returns:
-        _type_: _description_
+        JSON: Serialised details for one doctor.
     """
+    
+    # try:
     
     # Create SQLAlchemy query statement:
     # SELECT doctors.doctor_id, doctors.name, doctors.email, doctors.password, doctors.sex, doctors.specialty, doctors.is_admin 
@@ -92,13 +96,13 @@ def get_a_doctor(doctor_id):
 @doctors_bp.route("/<int:doctor_id>/appointments/")
 @jwt_required()
 def get_doctor_appointments(doctor_id):
-    """Get all appointments for a particular doctor
+    """Get all appointments for a particular doctor.
 
     Args:
-        doctor_id (int): _description_
+        doctor_id (int): Doctor primary key.
 
     Returns:
-        JSON: a list of appointments for the given doctor
+        JSON: All appointment details for the given doctor.
     """
     
     try:
@@ -149,8 +153,13 @@ def get_doctor_treatments(doctor_id):
     """Get all treatment details for a particular doctor
 
     Args:
-        doctor_id (int): _description_
+        doctor_id (int): Doctor primary key.
+        
+    Returns:
+        JSON: All treatment details for the given doctor.
     """
+    
+    # try:
     
     # Create SQLAlchemy query statement:
     # SELECT treatments.treatment_id, treatments.start_date, treatments.end_date, treatments.patient_id, treatments.doctor_id 
@@ -182,14 +191,16 @@ def get_doctor_treatments(doctor_id):
 @doctors_bp.route("/<int:doctor_id>", methods=["PUT", "PATCH"])
 @jwt_required()
 def update_doctor(doctor_id):
-    """_summary_
+    """Edit details for a particular doctor.
 
     Args:
-        doctor_id (int): _description_
+        doctor_id (int): Doctor primary key.
 
     Returns:
-        _type_: _description_
+        JSON: Updated details serialised according to the doctor schema.
     """
+    
+    # try:
     
     # Fetch ?
     body_data = request.get_json()
@@ -212,7 +223,7 @@ def update_doctor(doctor_id):
     # can i do this more efficiently with kwargs?
     doctor.name = body_data.get("name") or doctor.name
     doctor.email = body_data.get("email") or doctor.email
-    doctor.password = body_data.get("password") or doctor.password
+    doctor.password = body_data.get("password") or doctor.password # use pop() instead?  # .pop() increases secruity by removing password 
     # patients and appointments? no, do this through treatments and appointments, respectively?
 
     # Commit changes to database
@@ -228,14 +239,16 @@ def update_doctor(doctor_id):
 @jwt_required()
 @authorise_as_admin
 def delete_doctor(doctor_id):
-    """_summary_
+    """Delete a doctor.
 
     Args:
-        doctor_id (int): _description_
+        doctor_id (int): Doctor primary key.
 
     Returns:
-        _type_: _description_
+        JSON: Success message.
     """
+    
+    # try:
     
     # Create SQLAlchemy query statement:
     # SELECT doctors.doctor_id, doctors.name, doctors.email, doctors.password, doctors.sex, doctors.specialty, doctors.is_admin 

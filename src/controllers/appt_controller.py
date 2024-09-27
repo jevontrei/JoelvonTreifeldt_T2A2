@@ -31,6 +31,8 @@ def get_all_appointments():
         JSON: All appointment details, serialised according to appointments schema.
     """
     
+    # try:
+    
     # Create SQLAlchemy query statement:
     # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 
     # FROM appointments 
@@ -70,6 +72,7 @@ def get_an_appointment(appt_id):
     Returns:
         JSON: Appointment details, serialised according to appointment schema.
     """
+    # try:
 
     # Create SQLAlchemy query statement:
     # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 
@@ -108,7 +111,9 @@ def update_appointment(appt_id):
     Returns:
         JSON: Updated appointment details, serialised according to appointment schema.
     """
-    
+
+    # try:
+
     # Fetch body of HTTP request
     body_data = request.get_json()
 
@@ -159,6 +164,7 @@ def delete_appointment(appt_id):
     Returns:
         JSON: Success message.
     """
+    # try:
     
     # Create SQLAlchemy query statement:
     # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 

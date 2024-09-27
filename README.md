@@ -56,6 +56,7 @@ pip install -r requirements.txt
 ```
 
 - run `flask run` or `flask run --debug` to run server
+- PS: all passwords in this project are set to "password" for development purposes.
 
 ### R1 - Explain the problem that this app will solve, and explain how this app solves or addresses the problem.
 
@@ -247,6 +248,7 @@ Meets D, and includes appropriate code examples supporting the descriptions. -->
 
 Patients ...
 
+<!-- UPDATE THIS CODE: -->
 ```py
 class Patient(db.Model):
     __tablename__ = "patients"
@@ -338,7 +340,7 @@ ALSO different authorisation levels:
   - authorise_as_log_owner
   - authorise_treatment_participant
 - Validation / sanitisation of input
-  - regex?
+  - regex? no --> fields.Email() or whatever
 
 #### header data = auth / bearer token?
 

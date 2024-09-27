@@ -2,10 +2,10 @@
 from flask import Flask
 
 def create_app():
-    """Application factory
+    """Application factory; create the Flask app.
 
     Returns:
-        _type_: _description_
+        _type_: Flask app object.?
     """
     
     # try:
@@ -47,17 +47,19 @@ def create_app():
     # Root route
     @app.route("/")
     def welcome():
-        """Welcome the user
+        """Welcome the user.
 
         Returns:
-            _type_: _description_
+            JSON: Welcome message.
         """
         # return welcome message
         return jsonify(
             {"message": "Welcome. Let's get healthy."}
         )
 
-    # Globally handle generalised errors
+##################################################################
+
+    # Globally handle generalised errors (add more?!)
     @app.errorhandler(ValidationError)
     def validation_error(err):
         """_summary_
@@ -66,7 +68,7 @@ def create_app():
             err (_type_): _description_
 
         Returns:
-            _type_: _description_
+            tuple: _description_... (JSON) and a HTTP response status code.
         """
         return jsonify(
             {"error": err.messages}
@@ -80,7 +82,7 @@ def create_app():
             err (_type_): _description_
 
         Returns:
-            _type_: _description_
+            tuple: _description_ (JSON) and a HTTP response status code.
         """
         return jsonify(
             {"error": str(err)}
@@ -91,7 +93,7 @@ def create_app():
         """_summary_
 
         Returns:
-            _type_: _description_
+            tuple: _description_ (JSON) and a HTTP response status code.
         """
         return jsonify(
             {"error": "Unauthorised user."}

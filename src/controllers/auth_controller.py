@@ -1,9 +1,7 @@
 # TO DO:
-# figure out privacy settings.
-
-# somehow authorise doctors to view logs, but not all logs. you may not want your dentist viewing your psychology details.
-
-# in case of emergency/hospital/ambulance etc, there should be some contingency access for health professionals like paramedics, surgeons, ER doctors/nurses, etc
+# - Figure out privacy settings.
+# - Somehow authorise doctors to view logs, but not all logs. you may not want your dentist viewing your psychology details.
+# - In case of emergency/hospital/ambulance etc, there should be some contingency access for health professionals like paramedics, surgeons, ER doctors/nurses, etc
 
 ###########################################################################
 
@@ -35,15 +33,16 @@ auth_bp = Blueprint(
 
 @auth_bp.route("/register/<user_type>", methods=["POST"])
 def register_user(user_type):
-    """_summary_
+    """Create a new patient or doctor user.
 
     Args:
-        user_type (int): _description_
+        user_type (str): Patient or doctor primary key.
 
     Returns:
-        _type_: _description_
+        Tuple: All registration details, serialised according to patient or doctor schema (JSON); a 201 HTTP response status code.
     """
-
+    # try:
+    
     # Guard clause; escape function early if user type is invalid
     if user_type not in ["patient", "doctor"]:
         return jsonify(
@@ -51,7 +50,7 @@ def register_user(user_type):
         ), 400
 
     try:
-        # Load data according to schema (this allows email regex to work), deserialise it, store in variable; create user instance with kwargs; assign correct schema
+        # Load data according to schema, deserialise it, store in variable; create user instance with kwargs; assign correct schema
         if user_type == "patient":
             body_data = PatientSchema().load(request.get_json())
             user = Patient(**body_data)
@@ -63,8 +62,7 @@ def register_user(user_type):
             schema = doctor_schema
 
         # Guard clause; return error if no password provided
-        # use .pop() instead for security?
-        password = body_data.get("password")
+        password = body_data.pop("password")  # .pop() increases secruity by removing password 
         if not password:
             return jsonify(
                 {"error": "Password required."}
@@ -81,31 +79,24 @@ def register_user(user_type):
         # Return user object serialised according to the corresponding schema
         return schema.dump(user), 201
 
-    # when would this one actually arise? do i need it? i've already handled invalid emails haven't I?
-    # except ValidationError as e:
-    #     return jsonify(e.messages), 400
+    # Don't need ValidationError because it's globally handled in main.py
 
     # In case the date entered has invalid format, e.g. "2024-0101"
     except DataError as e:
         return jsonify(
             {"error": "Invalid date formatting."}
         ), 400
-
+        
     # If the email address (or ___?) is missing or already taken
     except IntegrityError as e:
         if e.orig.pgcode == errorcodes.NOT_NULL_VIOLATION:
-            # return jsonify(
-            # {"error": "Email address is required"}
-            # ), 400  # ?
             return jsonify(
                 {"error": f"The column {e.orig.diag.column_name} is required."}
             ), 400
 
         if e.orig.pgcode == errorcodes.UNIQUE_VIOLATION:
             return jsonify(
-                {
-                    "error": "Email address must be unique."
-                }
+                {"error": "Email address must be unique."}
             ), 400
 
     # If ... other errors arise?
@@ -125,13 +116,13 @@ def register_user(user_type):
 
 @auth_bp.route("/login/<user_type>", methods=["POST"])
 def login_user(user_type):
-    """_summary_
+    """Create new logged-in session for a patient or doctor user.
 
     Args:
-        user_type (int): _description_
+        user_type (str): Patient or doctor primary key.
 
     Returns:
-        _type_: _description_
+        JSON: All login details, serialised according to the corresponding schema.
     """
 
     # try:
@@ -146,7 +137,7 @@ def login_user(user_type):
         ), 400
 
     email = body_data.get("email")
-    password = body_data.get("password")  # use .pop() instead for security?
+    password = body_data.pop("password")  # .pop() increases secruity by removing password 
 
     # Guard clause; return error if ?
     if not email or not password:
@@ -186,7 +177,10 @@ def login_user(user_type):
             user = db.session.scalar(stmt)
             user_id = user.doctor_id
             schema = doctor_schema
-
+            
+    # except IntegrityError as e:
+    #     ?
+    
     # Return error if user doesn't exist
     except AttributeError as e:
         return jsonify(
@@ -208,7 +202,7 @@ def login_user(user_type):
             {"error": "Invalid password."}
         ), 401
 
-    # Create JWT
+    # Create JWT with additional details for use elsewhere
     token = create_access_token(
         identity=str(user_id),
         additional_claims={
@@ -219,7 +213,7 @@ def login_user(user_type):
         expires_delta=timedelta(days=1)
     )
 
-    # Return serialised login details?
+    # Return serialised login details
     return jsonify(
         {
             "email": email,

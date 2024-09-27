@@ -21,11 +21,13 @@ patients_bp = Blueprint(
 @jwt_required()
 @authorise_as_admin
 def get_all_patients():
-    """Get details for all patients
+    """Get details for all patients.
 
     Returns:
-        _type_: _description_
+        JSON: Serialised list of patient details.
     """
+    
+    # try:
     
     # Create SQLAlchemy query statement:
     # SELECT patients.patient_id, patients.name, patients.email, patients.password, patients.dob, patients.sex, patients.is_admin 
@@ -55,14 +57,16 @@ def get_all_patients():
 @jwt_required()
 @authorise_as_admin
 def get_a_patient(patient_id):
-    """Get a particular patient's details
+    """Get a particular patient's details.
 
     Args:
-        patient_id (int): _description_
+        patient_id (int): Patient primary key.
 
     Returns:
-        _type_: _description_
+        JSON: Serialised patient details.
     """
+    
+    # try:
     
     # Create SQLAlchemy query statement:
     # SELECT patients.patient_id, patients.name, patients.email, patients.password, patients.dob, patients.sex, patients.is_admin 
@@ -92,14 +96,16 @@ def get_a_patient(patient_id):
 @patients_bp.route("/<int:patient_id>/appointments/")
 @jwt_required()
 def get_patient_appointments(patient_id):
-    """Get all appointments for a particular patient
+    """Get all appointments for a particular patient.
 
     Args:
-        patient_id (int): _description_
+        patient_id (int): Patient primary key.
 
     Returns:
-        JSON: a list of appointments for the given patient
+        JSON: a list of appointment details for the given patient.
     """
+    
+    # try:
     
     # Create SQLAlchemy query statement:
     # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.treatment_id 
@@ -138,11 +144,16 @@ def get_patient_appointments(patient_id):
 # justify why i chose this particular auth decorator
 @authorise_as_admin
 def get_patient_treatments(patient_id):
-    """Get all treatment details for a particular patient
+    """Get all treatment details for a particular patient.
 
     Args:
-        patient_id (int): _description_
+        patient_id (int): Patient primary key.
+        
+    Returns:
+        JSON: Treatment details for the given patient.
     """
+    
+    # try:
     
     # Create SQLAlchemy query statement:
 
@@ -173,14 +184,17 @@ def get_patient_treatments(patient_id):
 @patients_bp.route("/<int:patient_id>", methods=["PUT", "PATCH"])
 @jwt_required()
 def update_patient(patient_id):
-    """_summary_
+    """Edit a patient's details.
 
     Args:
-        patient_id (int): _description_
+        patient_id (int): Patient primary key.
 
     Returns:
-        _type_: _description_
+        JSON: Updated and serialised patient details.
     """
+    
+    # try:
+    
     # fetch ...
     body_data = request.get_json()
     
@@ -205,7 +219,7 @@ def update_patient(patient_id):
     
     patient.name = body_data.get("name") or patient.name
     patient.email = body_data.get("email") or patient.email
-    patient.password = body_data.get("password") or patient.password
+    patient.password = body_data.get("password") or patient.password # use pop() instead?  # .pop() increases secruity by removing password 
     patient.dob = body_data.get("dob") or patient.dob
     patient.sex = body_data.get("sex") or patient.sex
     patient.is_admin = body_data.get("is_admin") or patient.is_admin
@@ -224,14 +238,16 @@ def update_patient(patient_id):
 @jwt_required()
 @authorise_as_admin
 def delete_patient(patient_id):
-    """_summary_
+    """Delete a patient.
 
     Args:
-        patient_id (int): _description_
+        patient_id (int): Patient primary key.
 
     Returns:
-        _type_: _description_
+        JSON: Success message.
     """
+    
+    # try:
     
     # Create SQLAlchemy query statement:
     # SELECT patients.patient_id, patients.name, patients.email, patients.password, patients.dob, patients.sex, patients.is_admin 

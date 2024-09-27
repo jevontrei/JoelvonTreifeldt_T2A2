@@ -28,17 +28,17 @@ treatments_bp = Blueprint(
 # must authorise as admin, otherwise any person could create a treatment relationship and view any patient's private logs
 @authorise_as_admin
 def create_treatment():
-    """
-    Add a new treatment between doctor and patient
+    """Add a new treatment relationship between doctor and patient.
 
     Args:
-        patient_id (int): _description_
-        doctor_id (int): _description_
+        patient_id (int): Patient primary key.
+        doctor_id (int): Doctor primary key.
         
     Returns:
-    _type_: _description_
+        tuple: New serialised treatment details (JSON); a 201 HTTP response status code.
     """
     
+    # try:
     
     # Fetch data, deserialise it, store in variable
     body_data = request.get_json()
@@ -71,14 +71,16 @@ def create_treatment():
 # @authorise_as_admin  # how to implement this without preventing patients from creating appointments for themselves etc?
 @authorise_treatment_participant
 def create_appointment(treatment_id):
-    """_summary_
+    """Create a new appointment for a particular treatment relationship.
 
     Args:
-        treatment_id (int): _description_
+        treatment_id (int): Treatment primary key.
 
     Returns:
-        _type_: _description_
+        tuple: New serialised appointment details (JSON); a 201 HTTP response status code.
     """
+    
+    # try:
 
     # apply integrity error except blox to ALL CREATE FUNCTIONS?!
 
@@ -118,14 +120,16 @@ def create_appointment(treatment_id):
 # @authorise_as_admin  # how to implement this without preventing patients from viewing their own appointments etc?
 @authorise_treatment_participant
 def get_treatment_appointments(treatment_id):
-    """Get all appointments for a particular treatment relationship
+    """Get all appointments for a particular treatment relationship.
 
     Args:
-        treatment_id (int): _description_
+        treatment_id (int): Treatment primary key.
 
     Returns:
-        _type_: _description_
+        JSON: Serialised details of all appointments for a given treatment.
     """
+    
+    # try:
 
     # Create SQLAlchemy query statement:
     # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id
@@ -164,8 +168,10 @@ def get_all_treatments():
     """Get all treatments
 
     Returns:
-        _type_: _description_
+        JSON: Serialised treatment details.
     """
+    
+    # try:
 
     # Create SQLAlchemy query statement:
     # SELECT treatments.treatment_id, treatments.start_date, treatments.end_date, treatments.patient_id, treatments.doctor_id
@@ -200,14 +206,16 @@ def get_all_treatments():
 # @authorise_as_admin  # how to implement this without preventing patients from viewing their own treatment details etc?
 @authorise_treatment_participant
 def get_a_treatment(treatment_id):
-    """Get details for a specific treatment using the id
+    """Get details for a specific treatment using its ID.
 
     Args:
-        treatment_id (int): _description_
+        treatment_id (int): Treatment primary key.
 
     Returns:
-        _type_: _description_
+        JSON: Serialised treatment details.
     """
+    
+    # try:
 
     # Create SQLAlchemy query statement:
     # SELECT treatments.treatment_id, treatments.start_date, treatments.end_date, treatments.patient_id, treatments.doctor_id
@@ -242,14 +250,16 @@ def get_a_treatment(treatment_id):
 # justify why i chose this particular auth decorator
 @authorise_treatment_participant
 def update_treatment(treatment_id):
-    """_summary_
+    """Edit treatment details.
 
     Args:
-        treatment_id (int): _description_
+        treatment_id (int): Treatment primary key.
 
     Returns:
-        _type_: _description_
+        JSON: Serialised and updated treatment details.
     """
+    
+    # try:
 
     body_data = request.get_json()
 
@@ -297,11 +307,13 @@ def delete_treatment(treatment_id):
     """Delete any treatment. WARNING: Not recommended. This action is destructive and will prevent patients and doctors from viewing ANY appointments associated with this treatment ID. I.e. the @authorise_treatment_participant decorator will not be functional for appointment GET requests. An admin should archive all related appointment details (especially notes) in the patient's log before deleting treatment.
 
     Args:
-        treatment_id (int): _description_
+        treatment_id (int): Treatment primary key.
 
     Returns:
-        _type_: _description_
+        JSON: Success message.
     """
+    
+    # try:
 
     # Create SQLAlchemy query statement:
     # SELECT treatments.treatment_id, treatments.start_date, treatments.end_date, treatments.patient_id, treatments.doctor_id
