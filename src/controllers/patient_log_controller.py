@@ -26,7 +26,7 @@ def create_log(patient_id):
     """Create a new patient log.
 
     Args:
-        patient_id (_type_): _description_
+        patient_id (int): _description_
 
     Returns:
         _type_: _description_
@@ -87,7 +87,7 @@ def get_patient_logs(patient_id):
     """Get all logs for a particular patient.
 
     Args:
-        patient_id (_type_): _description_
+        patient_id (int): _description_
 
     Returns:
         _type_: _description_
@@ -129,8 +129,8 @@ def get_a_log(patient_id, log_id):
     """Get a particular log.
 
     Args:
-        patient_id (_type_): _description_
-        log_id (_type_): _description_
+        patient_id (int): _description_
+        log_id (int): _description_
 
     Returns:
         _type_: _description_
@@ -170,8 +170,8 @@ def update_log(patient_id, log_id):
     """Edit a log.
 
     Args:
-        patient_id (_type_): _description_
-        log_id (_type_): _description_
+        patient_id (int): _description_
+        log_id (int): _description_
 
     Returns:
         _type_: _description_
@@ -223,7 +223,7 @@ def delete_log(patient_id, log_id):
     """Delete a log.
 
     Args:
-        log_id (_type_): _description_
+        log_id (int): _description_
 
     Returns:
         _type_: _description_

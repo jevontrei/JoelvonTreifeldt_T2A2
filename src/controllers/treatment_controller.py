@@ -32,9 +32,13 @@ def create_treatment():
     Add a new treatment between doctor and patient
 
     Args:
-        patient_id (_type_): _description_
-        doctor_id (_type_): _description_
+        patient_id (int): _description_
+        doctor_id (int): _description_
+        
+    Returns:
+    _type_: _description_
     """
+    
     
     # Fetch data, deserialise it, store in variable
     body_data = request.get_json()
@@ -70,7 +74,7 @@ def create_appointment(treatment_id):
     """_summary_
 
     Args:
-        treatment_id (_type_): _description_
+        treatment_id (int): _description_
 
     Returns:
         _type_: _description_
@@ -117,7 +121,7 @@ def get_treatment_appointments(treatment_id):
     """Get all appointments for a particular treatment relationship
 
     Args:
-        treatment_id (_type_): _description_
+        treatment_id (int): _description_
 
     Returns:
         _type_: _description_
@@ -199,7 +203,7 @@ def get_a_treatment(treatment_id):
     """Get details for a specific treatment using the id
 
     Args:
-        treatment_id (_type_): _description_
+        treatment_id (int): _description_
 
     Returns:
         _type_: _description_
@@ -241,7 +245,7 @@ def update_treatment(treatment_id):
     """_summary_
 
     Args:
-        treatment_id (_type_): _description_
+        treatment_id (int): _description_
 
     Returns:
         _type_: _description_
@@ -287,14 +291,13 @@ def update_treatment(treatment_id):
 
 @treatments_bp.route("/<int:treatment_id>", methods=["DELETE"])
 @jwt_required()
-# justify why i chose this particular auth decorator
-# @authorise_as_admin  # how to implement this without preventing patients from deleting their own treatment details etc?
-@authorise_treatment_participant
+# This is a high-level endpoint that should be accessible to admins only
+@authorise_as_admin
 def delete_treatment(treatment_id):
-    """Delete any treatment. WARNING: Not recommended. This action is destructive and will prevent patients and doctors from viewing ANY appointments associated with this treatment ID. I.e. the @authorise_treatment_participant decorator will not be functional. An admin should archive all related appointment details (especially notes) in the patient's log before deleting treatment.
+    """Delete any treatment. WARNING: Not recommended. This action is destructive and will prevent patients and doctors from viewing ANY appointments associated with this treatment ID. I.e. the @authorise_treatment_participant decorator will not be functional for appointment GET requests. An admin should archive all related appointment details (especially notes) in the patient's log before deleting treatment.
 
     Args:
-        treatment_id (_type_): _description_
+        treatment_id (int): _description_
 
     Returns:
         _type_: _description_

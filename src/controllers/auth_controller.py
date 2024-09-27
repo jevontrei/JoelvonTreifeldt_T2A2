@@ -38,7 +38,7 @@ def register_user(user_type):
     """_summary_
 
     Args:
-        user_type (_type_): _description_
+        user_type (int): _description_
 
     Returns:
         _type_: _description_
@@ -128,7 +128,7 @@ def login_user(user_type):
     """_summary_
 
     Args:
-        user_type (_type_): _description_
+        user_type (int): _description_
 
     Returns:
         _type_: _description_

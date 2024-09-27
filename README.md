@@ -291,6 +291,8 @@ Treatments were initially represented using `db.Table()` with FK attributes only
 
 #### Appointment model
 
+deleting a treatment cascade-deletes all child appointments. This is not recommended, and an admin
+
 Appointments ...
 
 ```py

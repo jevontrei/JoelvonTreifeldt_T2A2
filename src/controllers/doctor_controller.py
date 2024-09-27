@@ -58,7 +58,7 @@ def get_a_doctor(doctor_id):
     """_summary_
 
     Args:
-        doctor_id (_type_): _description_
+        doctor_id (int): _description_
 
     Returns:
         _type_: _description_
@@ -95,7 +95,7 @@ def get_doctor_appointments(doctor_id):
     """Get all appointments for a particular doctor
 
     Args:
-        doctor_id (_type_): _description_
+        doctor_id (int): _description_
 
     Returns:
         JSON: a list of appointments for the given doctor
@@ -149,7 +149,7 @@ def get_doctor_treatments(doctor_id):
     """Get all treatment details for a particular doctor
 
     Args:
-        doctor_id (_type_): _description_
+        doctor_id (int): _description_
     """
     
     # Create SQLAlchemy query statement:
@@ -185,7 +185,7 @@ def update_doctor(doctor_id):
     """_summary_
 
     Args:
-        doctor_id (_type_): _description_
+        doctor_id (int): _description_
 
     Returns:
         _type_: _description_
@@ -231,7 +231,7 @@ def delete_doctor(doctor_id):
     """_summary_
 
     Args:
-        doctor_id (_type_): _description_
+        doctor_id (int): _description_
 
     Returns:
         _type_: _description_
