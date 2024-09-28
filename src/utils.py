@@ -1,10 +1,13 @@
-from models import Patient, Doctor, Log, Treatment  # , log_schema
+from models import Patient, Doctor, Log, Treatment, Appointment  # , log_schema
 from init import db
 
 import functools
 from flask import jsonify
 from flask_jwt_extended import get_jwt_identity, get_jwt, get_jwt_header
-# from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import IntegrityError
+
+# delet
+import os
 
 ##############################################################
 
@@ -32,7 +35,7 @@ def authorise_as_admin(fn):
                 ), 403
 
             return fn(*args, **kwargs)
-        
+
         # # In case ... ?
         # except ? as e:
         #     return jsonify(
@@ -69,6 +72,14 @@ def authorise_as_log_viewer(fn):
             patient_id = kwargs.get("patient_id")
             user_type = jwt.get("user_type")
             logged_in_id = get_jwt_identity()
+
+            ############################################
+            # Confirm this works?!:
+            # Exit/authorise early if user is an admin
+            is_admin = get_jwt().get("is_admin", False)
+            if is_admin:
+                return fn(*args, **kwargs)
+            ############################################
 
             # Check if user is a patient or doctor
             if user_type == "patient":
@@ -109,7 +120,6 @@ def authorise_as_log_viewer(fn):
                 # Allow function to execute
                 return fn(*args, **kwargs)
 
-
         # In case ... ?
         # except ? as e:
         #     return jsonify(
@@ -120,7 +130,7 @@ def authorise_as_log_viewer(fn):
             return jsonify(
                 {"error": f"Unexpected error: {e}."}
             ), 500
-    
+
     # Return wrapper function
     return wrapper
 
@@ -132,7 +142,7 @@ def authorise_as_log_owner(fn):
 
     Args:
         fn (function): A controller function for a particular endpoint.
-        
+
     Returns:
         function: The decorated controller function.
     """
@@ -146,13 +156,21 @@ def authorise_as_log_owner(fn):
             patient_id = kwargs.get("patient_id")
             logged_in_id = get_jwt_identity()
 
+            ############################################
+            # Confirm this works?!:
+            # Exit/authorise early if user is an admin
+            is_admin = get_jwt().get("is_admin", False)
+            if is_admin:
+                return fn(*args, **kwargs)
+            ############################################
+
             # Guard clause; return error if patient_id does not match logged_in_id
             if str(patient_id) != logged_in_id:
                 return jsonify({"error": "Only the log owner has manage access."}), 403
 
             # Allow function to execute
             return fn(*args, **kwargs)
-        
+
         # In case ... ?
         # except ? as e:
         #     return jsonify(
@@ -175,12 +193,10 @@ def authorise_treatment_participant(fn):
 
     Args:
         fn (function): A controller function for a particular endpoint.
-        
+
     Returns:
         function: The decorated controller function.
     """
-    # try:
-
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         try:
@@ -188,21 +204,42 @@ def authorise_treatment_participant(fn):
             user_id = get_jwt_identity()
             user_type = get_jwt().get("user_type")
 
-            # Fetch treatment_id from kwargs
-            treatment_id = kwargs.get("treatment_id")
+            ############################################
+            # Confirm this works?!:
+            # Exit/authorise early if user is an admin
+            is_admin = get_jwt().get("is_admin", False)
+            if is_admin:
+                return fn(*args, **kwargs)
+            ############################################
 
-            # Create SQLAlchemy query statement:
-            # SELECT *
-            # FROM treatments
-            # WHERE treatment_id = :treatment_id_1;
-            stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
+            temporary_id = kwargs.get("appt_id") or kwargs.get("treatment_id")
+
+            if kwargs.get("appt_id"):
+                appt_id = temporary_id
+
+                # Create SQLAlchemy query statement:
+                # SELECT treatments.treatment_id, treatments.start_date, treatments.end_date, treatments.patient_id, treatments.doctor_id
+                # FROM treatments
+                # LEFT OUTER JOIN appointments
+                # ON treatments.treatment_id = appointments.treatment_id
+                # WHERE appointments.appt_id = :appt_id_1;
+                stmt = db.select(Treatment).join(
+                    Appointment, isouter=True).filter_by(appt_id=appt_id)
+
+            elif kwargs.get("treatment_id"):
+                treatment_id = temporary_id
+
+                # Create SQLAlchemy query statement:
+                # SELECT treatments.treatment_id, treatments.start_date, treatments.end_date, treatments.patient_id, treatments.doctor_id
+                # FROM treatments
+                # WHERE treatments.treatment_id = :treatment_id_1;
+                stmt = db.select(Treatment).filter_by(
+                    treatment_id=treatment_id)
 
             # Execute statement, fetch all resulting values
             treatment = db.session.scalars(stmt).first()
 
             # Guard clause; return error if no such doctor-patient relationship exists
-
-            # Guard clause; return error if no such treatment exists
             if not treatment:
                 return jsonify(
                     {"error": "Treatment not found."}
@@ -236,10 +273,22 @@ def authorise_treatment_participant(fn):
         #         {"error": "?"}
         #     ), ?00
 
-        except Exception as e:
+        # # delet this?
+        except IntegrityError as e:
             return jsonify(
-                {"error": f"Unexpected error: {e}."}
-            ), 500
+                {"error": f"?: {e}."}
+            )  # , ?00
+
+        # # delet this?
+        # except AttributeError as e:
+        #     return jsonify(
+        #         {"error": f"?: {e}."}
+        #     )#, ?00
+
+        # except Exception as e:
+        #     return jsonify(
+        #         {"error": f"Unexpected error: {e}."}
+        #     ), 500
 
     # Return wrapper function
     return wrapper

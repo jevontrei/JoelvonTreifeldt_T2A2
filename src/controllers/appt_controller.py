@@ -84,7 +84,6 @@ def get_an_appointment(appt_id):
         JSON: Appointment details, serialised according to appointment schema.
     """
     try:
-
         # Create SQLAlchemy query statement:
         # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 
         # FROM appointments 

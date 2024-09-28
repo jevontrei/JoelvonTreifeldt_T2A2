@@ -34,6 +34,7 @@ Table of Contents
       - [TALK ABOUT RESTful AND HOW I MOVED some ROUTES TO BE UNDER OTHER resources... like patients/x/treatments/ etc, while general treatment stuff is still under /treatments/... mention nested resources](#talk-about-restful-and-how-i-moved-some-routes-to-be-under-other-resources-like-patientsxtreatments-etc-while-general-treatment-stuff-is-still-under-treatments-mention-nested-resources)
       - [header data = auth / bearer token?](#header-data--auth--bearer-token)
       - [patient\_controller.py](#patient_controllerpy)
+- [JUST DO ALL INSOMNIA SCREENSHOTS](#just-do-all-insomnia-screenshots)
         - [Example JSON response (regenerate this? it's out of date)](#example-json-response-regenerate-this-its-out-of-date)
 - [Design Requirements](#design-requirements)
 - [Code Requirements](#code-requirements)
@@ -367,6 +368,8 @@ Route: `http://localhost:5000/patients/`
 - Required body data: N/A
 - Required header data: ?
 - Response: should include... JSON? SHOW EXAMPLE? HTTP STATUS CODE 200? Will respond with 404 Not Found if patient ID does not exist
+
+# JUST DO ALL INSOMNIA SCREENSHOTS
 
 ##### Example JSON response (regenerate this? it's out of date)
 
