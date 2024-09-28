@@ -18,6 +18,16 @@ Table of Contents
     - [R1 - Explain the problem that this app will solve, and explain how this app solves or addresses the problem.](#r1---explain-the-problem-that-this-app-will-solve-and-explain-how-this-app-solves-or-addresses-the-problem)
     - [R2 - Describe the way tasks are allocated and tracked in your project.](#r2---describe-the-way-tasks-are-allocated-and-tracked-in-your-project)
       - [Trello Board Screenshots](#trello-board-screenshots)
+        - [September 5th](#september-5th)
+        - [September 12th](#september-12th)
+        - [September 15th](#september-15th)
+        - [September 16th](#september-16th)
+        - [September 19th](#september-19th)
+        - [September 20th](#september-20th)
+        - [September 21st](#september-21st)
+        - [September 22nd](#september-22nd)
+        - [September 28th](#september-28th)
+        - [September 29th](#september-29th)
       - [GitHub Commit Screenshots](#github-commit-screenshots)
     - [R3 - List and explain the third-party services, packages and dependencies used in this app.](#r3---list-and-explain-the-third-party-services-packages-and-dependencies-used-in-this-app)
     - [R4 - Explain the benefits and drawbacks of this app’s underlying database system.](#r4---explain-the-benefits-and-drawbacks-of-this-apps-underlying-database-system)
@@ -104,9 +114,63 @@ Link to public GitHub repository: https://github.com/jevontrei/JoelvonTreifeldt_
 
 #### Trello Board Screenshots
 
+##### September 5th
+
+![Trello screenshot](./docs/trello/Screenshot%202024-09-05%20at%2020.01.20.png)
+![Trello screenshot](./docs/trello/Screenshot%202024-09-05%20at%2020.07.20.png)
+![Trello screenshot](./docs/trello/Screenshot%202024-09-05%20at%2020.17.27.png)
+
+##### September 12th
+
+![Trello screenshot](./docs/trello/Screenshot%202024-09-12%20at%2012.05.59.png)
+![Trello screenshot](./docs/trello/Screenshot%202024-09-12%20at%2012.06.04.png)
+
+##### September 15th
+
+![Trello screenshot](./docs/trello/Screenshot%202024-09-15%20at%2017.10.54.png)
+![Trello screenshot](./docs/trello/Screenshot%202024-09-15%20at%2017.11.16.png)
+![Trello screenshot](./docs/trello/Screenshot%202024-09-15%20at%2017.22.03.png)
+![Trello screenshot](./docs/trello/Screenshot%202024-09-15%20at%2017.22.25.png)
+
+##### September 16th
+
+![Trello screenshot](./docs/trello/Screenshot%202024-09-16%20at%2013.23.44.png)
+![Trello screenshot](./docs/trello/Screenshot%202024-09-16%20at%2013.26.22.png)
+![Trello screenshot](./docs/trello/Screenshot%202024-09-16%20at%2013.26.47.png)
+
+##### September 19th
+
+![Trello screenshot](./docs/trello/Screenshot%202024-09-19%20at%2022.27.44.png)
+![Trello screenshot](./docs/trello/Screenshot%202024-09-19%20at%2022.29.28.png)
+
+##### September 20th
+
+![Trello screenshot](./docs/trello/Screenshot%202024-09-20%20at%2013.02.32.png)
+![Trello screenshot](./docs/trello/Screenshot%202024-09-20%20at%2013.06.55.png)
+
+##### September 21st
+
+![Trello screenshot](./docs/trello/Screenshot%202024-09-21%20at%2009.22.13.png)
+![Trello screenshot](./docs/trello/Screenshot%202024-09-21%20at%2010.21.02.png)
+![Trello screenshot](./docs/trello/Screenshot%202024-09-21%20at%2010.21.14.png)
+
+##### September 22nd
+
+![Trello screenshot](./docs/trello/Screenshot%202024-09-22%20at%2013.29.14.png)
+
+##### September 28th
+
+![Trello screenshot](./docs/trello/Screenshot%202024-09-28%20at%2020.44.10.png)
+
+##### September 29th
+
+![Trello screenshot](./docs/trello)
+
 ...
 
 #### GitHub Commit Screenshots
+
+![GitHug commit screenshot](./docs/github_commits/github10.png)
 
 ...
 
