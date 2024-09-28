@@ -20,7 +20,7 @@ class Patient(db.Model):
 
     # One-to-many relationships from the patient's (parent) perspective
     logs = db.relationship("Log", back_populates="patient", cascade="all, delete")  # Deleting a patient deletes their logs
-    treatments = db.relationship("Treatment", back_populates="patient", cascade="all, delete")  # Deleting a patient deletes their treatments
+    treatments = db.relationship("Treatment", back_populates="patient", cascade="all, delete")  # Deleting a patient deletes their treatments and therefore appointments
 
 
 class PatientSchema(ma.Schema):

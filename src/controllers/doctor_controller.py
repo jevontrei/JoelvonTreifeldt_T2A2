@@ -6,6 +6,10 @@ from utils import authorise_as_admin
 from flask import jsonify, request, Blueprint
 from flask_jwt_extended import jwt_required
 
+# delet:
+from sqlalchemy.exc import IntegrityError
+
+
 ##################################################
 
 # Create blueprint with URL prefix
@@ -32,7 +36,7 @@ def get_all_doctors():
     """
     try:
         # Create SQLAlchemy query statement:
-        # SELECT doctors.doctor_id, doctors.name, doctors.email, doctors.password, doctors.sex, doctors.specialty, doctors.is_admin
+        # SELECT *
         # FROM doctors
         # ORDER BY doctors.name;
         stmt = db.select(
@@ -83,7 +87,7 @@ def get_a_doctor(doctor_id):
     """
     try:
         # Create SQLAlchemy query statement:
-        # SELECT doctors.doctor_id, doctors.name, doctors.email, doctors.password, doctors.sex, doctors.specialty, doctors.is_admin
+        # SELECT *
         # FROM doctors
         # WHERE doctors.doctor_id = :doctor_id_1;
         stmt = db.select(
@@ -136,7 +140,7 @@ def get_doctor_appointments(doctor_id):
 
     try:
         # Create SQLAlchemy query statement:
-        # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id
+        # SELECT *
         # FROM appointments
         # JOIN treatments
         # ON treatments.treatment_id = appointments.treatment_id
@@ -153,7 +157,7 @@ def get_doctor_appointments(doctor_id):
         )
 
         # Execute statement using scalars()
-        # Use fetchall() to return all resulting values, which also avoids returning an empty list/dict for queries for nonexistent doctors (e.g. doctor_id=9999)
+        # Use fetchall() to return all resulting values, which also avoids returning an empty list/dict for queries for nonexistent doctors (e.g. doctor_id=99999)
         appointments = db.session.scalars(stmt).fetchall()
 
         # Guard clause; return error if no appointments exist
@@ -203,7 +207,7 @@ def get_doctor_treatments(doctor_id):
 
     try:
         # Create SQLAlchemy query statement:
-        # SELECT treatments.treatment_id, treatments.start_date, treatments.end_date, treatments.patient_id, treatments.doctor_id
+        # SELECT *
         # FROM treatments
         # WHERE treatments.doctor_id = :doctor_id_1
         # ORDER BY treatments.start_date;
@@ -260,7 +264,7 @@ def update_doctor(doctor_id):
         body_data = request.get_json()
 
         # Create SQLAlchemy query statement:
-        # SELECT doctors.doctor_id, doctors.name, doctors.email, doctors.password, doctors.sex, doctors.specialty, doctors.is_admin
+        # SELECT *
         # FROM doctors
         # WHERE doctors.doctor_id = :doctor_id_1;
         stmt = db.select(Doctor).filter_by(doctor_id=doctor_id)
@@ -301,6 +305,14 @@ def update_doctor(doctor_id):
 
 ##################################################
 
+# ERROR?!:
+
+    """
+    {
+	"error": "Unexpected error: (psycopg2.errors.NotNullViolation) null value in column \"doctor_id\" of relation \"treatments\" violates not-null constraint\nDETAIL:  Failing row contains (2, 2023-11-21, null, 1, null).\n\n[SQL: UPDATE treatments SET doctor_id=%(doctor_id)s WHERE treatments.treatment_id = %(treatments_treatment_id)s]\n[parameters: {'doctor_id': None, 'treatments_treatment_id': 2}]\n(Background on this error at: https://sqlalche.me/e/20/gkpj)."
+}
+    """
+
 # http://localhost:5000/doctors/<int:doctor_id>
 @doctors_bp.route("/<int:doctor_id>", methods=["DELETE"])
 @jwt_required()
@@ -308,7 +320,7 @@ def update_doctor(doctor_id):
 # In future, build a doctor auth decorator with an early exit for admins
 @authorise_as_admin
 def delete_doctor(doctor_id):
-    """Delete a doctor.
+    """Delete a doctor. WARNING: Not recommended. This action is destructive and will prevent anyone from viewing ANY treatment or appointment details associated with any related treatment ID. All related appointments will be deleted. The @authorise_treatment_participant decorator will not be functional for appointment GET requests. An admin should archive all related treatment and appointment details (especially notes) in the patient's log before deleting doctor.
 
     Args:
         doctor_id (int): Doctor primary key.
@@ -317,43 +329,43 @@ def delete_doctor(doctor_id):
         JSON: Success message.
     """
 
-    try:
+    # try:
 
-        # Create SQLAlchemy query statement:
-        # SELECT doctors.doctor_id, doctors.name, doctors.email, doctors.password, doctors.sex, doctors.specialty, doctors.is_admin
-        # FROM doctors
-        # WHERE doctors.doctor_id = :doctor_id_1;
-        stmt = db.select(
-            Doctor
-        ).filter_by(
-            doctor_id=doctor_id
-        )
+    # Create SQLAlchemy query statement:
+    # SELECT *
+    # FROM doctors
+    # WHERE doctors.doctor_id = :doctor_id_1;
+    stmt = db.select(Doctor
+    ).filter_by(
+        doctor_id=doctor_id
+    )
 
-        # Connect to database session, execute statement, store resulting value
-        doctor = db.session.scalar(stmt)
+    # Connect to database session, execute statement, store resulting value
+    doctor = db.session.scalar(stmt)
 
-        # Guard clause; return error if doctor doesn't exist
-        if not doctor:
-            return jsonify(
-                {"error": f"Doctor {doctor_id} not found."}
-            ), 404
-
-        # Delete doctor and commit changes to database
-        db.session.delete(doctor)
-        db.session.commit()
-
-        # Return serialised success message
+    # Guard clause; return error if doctor doesn't exist
+    if not doctor:
         return jsonify(
-            {"message": f"Doctor {doctor_id} deleted."}
-        )
+            {"error": f"Doctor {doctor_id} not found."}
+        ), 404
 
-    # In case ... ?
-    # except ? as e:
+    # Delete doctor and commit changes to database
+    db.session.delete(doctor)
+    db.session.commit()
+
+    # Return serialised success message
+    return jsonify(
+        {"message": f"Doctor {doctor_id} deleted."}
+    )
+
+    # # In case ... ?
+    # # except ? as e:
+    # #     return jsonify(
+    # #         {"error": "?"}
+    # #     ), ?00
+
+    # # uncomment?! (YES!):
+    # except Exception as e:
     #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
-
-    except Exception as e:
-        return jsonify(
-            {"error": f"Unexpected error: {e}."}
-        ), 500
+    #         {"error": f"Unexpected error: {e}."}
+    #     ), 500

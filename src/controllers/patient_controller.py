@@ -133,9 +133,7 @@ def get_patient_appointments(patient_id):
     Returns:
         JSON: a list of appointment details for the given patient.
     """
-
     try:
-
         # Create SQLAlchemy query statement:
         # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.treatment_id
         # FROM appointments
@@ -159,7 +157,7 @@ def get_patient_appointments(patient_id):
         # Guard clause; return error if no appointments exist
         if not appointments:
             return jsonify(
-                {"error": f"No appointments found for patient {patient_id}."}
+                {"error": f"No appointments found for patient {patient_id}."}  # this is being returned erroneously?! like when im logged in as an admin
             ), 404
 
         # Return appointment objects serialised according to the appointments schema
@@ -237,6 +235,9 @@ def get_patient_treatments(patient_id):
 # http://localhost:5000/patients/<int:patient_id>
 @patients_bp.route("/<int:patient_id>", methods=["PUT", "PATCH"])
 @jwt_required()
+# This is a high-level endpoint that should be accessible to admins only
+# In future, build a patient auth decorator with an early exit for admins
+@authorise_as_admin
 def update_patient(patient_id):
     """Edit a patient's details.
 
@@ -305,7 +306,7 @@ def update_patient(patient_id):
 # In future, build a patient auth decorator with an early exit for admins
 @authorise_as_admin
 def delete_patient(patient_id):
-    """Delete a patient.
+    """Delete a patient. WARNING: Not recommended. This action is destructive and will delete all treatment and appointment history/details associated with this patient.
 
     Args:
         patient_id (int): Patient primary key.
@@ -354,3 +355,6 @@ def delete_patient(patient_id):
         return jsonify(
             {"error": f"Unexpected error: {e}."}
         ), 500
+
+
+# check all @jwt_required to check if i authd as admin or whatever... i keep missing some?!

@@ -18,8 +18,7 @@ class Doctor(db.Model):
     is_admin = db.Column(db.Boolean, default=False)
 
     # One-to-many relationship from the doctor's (parent) perspective
-    # does this need to be nested? to avoid circular chaos?
-    treatments = db.relationship("Treatment", back_populates="doctor")  # Don't cascade-delete; patients should retain treatment records
+    treatments = db.relationship("Treatment", back_populates="doctor", cascade="all, delete")  # Cascade-delete to maintain database consistency, but this should be improved; patients should retain treatment records
 
 
 class DoctorSchema(ma.Schema):

@@ -58,7 +58,6 @@ def authorise_as_log_viewer(fn):
     Returns:
         function: The decorated controller function.
     """
-    # try:
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         try:
@@ -100,14 +99,13 @@ def authorise_as_log_viewer(fn):
                     patient_id=patient_id, doctor_id=logged_in_id
                 )
 
-                # Execute statement, fetch all resulting values
-                # change this? only need one positive result
+                # Execute statement, fetch resulting values
                 treatment = db.session.scalars(stmt).fetchall()
 
                 # Guard clause; return error if no such doctor-patient relationship exists
                 if not treatment:
                     return jsonify(
-                        {"error": "Only authorised doctors can access this log."}
+                        {"error": "Only authorised doctors and admins can access this log."}
                     ), 403
 
                 # Allow function to execute
@@ -139,8 +137,6 @@ def authorise_as_log_owner(fn):
     Returns:
         function: The decorated controller function.
     """
-    # try:
-
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         try:
@@ -199,13 +195,16 @@ def authorise_treatment_participant(fn):
             if is_admin:
                 return fn(*args, **kwargs)
 
+            # Fetch user ID, soon to be assigned to its correct user type
             temporary_id = kwargs.get("appt_id") or kwargs.get("treatment_id")
 
             if kwargs.get("appt_id"):
                 appt_id = temporary_id
+                
+                # Ultimately need to use appointments to fetch patient_id and doctor_id
 
                 # Create SQLAlchemy query statement:
-                # SELECT treatments.treatment_id, treatments.start_date, treatments.end_date, treatments.patient_id, treatments.doctor_id
+                # SELECT *
                 # FROM treatments
                 # LEFT OUTER JOIN appointments
                 # ON treatments.treatment_id = appointments.treatment_id
@@ -217,7 +216,7 @@ def authorise_treatment_participant(fn):
                 treatment_id = temporary_id
 
                 # Create SQLAlchemy query statement:
-                # SELECT treatments.treatment_id, treatments.start_date, treatments.end_date, treatments.patient_id, treatments.doctor_id
+                # SELECT *
                 # FROM treatments
                 # WHERE treatments.treatment_id = :treatment_id_1;
                 stmt = db.select(Treatment).filter_by(
@@ -241,14 +240,14 @@ def authorise_treatment_participant(fn):
                 # patient_id must match the user_id
                 if str(patient_id) != user_id:
                     return jsonify(
-                        {"error": "Only authorised patients can access this resource."}
+                        {"error": "Only authorised patients and admins can access this resource."}
                     ), 403
 
             elif user_type == "doctor":
                 # doctor_id must match the user_id
                 if str(doctor_id) != user_id:
                     return jsonify(
-                        {"error": "Only authorised doctors can access this resource."}
+                        {"error": "Only authorised doctors and admins can access this resource."}
                     ), 403
 
             # Allow function to execute

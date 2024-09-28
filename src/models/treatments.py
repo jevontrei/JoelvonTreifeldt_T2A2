@@ -10,15 +10,15 @@ class Treatment(db.Model):
     end_date = db.Column(db.Date)  # End date is optional; treatment may be ongoing
     
     # Foreign keys from parent tables
-    patient_id = db.Column(db.Integer, db.ForeignKey("patients.patient_id", ondelete="CASCADE"), nullable=False)  # Deleting a patient deletes their treatments
-    doctor_id = db.Column(db.Integer, db.ForeignKey("doctors.doctor_id"), nullable=False)  # Don't cascade; deleting a doctor sets the treatment end_date to yesterday if it hasn't already passed?! Implement this
+    patient_id = db.Column(db.Integer, db.ForeignKey("patients.patient_id", ondelete="CASCADE"), nullable=False)  # Deleting a patient deletes their treatments and therefore appointments
+    doctor_id = db.Column(db.Integer, db.ForeignKey("doctors.doctor_id", ondelete="CASCADE"), nullable=False)  # Deleting a doctor deletes their treatments to maintain database consistency; but this should be improved. Patients should retain history and agency. Implement this in future: deleting a doctor sets the treatment end_date to yesterday if it hasn't already passed
 
     # Many-to-one relationships from the treatment's perspective (child)
     patient = db.relationship("Patient", back_populates="treatments")
     doctor = db.relationship("Doctor", back_populates="treatments")
     
     # One-to-many relationship from the treatment's perspective (parent)
-    appointments = db.relationship("Appointment", back_populates="treatment", cascade="all, delete")  # Cascade; but patient should retain history. Treatments should not be deleted, and if they are, an admin should dump the raw appt data into the patient's log as an archive before deleting
+    appointments = db.relationship("Appointment", back_populates="treatment", cascade="all, delete")  # Cascade; deleting a treatment deletes all child appointments; but this should be improved; patient should retain history. Treatments should not be deleted, and if they are, an admin should dump the raw appointment data into the patient's log as an archive before deleting
 
 
 class TreatmentSchema(ma.Schema):

@@ -25,6 +25,7 @@ logs_bp = Blueprint(
 
 @logs_bp.route("/", methods=["POST"])
 @jwt_required()
+# Not even admins can create a log on the patient's behalf. In future, make this possible to increase accessibility
 def create_log(patient_id):
     """Create a new patient log.
 

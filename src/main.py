@@ -6,7 +6,7 @@ def create_app():
     """Application factory; create the Flask app.
 
     Returns:
-        _type_: Flask app object.?
+        Flask app object.
     """
 
     # Initialise app (instance of Flask class) before imports
@@ -53,14 +53,14 @@ def create_app():
 
 ##################################################################
 
-    # Globally handle generalised errors (add more?!)
-
+    # Globally handle generalised errors
+    
     @app.errorhandler(ValidationError)
     def validation_error(e):
         """_summary_
 
         Args:
-            e (_type_): _description_
+            e: Error.
 
         Returns:
             tuple: Error message (JSON) and a HTTP response status code.
@@ -72,7 +72,7 @@ def create_app():
         """_summary_
 
         Args:
-            e (_type_): _description_
+            e: Error.
 
         Returns:
             tuple: Error message (JSON) and a HTTP response status code.
@@ -84,7 +84,7 @@ def create_app():
         """_summary_
 
         Args:
-            e (_type_): _description_
+            e: Error.
             
         Returns:
             tuple: Error message (JSON) and a HTTP response status code.
@@ -96,7 +96,7 @@ def create_app():
         """In case an invalid endpoint is requested.
 
         Args:
-            e (_type_): _description_
+            e: Error.
             
         Returns:
             tuple: Error message (JSON) and HTTP response status code

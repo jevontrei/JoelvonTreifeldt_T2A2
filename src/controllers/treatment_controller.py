@@ -156,7 +156,7 @@ def create_appointment(treatment_id):
 
 @treatments_bp.route("/<int:treatment_id>/appointments/")
 @jwt_required()
-# explain early admin auth?
+# Authorise as either a patient or doctor involved in this treatment/appointment, with an early exit for admins
 @authorise_treatment_participant
 def get_treatment_appointments(treatment_id):
     """Get all appointments for a particular treatment relationship.
@@ -260,7 +260,7 @@ def get_all_treatments():
 
 @treatments_bp.route("/<int:treatment_id>")
 @jwt_required()
-# explain early admin auth?
+# Authorise as either a patient or doctor involved in this treatment/appointment, with an early exit for admins
 @authorise_treatment_participant
 def get_a_treatment(treatment_id):
     """Get details for a specific treatment using its ID.
@@ -313,7 +313,7 @@ def get_a_treatment(treatment_id):
 
 @treatments_bp.route("/<int:treatment_id>", methods=["PUT", "PATCH"])
 @jwt_required()
-# explain early admin auth?
+# Authorise as either a patient or doctor involved in this treatment/appointment, with an early exit for admins
 @authorise_treatment_participant
 def update_treatment(treatment_id):
     """Edit treatment details.
@@ -383,7 +383,7 @@ def update_treatment(treatment_id):
 # This is a high-level endpoint that should be accessible to admins only
 @authorise_as_admin
 def delete_treatment(treatment_id):
-    """Delete any treatment. WARNING: Not recommended. This action is destructive and will prevent patients and doctors from viewing ANY appointments associated with this treatment ID. I.e. the @authorise_treatment_participant decorator will not be functional for appointment GET requests. An admin should archive all related appointment details (especially notes) in the patient's log before deleting treatment.
+    """Delete any treatment. WARNING: Not recommended. This action is destructive and will prevent patients and doctors from viewing ANY appointments associated with this treatment ID. All related appointments will be deleted. The @authorise_treatment_participant decorator will not be functional for appointment GET requests. An admin should archive all related appointment details (especially notes) in the patient's log before deleting treatment.
 
     Args:
         treatment_id (int): Treatment primary key.
