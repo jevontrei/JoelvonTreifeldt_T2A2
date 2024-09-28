@@ -17,8 +17,6 @@ patients_bp = Blueprint(
 ##################################################
 
 # http://localhost:5000/patients/
-
-
 @patients_bp.route("/")
 @jwt_required()
 # This is a high-level endpoint that should be accessible to admins only
@@ -357,4 +355,4 @@ def delete_patient(patient_id):
         ), 500
 
 
-# check all @jwt_required to check if i authd as admin or whatever... i keep missing some?!
+# check all @jwt_required everywhere to check if i authd as admin or whatever... i keep missing some?!

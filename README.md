@@ -33,9 +33,15 @@ Table of Contents
     - [R8 - Explain how to use this application’s API endpoints.](#r8---explain-how-to-use-this-applications-api-endpoints)
       - [TALK ABOUT RESTful AND HOW I MOVED some ROUTES TO BE UNDER OTHER resources... like patients/x/treatments/ etc, while general treatment stuff is still under /treatments/... mention nested resources](#talk-about-restful-and-how-i-moved-some-routes-to-be-under-other-resources-like-patientsxtreatments-etc-while-general-treatment-stuff-is-still-under-treatments-mention-nested-resources)
       - [header data = auth / bearer token?](#header-data--auth--bearer-token)
+      - [main.py](#mainpy)
+      - [appt\_controller.py](#appt_controllerpy)
+      - [auth\_controller.py](#auth_controllerpy)
+      - [cli\_controller.py](#cli_controllerpy)
+      - [doctor\_controller.py](#doctor_controllerpy)
       - [patient\_controller.py](#patient_controllerpy)
-- [JUST DO ALL INSOMNIA SCREENSHOTS](#just-do-all-insomnia-screenshots)
-        - [Example JSON response (regenerate this? it's out of date)](#example-json-response-regenerate-this-its-out-of-date)
+        - [Example JSON response](#example-json-response)
+      - [patient\_log\_controller.py](#patient_log_controllerpy)
+      - [treatment\_controller.py](#treatment_controllerpy)
 - [Design Requirements](#design-requirements)
 - [Code Requirements](#code-requirements)
 - [Coding requirements](#coding-requirements)
@@ -252,6 +258,7 @@ Meets D, and includes appropriate code examples supporting the descriptions. -->
 Patients ...
 
 <!-- UPDATE THIS CODE: -->
+
 ```py
 class Patient(db.Model):
     __tablename__ = "patients"
@@ -286,7 +293,6 @@ Doctors ...
 #### Treatment model (join table)
 
     # This relationship allows us to view a treatment's appts... bi-directionally but no need for a line starting with appt_id = ... bc it's not actually a column in the treatments table, and bc treatments is the parent. this is just to establish the two-way connection
-
 
 Treatments were initially represented using `db.Table()` with FK attributes only. However, to facilitate the inclusion of other attributes (start date, end date), it was converted to a full entity using `db.model()` along with a schema.
 
@@ -358,111 +364,579 @@ Meets P, and includes examples of what each identified endpoint will return on s
 6 to >5 pts HD
 Meets D, applied to ALL of the application’s API endpoints. -->
 
-All endpoints are described below, with routes, verbs, required body/header data, and responses as applicable.
+All endpoints are outlined below, with routes, verbs, required body/header data, and responses as applicable with screenshots.
+
+#### main.py
+
+Route: `http://localhost:5000/`
+
+- HTTP verb: `GET`
+- Required: N/A
+- Expected failure response: N/A
+- Expected response: 200; JSON
+
+![](./docs/insomnia/ins%20welcome.png)
+
+---
+
+#### appt_controller.py
+
+Route: `http://localhost:5000/appointments/`
+
+- HTTP verb: `GET`
+- Required: JWT, admin auth header
+- Expected failure response:
+
+```py
+{
+  "error": "Only admins can perform this action."
+}
+```
+
+- Expected response: 200; JSON
+
+![](./docs/insomnia/ins%20appt%20get%20all.png)
+
+---
+
+Route: `http://localhost:5000/appointments/<int:appt_id>`
+
+- HTTP verb: `GET`
+- Required: JWT, treatment participant incl admin auth header
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/ins%20appt%20get%20x.png)
+
+---
+
+Route: `http://localhost:5000/appointments/<int:appt_id>`
+
+- HTTP verb: `PUT, PATCH`
+- Required: JWT, treatment participant incl admin auth header; updated details body
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/ins%20appt%20patch.png)
+
+---
+
+Route: `http://localhost:5000/appointments/<int:appt_id>`
+
+- HTTP verb: `DEL`
+- Required: JWT, treatment participant incl admin auth header
+  Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/ins%20appt%20del.png)
+
+---
+
+#### auth_controller.py
+
+Route: `http://localhost:5000/auth/register/<user_type>`
+
+- HTTP verb: `POST`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/ins%20reg%20doc.png)
+
+---
+
+Route: `http://localhost:5000/auth/login/<user_type>`
+
+- HTTP verb: `POST`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+#### cli_controller.py
+
+do i unclude these here?
+
+Route: `?`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?;
+
+![](./docs/insomnia/)
+
+---
+
+Route: `?`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?;
+
+![](./docs/insomnia/)
+
+---
+
+Route: `?`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?;
+
+![](./docs/insomnia/)
+
+---
+
+#### doctor_controller.py
+
+Route: `http://localhost:5000/doctors/`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+Route: `http://localhost:5000/doctors/<int:doctor_id>`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+Route: `http://localhost:5000/doctors/<int:doctor_id>/appointments/`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+Route: `http://localhost:5000/doctors/<int:doctor_id>/treatments/`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+Route: `http://localhost:5000/doctors/<int:doctor_id>`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+Route: `http://localhost:5000/doctors/<int:doctor_id>`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
 
 #### patient_controller.py
 
 Route: `http://localhost:5000/patients/`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
 
 - HTTP verb: `GET`
 - Required body data: N/A
 - Required header data: ?
 - Response: should include... JSON? SHOW EXAMPLE? HTTP STATUS CODE 200? Will respond with 404 Not Found if patient ID does not exist
 
-# JUST DO ALL INSOMNIA SCREENSHOTS
-
-##### Example JSON response (regenerate this? it's out of date)
+##### Example JSON response
 
 HTTP status code: 200 OK
 
-```
-[
-  {
-    "appt_id": 1,
-    "cost": 100,
-    "datetime": "2000-12-12T00:00:00",
-    "notes": null,
-    "place": "Frog's Hollow Medical Centre",
-    "status": "Completed",
-    "treatment_id": 1
-  },
-  {
-    "appt_id": 2,
-    "cost": 206,
-    "datetime": "1999-06-13T00:00:00",
-    "notes": null,
-    "place": "Spring Hill Medical Centre",
-    "status": "Completed",
-    "treatment_id": 1
-  },
-  {
-    "appt_id": 3,
-    "cost": 99,
-    "datetime": "1989-06-13T00:00:00",
-    "notes": "general checkup",
-    "place": "Spring Hill Medical Centre",
-    "status": "Cancelled",
-    "treatment_id": 1
-  },
-  {
-    "appt_id": 4,
-    "cost": 58,
-    "datetime": "2024-12-01T00:00:00",
-    "notes": null,
-    "place": "UQ Medical Centre",
-    "status": "Scheduled",
-    "treatment_id": 2
-  },
-  {
-    "appt_id": 5,
-    "cost": 52,
-    "datetime": "2025-06-08T00:00:00",
-    "notes": "yearly mental health appt",
-    "place": "UQ Medical Centre",
-    "status": "Scheduled",
-    "treatment_id": 3
-  },
-  {
-    "appt_id": 6,
-    "cost": 77,
-    "datetime": "2023-10-01T00:00:00",
-    "notes": null,
-    "place": "UQ Medical Centre",
-    "status": "Completed",
-    "treatment_id": 2
-  },
-  {
-    "appt_id": 7,
-    "cost": 32,
-    "datetime": "1463-09-02T00:00:00",
-    "notes": "blood test",
-    "place": "London Medical Centre",
-    "status": "Completed",
-    "treatment_id": 3
-  },
-  {
-    "appt_id": 8,
-    "cost": 21,
-    "datetime": "1463-09-11T00:00:00",
-    "notes": "follow-up for blood test",
-    "place": "London Medical Centre",
-    "status": "Completed",
-    "treatment_id": 3
-  }
-]
+![ins pat get all](./docs/insomnia/ins%20pat%20get%20all.png)
+
+---
+
+Route: `http://localhost:5000/patients/<int:patient_id>`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
 ```
 
-Route: `http://localhost:5000/patients/<int:id>`
+- Expected response: ?; JSON
 
 - HTTP verb: `GET`
-- Body/header data: ?
-- Response: JSON? SHOW EXAMPLE? HTTP STATUS CODE? 200/404?
+- Required: ?
+- Expected failure response:
 
-Route: `http://localhost:5000/patients/`
+```py
+?
+```
 
-- HTTP verb: `POST`
-- Body/header data: ?
-- Response: JSON? SHOW EXAMPLE? HTTP STATUS CODE? 200/404?
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+Route: `http://localhost:5000/patients/<int:patient_id>/appointments/`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+Route: `http://localhost:5000/patients/<int:patient_id>/treatments/`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+Route: `http://localhost:5000/patients/<int:patient_id>`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+Route: `http://localhost:5000/patients/<int:patient_id>`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+#### patient_log_controller.py
+
+Route: `http://localhost:5000/patients/<int:patient_id>/logs/`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+Route: `http://localhost:5000/patients/<int:patient_id>/logs/`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+#### treatment_controller.py
+
+Route: `# http://localhost:5000/treatments/`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+Route: `http://localhost:5000/treatments/<int:treatment_id>/appointments/`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+Route: `http://localhost:5000/treatments/<int:treatment_id>/appointments/`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+Route: `http://localhost:5000/treatments/`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+Route: `http://localhost:5000/treatments/<int:treatment_id>`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+Route: `http://localhost:5000/treatments/<int:treatment_id>`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
+
+Route: `http://localhost:5000/treatments/<int:treatment_id>`
+
+- HTTP verb: `?`
+- Required: ?
+- Expected failure response:
+
+```py
+?
+```
+
+- Expected response: ?; JSON
+
+![](./docs/insomnia/)
+
+---
 
 ---
 

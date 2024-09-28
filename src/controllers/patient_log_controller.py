@@ -21,8 +21,6 @@ logs_bp = Blueprint(
 ############################################
 
 # http://localhost:5000/patients/<int:patient_id>/logs/
-
-
 @logs_bp.route("/", methods=["POST"])
 @jwt_required()
 # Not even admins can create a log on the patient's behalf. In future, make this possible to increase accessibility

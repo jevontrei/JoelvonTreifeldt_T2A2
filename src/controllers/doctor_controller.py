@@ -305,14 +305,6 @@ def update_doctor(doctor_id):
 
 ##################################################
 
-# ERROR?!:
-
-    """
-    {
-	"error": "Unexpected error: (psycopg2.errors.NotNullViolation) null value in column \"doctor_id\" of relation \"treatments\" violates not-null constraint\nDETAIL:  Failing row contains (2, 2023-11-21, null, 1, null).\n\n[SQL: UPDATE treatments SET doctor_id=%(doctor_id)s WHERE treatments.treatment_id = %(treatments_treatment_id)s]\n[parameters: {'doctor_id': None, 'treatments_treatment_id': 2}]\n(Background on this error at: https://sqlalche.me/e/20/gkpj)."
-}
-    """
-
 # http://localhost:5000/doctors/<int:doctor_id>
 @doctors_bp.route("/<int:doctor_id>", methods=["DELETE"])
 @jwt_required()
@@ -328,44 +320,41 @@ def delete_doctor(doctor_id):
     Returns:
         JSON: Success message.
     """
+    try:
+        # Create SQLAlchemy query statement:
+        # SELECT *
+        # FROM doctors
+        # WHERE doctors.doctor_id = :doctor_id_1;
+        stmt = db.select(Doctor
+                         ).filter_by(
+            doctor_id=doctor_id
+        )
 
-    # try:
+        # Connect to database session, execute statement, store resulting value
+        doctor = db.session.scalar(stmt)
 
-    # Create SQLAlchemy query statement:
-    # SELECT *
-    # FROM doctors
-    # WHERE doctors.doctor_id = :doctor_id_1;
-    stmt = db.select(Doctor
-    ).filter_by(
-        doctor_id=doctor_id
-    )
+        # Guard clause; return error if doctor doesn't exist
+        if not doctor:
+            return jsonify(
+                {"error": f"Doctor {doctor_id} not found."}
+            ), 404
 
-    # Connect to database session, execute statement, store resulting value
-    doctor = db.session.scalar(stmt)
+        # Delete doctor and commit changes to database
+        db.session.delete(doctor)
+        db.session.commit()
 
-    # Guard clause; return error if doctor doesn't exist
-    if not doctor:
+        # Return serialised success message
         return jsonify(
-            {"error": f"Doctor {doctor_id} not found."}
-        ), 404
+            {"message": f"Doctor {doctor_id} deleted."}
+        )
 
-    # Delete doctor and commit changes to database
-    db.session.delete(doctor)
-    db.session.commit()
-
-    # Return serialised success message
-    return jsonify(
-        {"message": f"Doctor {doctor_id} deleted."}
-    )
-
-    # # In case ... ?
-    # # except ? as e:
-    # #     return jsonify(
-    # #         {"error": "?"}
-    # #     ), ?00
-
-    # # uncomment?! (YES!):
-    # except Exception as e:
+    # In case ... ?
+    # except ? as e:
     #     return jsonify(
-    #         {"error": f"Unexpected error: {e}."}
-    #     ), 500
+    #         {"error": "?"}
+    #     ), ?00
+
+    except Exception as e:
+        return jsonify(
+            {"error": f"Unexpected error: {e}."}
+        ), 500

@@ -23,8 +23,6 @@ treatments_bp = Blueprint(
 #####################################################
 
 # http://localhost:5000/treatments/
-
-
 @treatments_bp.route("/", methods=["POST"])
 @jwt_required()
 # Must authorise as admin, otherwise any person could create a treatment relationship and view any patient's private logs
@@ -93,8 +91,6 @@ def create_treatment():
 # weird identical duplicates are allowed to happen... fix this?!
 
 # http://localhost:5000/treatments/<int:treatment_id>/appointments/
-
-
 @treatments_bp.route("/<int:treatment_id>/appointments/", methods=["POST"])
 @jwt_required()
 # Authorise either patients or their doctors to create appointments, with an early exit for admins
@@ -152,8 +148,6 @@ def create_appointment(treatment_id):
 #####################################################
 
 # http://localhost:5000/treatments/<int:treatment_id>/appointments/
-
-
 @treatments_bp.route("/<int:treatment_id>/appointments/")
 @jwt_required()
 # Authorise as either a patient or doctor involved in this treatment/appointment, with an early exit for admins
@@ -206,8 +200,6 @@ def get_treatment_appointments(treatment_id):
 #####################################################
 
 # http://localhost:5000/treatments/
-
-
 @treatments_bp.route("/")
 @jwt_required()
 # This is a high-level endpoint that should be accessible to admins only
@@ -256,8 +248,6 @@ def get_all_treatments():
 #####################################################
 
 # http://localhost:5000/treatments/<int:treatment_id>
-
-
 @treatments_bp.route("/<int:treatment_id>")
 @jwt_required()
 # Authorise as either a patient or doctor involved in this treatment/appointment, with an early exit for admins
@@ -309,8 +299,6 @@ def get_a_treatment(treatment_id):
 #####################################################
 
 # http://localhost:5000/treatments/<int:treatment_id>
-
-
 @treatments_bp.route("/<int:treatment_id>", methods=["PUT", "PATCH"])
 @jwt_required()
 # Authorise as either a patient or doctor involved in this treatment/appointment, with an early exit for admins
@@ -376,8 +364,6 @@ def update_treatment(treatment_id):
 #####################################################
 
 # http://localhost:5000/treatments/<int:treatment_id>
-
-
 @treatments_bp.route("/<int:treatment_id>", methods=["DELETE"])
 @jwt_required()
 # This is a high-level endpoint that should be accessible to admins only

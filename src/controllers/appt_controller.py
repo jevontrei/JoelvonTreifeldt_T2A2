@@ -119,6 +119,7 @@ def get_an_appointment(appt_id):
 
 ##################################################
 
+# http://localhost:5000/appointments/<int:appt_id>
 @appointments_bp.route("/<int:appt_id>", methods=["PUT", "PATCH"])
 @jwt_required()
 # Authorise as either a patient or doctor involved in this treatment/appointment, with an early exit for admins
@@ -183,6 +184,7 @@ def update_appointment(appt_id):
 
 ##################################################
 
+# http://localhost:5000/appointments/<int:appt_id>
 @appointments_bp.route("/<int:appt_id>", methods=["DELETE"])
 @jwt_required()
 # Authorise as either a patient or doctor involved in this treatment/appointment, with an early exit for admins

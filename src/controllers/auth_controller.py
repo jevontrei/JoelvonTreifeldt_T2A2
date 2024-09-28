@@ -29,8 +29,6 @@ auth_bp = Blueprint(
 ###########################################################################
 
 # http://localhost:5000/auth/register/<user_type>
-
-
 @auth_bp.route("/register/<user_type>", methods=["POST"])
 def register_user(user_type):
     """Create a new patient or doctor user.
