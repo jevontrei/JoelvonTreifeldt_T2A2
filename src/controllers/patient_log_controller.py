@@ -45,6 +45,7 @@ def create_log(patient_id):
                 {"error": "Only patients can create logs."}
             ), 403
         # Guard clause; return error if logged in patient does not match patient_id
+        # THIS IS BROKEN?! FIX IT AND ADD SCREENSHOT TO README under 'ins pat log post'
         if get_jwt_identity() != patient_id:
             return jsonify(
                 {"error": "Logged in patient does not match patient_id."}

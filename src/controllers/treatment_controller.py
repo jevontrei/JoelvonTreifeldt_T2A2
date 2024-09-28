@@ -9,7 +9,7 @@ from psycopg2 import errorcodes
 
 #####################################################
 
-# TO DO: verify that end date is AFTER start date?!
+# TO DO: verify that end date is AFTER start date?! do that in schema?
 
 #####################################################
 

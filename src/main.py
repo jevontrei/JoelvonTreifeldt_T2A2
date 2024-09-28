@@ -39,6 +39,10 @@ def create_app():
     app.register_blueprint(patients_bp)
     app.register_blueprint(treatments_bp)
 
+##################################################################
+
+    # http://localhost:5000/
+
     # Root route
     @app.route("/")
     def welcome():

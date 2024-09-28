@@ -20,10 +20,11 @@ class Treatment(db.Model):
     # One-to-many relationship from the treatment's perspective (parent)
     appointments = db.relationship("Appointment", back_populates="treatment", cascade="all, delete")  # Cascade; deleting a treatment deletes all child appointments; but this should be improved; patient should retain history. Treatments should not be deleted, and if they are, an admin should dump the raw appointment data into the patient's log as an archive before deleting
 
+# TO DO: verify that end date is AFTER start date?! do that in schema?
 
 class TreatmentSchema(ma.Schema):
     # remember to constrain each entry to be unique... right now you can create 100+ different identical treatment entries?!
-    # remember to validate that end date, if it exists, is on or after start date:
+    # remember to validate that end date, if it exists, is on or after start date?!:
 
     class Meta:
         fields = (
