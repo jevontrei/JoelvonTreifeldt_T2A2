@@ -166,6 +166,8 @@ Meets D, and the explanation includes comparisons to how AT LEAST ONE model or r
 
 **_PLAN_** for normalised data/relations!!!!!!
 
+Maybe a User class (which Patient and Doctor inherit from) would be more normalised
+
 The relations are as follows:
 
 - Patient-Doctor (many to many) via the Treatments join table.

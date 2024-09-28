@@ -20,21 +20,32 @@ def authorise_as_admin(fn):
     Returns:
         function: The decorated controller function.
     """
-    # try:
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-        # try:
-        jwt = get_jwt()
+        try:
+            jwt = get_jwt()
 
-        # Guard clause; return error if user is not an admin
-        if not jwt.get("is_admin"):
+            # Guard clause; return error if user is not an admin
+            if not jwt.get("is_admin"):
+                return jsonify(
+                    {"error": "Only admins can perform this action."}
+                ), 403
+
+            return fn(*args, **kwargs)
+        
+        # # In case ... ?
+        # except ? as e:
+        #     return jsonify(
+        #         {"error": "?"}
+        #     ), ?00
+
+        except Exception as e:
             return jsonify(
-                {"error": "Only admins can perform this action."}
-            ), 403
-
-        return fn(*args, **kwargs)
+                {"error": f"Unexpected error: {e}."}
+            ), 500
 
     return wrapper
+
 
 ##############################################################
 
@@ -51,53 +62,65 @@ def authorise_as_log_viewer(fn):
     # try:
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-        # try:
+        try:
 
-        # Fetch patient_id, current user type and ID
-        jwt = get_jwt()
-        patient_id = kwargs.get("patient_id")
-        user_type = jwt.get("user_type")
-        logged_in_id = get_jwt_identity()
+            # Fetch patient_id, current user type and ID
+            jwt = get_jwt()
+            patient_id = kwargs.get("patient_id")
+            user_type = jwt.get("user_type")
+            logged_in_id = get_jwt_identity()
 
-        # Check if user is a patient or doctor
-        if user_type == "patient":
-            # patient_id must match the log's patient_id
-            if str(patient_id) != logged_in_id:
-                return jsonify(
-                    {"error": "Only the log creator patient has manage access."}
-                ), 403
+            # Check if user is a patient or doctor
+            if user_type == "patient":
+                # patient_id must match the log's patient_id
+                if str(patient_id) != logged_in_id:
+                    return jsonify(
+                        {"error": "Only the log creator patient has manage access."}
+                    ), 403
 
-            # Allow function to execute
-            return fn(*args, **kwargs)
+                # Allow function to execute
+                return fn(*args, **kwargs)
 
-        elif user_type == "doctor":
-            # doctor_id must be associated with the log's patient_id through the Treatments table
-            # PROBLEM: Doctor should not be able to see log if the treatment end date has passed?! Implement this.
+            elif user_type == "doctor":
+                # doctor_id must be associated with the log's patient_id through the Treatments table
+                # PROBLEM: Doctor should not be able to see log if the treatment end date has passed?! Implement this.
 
-            # Create SQLAlchemy query statement:
-            # SELECT *
-            # FROM treatments
-            # WHERE patient_id = :patient_id_1
-            # AND doctor_id = :doctor_id_1;
-            stmt = db.select(
-                Treatment
-            ).filter_by(
-                patient_id=patient_id, doctor_id=logged_in_id
-            )
+                # Create SQLAlchemy query statement:
+                # SELECT *
+                # FROM treatments
+                # WHERE patient_id = :patient_id_1
+                # AND doctor_id = :doctor_id_1;
+                stmt = db.select(
+                    Treatment
+                ).filter_by(
+                    patient_id=patient_id, doctor_id=logged_in_id
+                )
 
-            # Execute statement, fetch all resulting values
-            # change this? only need one positive result
-            treatment = db.session.scalars(stmt).fetchall()
+                # Execute statement, fetch all resulting values
+                # change this? only need one positive result
+                treatment = db.session.scalars(stmt).fetchall()
 
-            # Guard clause; return error if no such doctor-patient relationship exists
-            if not treatment:
-                return jsonify(
-                    {"error": "Only authorised doctors can access this log."}
-                ), 403
+                # Guard clause; return error if no such doctor-patient relationship exists
+                if not treatment:
+                    return jsonify(
+                        {"error": "Only authorised doctors can access this log."}
+                    ), 403
 
-            # Allow function to execute
-            return fn(*args, **kwargs)
+                # Allow function to execute
+                return fn(*args, **kwargs)
 
+
+        # In case ... ?
+        # except ? as e:
+        #     return jsonify(
+        #         {"error": "?"}
+        #     ), ?00
+
+        except Exception as e:
+            return jsonify(
+                {"error": f"Unexpected error: {e}."}
+            ), 500
+    
     # Return wrapper function
     return wrapper
 
@@ -117,18 +140,29 @@ def authorise_as_log_owner(fn):
 
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-        # try:
-        # Fetch patient_id, current user type and ID
-        jwt = get_jwt()
-        patient_id = kwargs.get("patient_id")
-        logged_in_id = get_jwt_identity()
+        try:
+            # Fetch patient_id, current user type and ID
+            jwt = get_jwt()
+            patient_id = kwargs.get("patient_id")
+            logged_in_id = get_jwt_identity()
 
-        # Guard clause; return error if patient_id does not match logged_in_id
-        if str(patient_id) != logged_in_id:
-            return jsonify({"error": "Only the log owner has manage access."}), 403
+            # Guard clause; return error if patient_id does not match logged_in_id
+            if str(patient_id) != logged_in_id:
+                return jsonify({"error": "Only the log owner has manage access."}), 403
 
-        # Allow function to execute
-        return fn(*args, **kwargs)
+            # Allow function to execute
+            return fn(*args, **kwargs)
+        
+        # In case ... ?
+        # except ? as e:
+        #     return jsonify(
+        #         {"error": "?"}
+        #     ), ?00
+
+        except Exception as e:
+            return jsonify(
+                {"error": f"Unexpected error: {e}."}
+            ), 500
 
     # Return wrapper function
     return wrapper
@@ -149,52 +183,63 @@ def authorise_treatment_participant(fn):
 
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-        # try:
-        # Fetch user_id, user_type
-        user_id = get_jwt_identity()
-        user_type = get_jwt().get("user_type")
+        try:
+            # Fetch user_id, user_type
+            user_id = get_jwt_identity()
+            user_type = get_jwt().get("user_type")
 
-        # Fetch treatment_id from kwargs
-        treatment_id = kwargs.get("treatment_id")
+            # Fetch treatment_id from kwargs
+            treatment_id = kwargs.get("treatment_id")
 
-        # Create SQLAlchemy query statement:
-        # SELECT *
-        # FROM treatments
-        # WHERE treatment_id = :treatment_id_1;
-        stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
+            # Create SQLAlchemy query statement:
+            # SELECT *
+            # FROM treatments
+            # WHERE treatment_id = :treatment_id_1;
+            stmt = db.select(Treatment).filter_by(treatment_id=treatment_id)
 
-        # Execute statement, fetch all resulting values
-        treatment = db.session.scalars(stmt).first()
+            # Execute statement, fetch all resulting values
+            treatment = db.session.scalars(stmt).first()
 
-        # Guard clause; return error if no such doctor-patient relationship exists
+            # Guard clause; return error if no such doctor-patient relationship exists
 
-        # Guard clause; return error if no such treatment exists
-        if not treatment:
+            # Guard clause; return error if no such treatment exists
+            if not treatment:
+                return jsonify(
+                    {"error": "Treatment not found."}
+                ), 404
+
+            # Fetch patient_id and doctor_id from treatment
+            patient_id = treatment.patient_id
+            doctor_id = treatment.doctor_id
+
+            # Check user type
+            if user_type == "patient":
+                # patient_id must match the user_id
+                if str(patient_id) != user_id:
+                    return jsonify(
+                        {"error": "Only authorised patients can access this resource."}
+                    ), 403
+
+            elif user_type == "doctor":
+                # doctor_id must match the user_id
+                if str(doctor_id) != user_id:
+                    return jsonify(
+                        {"error": "Only authorised doctors can access this resource."}
+                    ), 403
+
+            # Allow function to execute
+            return fn(*args, **kwargs)
+
+        # In case ... ?
+        # except ? as e:
+        #     return jsonify(
+        #         {"error": "?"}
+        #     ), ?00
+
+        except Exception as e:
             return jsonify(
-                {"error": "Treatment not found."}
-            ), 404
-
-        # Fetch patient_id and doctor_id from treatment
-        patient_id = treatment.patient_id
-        doctor_id = treatment.doctor_id
-
-        # Check user type
-        if user_type == "patient":
-            # patient_id must match the user_id
-            if str(patient_id) != user_id:
-                return jsonify(
-                    {"error": "Only authorised patients can access this resource."}
-                ), 403
-
-        elif user_type == "doctor":
-            # doctor_id must match the user_id
-            if str(doctor_id) != user_id:
-                return jsonify(
-                    {"error": "Only authorised doctors can access this resource."}
-                ), 403
-
-        # Allow function to execute
-        return fn(*args, **kwargs)
+                {"error": f"Unexpected error: {e}."}
+            ), 500
 
     # Return wrapper function
     return wrapper

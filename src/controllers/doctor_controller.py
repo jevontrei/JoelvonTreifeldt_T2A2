@@ -2,7 +2,7 @@ from init import db
 from models import Doctor, doctor_schema, doctors_schema, Appointment, appointments_schema, Treatment, treatments_schema
 from utils import authorise_as_admin
 
- 
+
 from flask import jsonify, request, Blueprint
 from flask_jwt_extended import jwt_required
 
@@ -10,14 +10,16 @@ from flask_jwt_extended import jwt_required
 
 # Create blueprint with URL prefix
 doctors_bp = Blueprint(
-    "doctors", 
-    __name__, 
+    "doctors",
+    __name__,
     url_prefix="/doctors"
 )
 
 ##################################################
 
 # http://localhost:5000/doctors/
+
+
 @doctors_bp.route("/")
 @jwt_required()
 def get_all_doctors():
@@ -26,30 +28,42 @@ def get_all_doctors():
     Returns:
         JSON: All doctor details, serialised.
     """
-    
-    # try:
-    
-    # Create SQLAlchemy query statement:
-    # SELECT doctors.doctor_id, doctors.name, doctors.email, doctors.password, doctors.sex, doctors.specialty, doctors.is_admin 
-    # FROM doctors 
-    # ORDER BY doctors.name;
-    stmt = db.select(
-        Doctor
-    ).order_by(
-        Doctor.name
-    )
 
-    # ... ? fetchall() prevents returning an empty list/dict
-    doctors = db.session.scalars(stmt).fetchall()
-    
-    # Guard clause; return error if no doctors exist
-    if not doctors:
+    try:
+
+        # Create SQLAlchemy query statement:
+        # SELECT doctors.doctor_id, doctors.name, doctors.email, doctors.password, doctors.sex, doctors.specialty, doctors.is_admin
+        # FROM doctors
+        # ORDER BY doctors.name;
+        stmt = db.select(
+            Doctor
+        ).order_by(
+            Doctor.name
+        )
+
+        # ... ? fetchall() prevents returning an empty list/dict
+        doctors = db.session.scalars(stmt).fetchall()
+
+        # Guard clause; return error if no doctors exist
+        if not doctors:
+            return jsonify(
+                {"error": "No doctors found."}
+            ), 404
+
+        # Return doctor objects serialised according to the doctors schema
+        return doctors_schema.dump(doctors)
+
+    # In case ... ?
+    # except ? as e:
+    #     return jsonify(
+    #         {"error": "?"}
+    #     ), ?00
+
+    except Exception as e:
         return jsonify(
-            {"error": "No doctors found."}
-        ), 404
+            {"error": f"Unexpected error: {e}."}
+        ), 500
 
-    # Return doctor objects serialised according to the doctors schema 
-    return doctors_schema.dump(doctors)
 
 ##################################################
 
@@ -65,30 +79,42 @@ def get_a_doctor(doctor_id):
     Returns:
         JSON: Serialised details for one doctor.
     """
-    
-    # try:
-    
-    # Create SQLAlchemy query statement:
-    # SELECT doctors.doctor_id, doctors.name, doctors.email, doctors.password, doctors.sex, doctors.specialty, doctors.is_admin 
-    # FROM doctors 
-    # WHERE doctors.doctor_id = :doctor_id_1;
-    stmt = db.select(
-        Doctor
-    ).filter_by(
-        doctor_id=doctor_id
-    )
 
-    # Connect to database session, execute statement, store resulting value
-    doctor = db.session.scalar(stmt)
-    
-    # Guard clause; return error if doctor doesn't exist
-    if not doctor:
+    try:
+
+        # Create SQLAlchemy query statement:
+        # SELECT doctors.doctor_id, doctors.name, doctors.email, doctors.password, doctors.sex, doctors.specialty, doctors.is_admin
+        # FROM doctors
+        # WHERE doctors.doctor_id = :doctor_id_1;
+        stmt = db.select(
+            Doctor
+        ).filter_by(
+            doctor_id=doctor_id
+        )
+
+        # Connect to database session, execute statement, store resulting value
+        doctor = db.session.scalar(stmt)
+
+        # Guard clause; return error if doctor doesn't exist
+        if not doctor:
+            return jsonify(
+                {"error": f"Doctor {doctor_id} not found."}
+            ), 404
+
+        # # Return doctor object serialised according to the doctor schema
+        return doctor_schema.dump(doctor)
+
+    # In case ... ?
+    # except ? as e:
+    #     return jsonify(
+    #         {"error": "?"}
+    #     ), ?00
+
+    except Exception as e:
         return jsonify(
-            {"error": f"Doctor {doctor_id} not found."}
-        ), 404
-    
-    # # Return doctor object serialised according to the doctor schema 
-    return doctor_schema.dump(doctor)
+            {"error": f"Unexpected error: {e}."}
+        ), 500
+
 
 ##################################################
 
@@ -104,25 +130,25 @@ def get_doctor_appointments(doctor_id):
     Returns:
         JSON: All appointment details for the given doctor.
     """
-    
+
     try:
         # Create SQLAlchemy query statement:
-        # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id 
-        # FROM appointments 
-        # JOIN treatments 
-        # ON treatments.treatment_id = appointments.treatment_id 
-        # WHERE treatments.doctor_id = :doctor_id_1 
+        # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id
+        # FROM appointments
+        # JOIN treatments
+        # ON treatments.treatment_id = appointments.treatment_id
+        # WHERE treatments.doctor_id = :doctor_id_1
         # ORDER BY appointments.date, appointments.time;
         stmt = db.select(
             Appointment
         ).join(
             Treatment
         ).filter(
-            Treatment.doctor_id==doctor_id
+            Treatment.doctor_id == doctor_id
         ).order_by(
             Appointment.date, Appointment.time
         )
-        
+
         # Execute statement using scalars()
         # Use fetchall() to return all resulting values, which also avoids returning an empty list/dict for queries for nonexistent doctors (e.g. doctor_id=9999)
         appointments = db.session.scalars(stmt).fetchall()
@@ -133,14 +159,26 @@ def get_doctor_appointments(doctor_id):
                 {"error": f"No appointments found for doctor {doctor_id}."}
             ), 404
 
-        # Return appointment objects serialised according to the appointments schema 
+        # Return appointment objects serialised according to the appointments schema
         return appointments_schema.dump(appointments)
-    
+
     # In case a queried-for entity is nonexistent or has been deleted
     except UnboundLocalError as e:
         return jsonify(
             {"error": str(e)}
         ), 404
+
+    # In case ... ?
+    # except ? as e:
+    #     return jsonify(
+    #         {"error": "?"}
+    #     ), ?00
+
+    except Exception as e:
+        return jsonify(
+            {"error": f"Unexpected error: {e}."}
+        ), 500
+
 
 #####################################################
 
@@ -154,36 +192,47 @@ def get_doctor_treatments(doctor_id):
 
     Args:
         doctor_id (int): Doctor primary key.
-        
+
     Returns:
         JSON: All treatment details for the given doctor.
     """
-    
-    # try:
-    
-    # Create SQLAlchemy query statement:
-    # SELECT treatments.treatment_id, treatments.start_date, treatments.end_date, treatments.patient_id, treatments.doctor_id 
-    # FROM treatments 
-    # WHERE treatments.doctor_id = :doctor_id_1 
-    # ORDER BY treatments.start_date;
-    stmt = db.select(
-        Treatment
-    ).filter_by(
-        doctor_id=doctor_id
-    ).order_by(
-        Treatment.start_date
-    )
 
-    treatments = db.session.scalars(stmt).fetchall()
-    
-    # Guard clause; return error if no treatments exist
-    if not treatments:
+    try:
+        # Create SQLAlchemy query statement:
+        # SELECT treatments.treatment_id, treatments.start_date, treatments.end_date, treatments.patient_id, treatments.doctor_id
+        # FROM treatments
+        # WHERE treatments.doctor_id = :doctor_id_1
+        # ORDER BY treatments.start_date;
+        stmt = db.select(
+            Treatment
+        ).filter_by(
+            doctor_id=doctor_id
+        ).order_by(
+            Treatment.start_date
+        )
+
+        treatments = db.session.scalars(stmt).fetchall()
+
+        # Guard clause; return error if no treatments exist
+        if not treatments:
+            return jsonify(
+                {"error": f"No treatments found for doctor {doctor_id}."}
+            ), 404
+
+        # Return treatment objects serialised according to the treatments schema
+        return treatments_schema.dump(treatments)
+
+    # In case ... ?
+    # except ? as e:
+    #     return jsonify(
+    #         {"error": "?"}
+    #     ), ?00
+
+    except Exception as e:
         return jsonify(
-            {"error": f"No treatments found for doctor {doctor_id}."}
-        ), 404
-    
-    # Return treatment objects serialised according to the treatments schema 
-    return treatments_schema.dump(treatments)
+            {"error": f"Unexpected error: {e}."}
+        ), 500
+
 
 ##################################################
 
@@ -199,38 +248,51 @@ def update_doctor(doctor_id):
     Returns:
         JSON: Updated details serialised according to the doctor schema.
     """
-    
-    # try:
-    
-    # Fetch ?
-    body_data = request.get_json()
-    
-    # Create SQLAlchemy query statement:
-    # SELECT doctors.doctor_id, doctors.name, doctors.email, doctors.password, doctors.sex, doctors.specialty, doctors.is_admin 
-    # FROM doctors 
-    # WHERE doctors.doctor_id = :doctor_id_1;
-    stmt = db.select(Doctor).filter_by(doctor_id=doctor_id)
 
-    # Connect to database session, execute statement, store resulting value
-    doctor = db.session.scalar(stmt)
-    
-    # Guard clause; return error if doctor doesn't exist
-    if not doctor:
+    try:
+
+        # Fetch ?
+        body_data = request.get_json()
+
+        # Create SQLAlchemy query statement:
+        # SELECT doctors.doctor_id, doctors.name, doctors.email, doctors.password, doctors.sex, doctors.specialty, doctors.is_admin
+        # FROM doctors
+        # WHERE doctors.doctor_id = :doctor_id_1;
+        stmt = db.select(Doctor).filter_by(doctor_id=doctor_id)
+
+        # Connect to database session, execute statement, store resulting value
+        doctor = db.session.scalar(stmt)
+
+        # Guard clause; return error if doctor doesn't exist
+        if not doctor:
+            return jsonify(
+                {"error": f"Doctor {doctor_id} not found."}
+            ), 404
+
+        # can i do this more efficiently with kwargs?
+        doctor.name = body_data.get("name") or doctor.name
+        doctor.email = body_data.get("email") or doctor.email
+        # use pop() instead?  # .pop() increases secruity by removing password
+        doctor.password = body_data.get("password") or doctor.password
+        # patients and appointments? no, do this through treatments and appointments, respectively?
+
+        # Commit changes to database
+        db.session.commit()
+
+        # Return updated doctor object serialised according to the doctor schema
+        return doctor_schema.dump(doctor)
+
+    # In case ... ?
+    # except ? as e:
+    #     return jsonify(
+    #         {"error": "?"}
+    #     ), ?00
+
+    except Exception as e:
         return jsonify(
-            {"error": f"Doctor {doctor_id} not found."}
-        ), 404
-    
-    # can i do this more efficiently with kwargs?
-    doctor.name = body_data.get("name") or doctor.name
-    doctor.email = body_data.get("email") or doctor.email
-    doctor.password = body_data.get("password") or doctor.password # use pop() instead?  # .pop() increases secruity by removing password 
-    # patients and appointments? no, do this through treatments and appointments, respectively?
+            {"error": f"Unexpected error: {e}."}
+        ), 500
 
-    # Commit changes to database
-    db.session.commit()
-    
-    # Return updated doctor object serialised according to the doctor schema
-    return doctor_schema.dump(doctor)
 
 ##################################################
 
@@ -247,33 +309,44 @@ def delete_doctor(doctor_id):
     Returns:
         JSON: Success message.
     """
-    
-    # try:
-    
-    # Create SQLAlchemy query statement:
-    # SELECT doctors.doctor_id, doctors.name, doctors.email, doctors.password, doctors.sex, doctors.specialty, doctors.is_admin 
-    # FROM doctors 
-    # WHERE doctors.doctor_id = :doctor_id_1;
-    stmt = db.select(
-        Doctor
-    ).filter_by(
-        doctor_id=doctor_id
-    )
 
-    # Connect to database session, execute statement, store resulting value
-    doctor = db.session.scalar(stmt)
+    try:
 
-    # Guard clause; return error if doctor doesn't exist
-    if not doctor:
+        # Create SQLAlchemy query statement:
+        # SELECT doctors.doctor_id, doctors.name, doctors.email, doctors.password, doctors.sex, doctors.specialty, doctors.is_admin
+        # FROM doctors
+        # WHERE doctors.doctor_id = :doctor_id_1;
+        stmt = db.select(
+            Doctor
+        ).filter_by(
+            doctor_id=doctor_id
+        )
+
+        # Connect to database session, execute statement, store resulting value
+        doctor = db.session.scalar(stmt)
+
+        # Guard clause; return error if doctor doesn't exist
+        if not doctor:
+            return jsonify(
+                {"error": f"Doctor {doctor_id} not found."}
+            ), 404
+
+        # Delete doctor and commit changes to database
+        db.session.delete(doctor)
+        db.session.commit()
+
+        # Return serialised success message
         return jsonify(
-            {"error": f"Doctor {doctor_id} not found."}
-        ), 404
+            {"message": f"Doctor {doctor_id} deleted."}
+        )
 
-    # Delete doctor and commit changes to database
-    db.session.delete(doctor)
-    db.session.commit()
-    
-    # Return serialised success message
-    return jsonify(
-        {"message": f"Doctor {doctor_id} deleted."}
-    )
+    # In case ... ?
+    # except ? as e:
+    #     return jsonify(
+    #         {"error": "?"}
+    #     ), ?00
+
+    except Exception as e:
+        return jsonify(
+            {"error": f"Unexpected error: {e}."}
+        ), 500

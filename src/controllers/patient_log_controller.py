@@ -68,11 +68,23 @@ def create_log(patient_id):
         # Return log object serialised according to the log schema
         return log_schema.dump(log), 201
     
-    # If the ?
+    # In case the ?
     except IntegrityError as e:
         return jsonify(
-            {"error": f"Patient id {patient_id} not found."}
+            {"error": f"Patient ID {patient_id} not found."}
         ), 404
+    
+    # In case ... ?
+    # except ? as e:
+    #     return jsonify(
+    #         {"error": "?"}
+    #     ), ?00
+
+    except Exception as e:
+        return jsonify(
+            {"error": f"Unexpected error: {e}."}
+        ), 500
+
 
 ############################################
 
@@ -91,32 +103,43 @@ def get_patient_logs(patient_id):
         JSON: All log details for the given patient.
     """
     
-    # try:
+    try:
     
-    # Create SQLAlchemy query statement:
-    # SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
-    # FROM logs 
-    # WHERE logs.patient_id = :patient_id_1 
-    # ORDER BY logs.date;
-    stmt = db.select(
-        Log
-    ).filter_by(
-        patient_id=patient_id
-    ).order_by(
-        Log.date
-    )
+        # Create SQLAlchemy query statement:
+        # SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
+        # FROM logs 
+        # WHERE logs.patient_id = :patient_id_1 
+        # ORDER BY logs.date;
+        stmt = db.select(
+            Log
+        ).filter_by(
+            patient_id=patient_id
+        ).order_by(
+            Log.date
+        )
 
-    # Execute statement, fetch all resulting values(?)
-    logs = db.session.scalars(stmt).fetchall()
-    
-    # Guard clause; return error if no logs exist
-    if not logs:
+        # Execute statement, fetch all resulting values(?)
+        logs = db.session.scalars(stmt).fetchall()
+        
+        # Guard clause; return error if no logs exist
+        if not logs:
+            return jsonify(
+                {"error": f"Patient {patient_id} not found, or they have no logs."}
+            ), 404
+        
+        # Return log objects serialised according to the logs schema
+        return logs_schema.dump(logs)   
+
+    # In case ... ?
+    # except ? as e:
+    #     return jsonify(
+    #         {"error": "?"}
+    #     ), ?00
+
+    except Exception as e:
         return jsonify(
-            {"error": f"Patient {patient_id} not found, or they have no logs."}
-        ), 404
-    
-    # Return log objects serialised according to the logs schema
-    return logs_schema.dump(logs)
+            {"error": f"Unexpected error: {e}."}
+        ), 500
 
 ############################################
 
@@ -136,31 +159,43 @@ def get_a_log(patient_id, log_id):
         JSON: Serialised details of the patient log.
     """
     
-    # try:
+    try:
 
-    # Create SQLAlchemy query statement:
-    # SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
-    # FROM logs 
-    # WHERE logs.patient_id = :patient_id_1 
-    # AND logs.log_id = :log_id_1;
-    stmt = db.select(
-        Log
-    ).filter_by(
-        patient_id=patient_id, 
-        log_id=log_id
-    )
+        # Create SQLAlchemy query statement:
+        # SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
+        # FROM logs 
+        # WHERE logs.patient_id = :patient_id_1 
+        # AND logs.log_id = :log_id_1;
+        stmt = db.select(
+            Log
+        ).filter_by(
+            patient_id=patient_id, 
+            log_id=log_id
+        )
 
-    # Connect to database session, execute statement, store resulting value
-    log = db.session.scalar(stmt)
-    
-    # Guard clause; return error if log doesn't exist
-    if not log:
+        # Connect to database session, execute statement, store resulting value
+        log = db.session.scalar(stmt)
+        
+        # Guard clause; return error if log doesn't exist
+        if not log:
+            return jsonify(
+                {"error": f"Patient {patient_id} or log {log_id} not found."}
+            ), 404
+        
+        # Return log object serialised according to the log schema
+        return log_schema.dump(log)
+
+    # In case ... ?
+    # except ? as e:
+    #     return jsonify(
+    #         {"error": "?"}
+    #     ), ?00
+
+    except Exception as e:
         return jsonify(
-            {"error": f"Patient {patient_id} or log {log_id} not found."}
-        ), 404
-    
-    # Return log object serialised according to the log schema
-    return log_schema.dump(log)
+            {"error": f"Unexpected error: {e}."}
+        ), 500
+
 
 ############################################
 
@@ -179,42 +214,54 @@ def update_log(patient_id, log_id):
         JSON: Serialised and updated log details.
     """
     
-    # try:
+    try:
     
-    # Fetch content of request
-    body_data = request.get_json()
-    
-    # Create SQLAlchemy query statement:
-    # SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
-    # FROM logs 
-    # WHERE logs.patient_id = :patient_id_1 
-    # AND logs.log_id = :log_id_1;
-    stmt = db.select(
-        Log
-    ).filter_by(
-        patient_id=patient_id, 
-        log_id=log_id
-    )
-    
-    # Connect to database session, execute statement, store resulting value
-    log = db.session.scalar(stmt)
-    
-    # Guard clause; return error if log doesn't exist
-    if not log:
-        return jsonify(
-            {"error": f"Patient {patient_id} or log {log_id} not found."}
-        ), 404
+        # Fetch content of request
+        body_data = request.get_json()
         
-    # ?
-    log.date = body_data.get("date") or log.date
-    log.notes = body_data.get("notes") or log.notes
-    # Do it for FK too? No. A log is not realistically going to change patients.
-    
-    # Commit changes to database
-    db.session.commit()
-    
-    # Return updated log object serialised according to the log schema
-    return log_schema.dump(log)
+        # Create SQLAlchemy query statement:
+        # SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
+        # FROM logs 
+        # WHERE logs.patient_id = :patient_id_1 
+        # AND logs.log_id = :log_id_1;
+        stmt = db.select(
+            Log
+        ).filter_by(
+            patient_id=patient_id, 
+            log_id=log_id
+        )
+        
+        # Connect to database session, execute statement, store resulting value
+        log = db.session.scalar(stmt)
+        
+        # Guard clause; return error if log doesn't exist
+        if not log:
+            return jsonify(
+                {"error": f"Patient {patient_id} or log {log_id} not found."}
+            ), 404
+            
+        # ?
+        log.date = body_data.get("date") or log.date
+        log.notes = body_data.get("notes") or log.notes
+        # Do it for FK too? No. A log is not realistically going to change patients.
+        
+        # Commit changes to database
+        db.session.commit()
+        
+        # Return updated log object serialised according to the log schema
+        return log_schema.dump(log)
+
+    # In case ... ?
+    # except ? as e:
+    #     return jsonify(
+    #         {"error": "?"}
+    #     ), ?00
+
+    except Exception as e:
+        return jsonify(
+            {"error": f"Unexpected error: {e}."}
+        ), 500
+
     
 ############################################
 
@@ -233,35 +280,47 @@ def delete_log(patient_id, log_id):
         JSON: Success message.
     """
     
-    # try:
+    try:
     
-    # Create SQLAlchemy query statement:
-    # SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
-    # FROM logs 
-    # WHERE logs.patient_id = :patient_id_1 
-    # AND logs.log_id = :log_id_1;
-    stmt = db.select(
-        Log
-    ).filter_by(
-        patient_id=patient_id, 
-        log_id=log_id
-    )
+        # Create SQLAlchemy query statement:
+        # SELECT logs.log_id, logs.date, logs.notes, logs.patient_id 
+        # FROM logs 
+        # WHERE logs.patient_id = :patient_id_1 
+        # AND logs.log_id = :log_id_1;
+        stmt = db.select(
+            Log
+        ).filter_by(
+            patient_id=patient_id, 
+            log_id=log_id
+        )
 
-    # Connect to database session, execute statement, store resulting value
-    log = db.session.scalar(stmt)
+        # Connect to database session, execute statement, store resulting value
+        log = db.session.scalar(stmt)
 
-    # Guard clause; return error if log doesn't exist
-    if not log:
+        # Guard clause; return error if log doesn't exist
+        if not log:
+            return jsonify(
+                {"error": f"Patient {patient_id} or log {log_id} not found."}
+            ), 404
+
+        # Delete log and commit changes to database
+        db.session.delete(log)
+        db.session.commit()
+        
+        # Return serialised success message
         return jsonify(
-            {"error": f"Patient {patient_id} or log {log_id} not found."}
-        ), 404
-
-    # Delete log and commit changes to database
-    db.session.delete(log)
-    db.session.commit()
+            {"message": f"Log {log_id} deleted."}
+        )
     
-    # Return serialised success message
-    return jsonify(
-        {"message": f"Log {log_id} deleted."}
-    )
+    # In case ... ?
+    # except ? as e:
+    #     return jsonify(
+    #         {"error": "?"}
+    #     ), ?00
+
+    except Exception as e:
+        return jsonify(
+            {"error": f"Unexpected error: {e}."}
+        ), 500
+
     

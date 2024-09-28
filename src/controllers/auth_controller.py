@@ -41,7 +41,6 @@ def register_user(user_type):
     Returns:
         Tuple: All registration details, serialised according to patient or doctor schema (JSON); a 201 HTTP response status code.
     """
-    # try:
     
     # Guard clause; escape function early if user type is invalid
     if user_type not in ["patient", "doctor"]:
@@ -79,7 +78,7 @@ def register_user(user_type):
         # Return user object serialised according to the corresponding schema
         return schema.dump(user), 201
 
-    # Don't need ValidationError because it's globally handled in main.py
+    # Don't need ValidationError because it's globally handled in main.py (but is the message specific enough? check)
 
     # In case the date entered has invalid format, e.g. "2024-0101"
     except DataError as e:
@@ -98,14 +97,18 @@ def register_user(user_type):
             return jsonify(
                 {"error": "Email address must be unique."}
             ), 400
-
-    # If ... other errors arise?
-    # except Exception as e:
+            
+    # In case ... ?
+    # except ? as e:
     #     return jsonify(
-    #         {
-    #             "error": "...?"
-    #         }
-    #     ), 400  # ?
+    #         {"error": "?"}
+    #     ), ?00
+
+    except Exception as e:
+        return jsonify(
+            {"error": f"Unexpected error: {e}."}
+        ), 500
+
 
 ###########################################################################
 
@@ -125,6 +128,8 @@ def login_user(user_type):
         JSON: All login details, serialised according to the corresponding schema.
     """
 
+    
+    # which levels do i need try blocks at? both?
     # try:
 
     # Fetch data, deserialise it, store in variable
@@ -178,6 +183,7 @@ def login_user(user_type):
             user_id = user.doctor_id
             schema = doctor_schema
             
+    # is this relevant here?
     # except IntegrityError as e:
     #     ?
     
@@ -194,6 +200,19 @@ def login_user(user_type):
     #     return jsonify(
         # {"error": f"User account '{email}' not found. Please register user or initialise database."}
         # ), 404
+        
+    # In case ... ?
+    # except ? as e:
+    #     return jsonify(
+    #         {"error": "?"}
+    #     ), ?00
+
+    # move this out/down?
+
+    except Exception as e:
+        return jsonify(
+            {"error": f"Unexpected error: {e}."}
+        ), 500
 
     # is 'password' a keyword for this function? will this give me issues?:
     # Guard clause; return error if password doesn't match stored hash?
@@ -222,5 +241,14 @@ def login_user(user_type):
             "token": token
         }
     )
+    
+    # In case ... ?
+    # except ? as e:
+    #     return jsonify(
+    #         {"error": "?"}
+    #     ), ?00
 
-    # except ... as ?:
+    # except Exception as e:
+    #     return jsonify(
+    #         {"error": f"Unexpected error: {e}."}
+    #     ), 500
