@@ -1,6 +1,6 @@
 from init import db
 from models import Patient, patient_schema, patients_schema, Appointment, appointments_schema, Treatment, treatments_schema
-from utils import authorise_as_admin
+from utils import authorise_as_admin, authorise_treatment_participant
 
 from flask import jsonify, request, Blueprint
 from flask_jwt_extended import jwt_required
@@ -21,6 +21,7 @@ patients_bp = Blueprint(
 
 @patients_bp.route("/")
 @jwt_required()
+# This is a high-level endpoint that should be accessible to admins only
 @authorise_as_admin
 def get_all_patients():
     """Get details for all patients.
@@ -28,7 +29,6 @@ def get_all_patients():
     Returns:
         JSON: Serialised list of patient details.
     """
-
     try:
 
         # Create SQLAlchemy query statement:
@@ -69,6 +69,8 @@ def get_all_patients():
 # http://localhost:5000/patients/<int:patient_id>
 @patients_bp.route("/<int:patient_id>")
 @jwt_required()
+# This is a high-level endpoint that should be accessible to admins only
+# In future, build a patient auth decorator with an early exit for admins
 @authorise_as_admin
 def get_a_patient(patient_id):
     """Get a particular patient's details.
@@ -79,9 +81,7 @@ def get_a_patient(patient_id):
     Returns:
         JSON: Serialised patient details.
     """
-
     try:
-
         # Create SQLAlchemy query statement:
         # SELECT patients.patient_id, patients.name, patients.email, patients.password, patients.dob, patients.sex, patients.is_admin
         # FROM patients
@@ -121,6 +121,9 @@ def get_a_patient(patient_id):
 # http://localhost:5000/patients/<int:patient_id>/appointments/
 @patients_bp.route("/<int:patient_id>/appointments/")
 @jwt_required()
+# This is a high-level endpoint that should be accessible to admins only
+# In future, build a patient auth decorator with an early exit for admins
+@authorise_as_admin
 def get_patient_appointments(patient_id):
     """Get all appointments for a particular patient.
 
@@ -179,7 +182,8 @@ def get_patient_appointments(patient_id):
 # http://localhost:5000/patients/<int:patient_id>/treatments/
 @patients_bp.route("/<int:patient_id>/treatments/")
 @jwt_required()
-# justify why i chose this particular auth decorator
+# This is a high-level endpoint that should be accessible to admins only
+# In future, build an appropriate patient/doctor auth decorator with an early exit for admins. The @authorise_treatment_participant decorator is insufficient, e.g. because you don't want your optometrist accessing your psychology treatment details
 @authorise_as_admin
 def get_patient_treatments(patient_id):
     """Get all treatment details for a particular patient.
@@ -242,10 +246,8 @@ def update_patient(patient_id):
     Returns:
         JSON: Updated and serialised patient details.
     """
-
     try:
-
-        # Fetch ...?
+        # Fetch body of HTTP request
         body_data = request.get_json()
 
         # Create SQLAlchemy query statement:
@@ -299,6 +301,8 @@ def update_patient(patient_id):
 # http://localhost:5000/patients/<int:patient_id>
 @patients_bp.route("/<int:patient_id>", methods=["DELETE"])
 @jwt_required()
+# This is a high-level endpoint that should be accessible to admins only
+# In future, build a patient auth decorator with an early exit for admins
 @authorise_as_admin
 def delete_patient(patient_id):
     """Delete a patient.

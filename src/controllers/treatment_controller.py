@@ -27,7 +27,7 @@ treatments_bp = Blueprint(
 
 @treatments_bp.route("/", methods=["POST"])
 @jwt_required()
-# must authorise as admin, otherwise any person could create a treatment relationship and view any patient's private logs
+# Must authorise as admin, otherwise any person could create a treatment relationship and view any patient's private logs
 @authorise_as_admin
 def create_treatment():
     """Add a new treatment relationship between doctor and patient.
@@ -39,11 +39,10 @@ def create_treatment():
     Returns:
         tuple: New serialised treatment details (JSON); a 201 HTTP response status code.
     """
-
     try:
         # need something to check if patient_id and doctor_id exist? --> ForeignKeyViolation
 
-        # Fetch data, deserialise it, store in variable
+        # Fetch body of HTTP request
         body_data = request.get_json()
 
         # Abort if empty string is entered for one of the fields; This is necessary because a TypeError except block will not pick up this error
@@ -98,7 +97,7 @@ def create_treatment():
 
 @treatments_bp.route("/<int:treatment_id>/appointments/", methods=["POST"])
 @jwt_required()
-# @authorise_as_admin  # how to implement this without preventing patients from creating appointments for themselves etc?
+# Authorise either patients or their doctors to create appointments, with an early exit for admins
 @authorise_treatment_participant
 def create_appointment(treatment_id):
     """Create a new appointment for a particular treatment relationship.
@@ -109,20 +108,19 @@ def create_appointment(treatment_id):
     Returns:
         tuple: New serialised appointment details (JSON); a 201 HTTP response status code.
     """
-
     try:
+        # Fetch body of HTTP request
         body_data = request.get_json()
 
         # remember to validate input!
-        # define new instance of Appointment class
+        
+        # Define new instance of Appointment class
         appointment = Appointment(
             date=body_data.get("date"),
             time=body_data.get("time"),
             place=body_data.get("place"),
             cost=body_data.get("cost"),
             status=body_data.get("status"),
-
-            # validate this! check it exists. with a guard clause?
             treatment_id=body_data.get("treatment_id")
         )
 
@@ -158,8 +156,7 @@ def create_appointment(treatment_id):
 
 @treatments_bp.route("/<int:treatment_id>/appointments/")
 @jwt_required()
-# justify deco choice?!
-# @authorise_as_admin  # how to implement this without preventing patients from viewing their own appointments etc?
+# explain early admin auth?
 @authorise_treatment_participant
 def get_treatment_appointments(treatment_id):
     """Get all appointments for a particular treatment relationship.
@@ -170,9 +167,7 @@ def get_treatment_appointments(treatment_id):
     Returns:
         JSON: Serialised details of all appointments for a given treatment.
     """
-
     try:
-
         # Create SQLAlchemy query statement:
         # SELECT appointments.appt_id, appointments.date, appointments.time, appointments.place, appointments.cost, appointments.status, appointments.notes, appointments.treatment_id
         # FROM appointments
@@ -215,7 +210,6 @@ def get_treatment_appointments(treatment_id):
 
 @treatments_bp.route("/")
 @jwt_required()
-# justify why i chose this particular auth decorator
 # This is a high-level endpoint that should be accessible to admins only
 @authorise_as_admin
 def get_all_treatments():
@@ -224,9 +218,7 @@ def get_all_treatments():
     Returns:
         JSON: Serialised treatment details.
     """
-
     try:
-
         # Create SQLAlchemy query statement:
         # SELECT treatments.treatment_id, treatments.start_date, treatments.end_date, treatments.patient_id, treatments.doctor_id
         # FROM treatments
@@ -268,8 +260,7 @@ def get_all_treatments():
 
 @treatments_bp.route("/<int:treatment_id>")
 @jwt_required()
-# justify why i chose this particular auth decorator
-# @authorise_as_admin  # how to implement this without preventing patients from viewing their own treatment details etc?
+# explain early admin auth?
 @authorise_treatment_participant
 def get_a_treatment(treatment_id):
     """Get details for a specific treatment using its ID.
@@ -280,9 +271,7 @@ def get_a_treatment(treatment_id):
     Returns:
         JSON: Serialised treatment details.
     """
-
     try:
-
         # Create SQLAlchemy query statement:
         # SELECT treatments.treatment_id, treatments.start_date, treatments.end_date, treatments.patient_id, treatments.doctor_id
         # FROM treatments
@@ -324,8 +313,7 @@ def get_a_treatment(treatment_id):
 
 @treatments_bp.route("/<int:treatment_id>", methods=["PUT", "PATCH"])
 @jwt_required()
-# @authorise_as_admin  # how to implement this without preventing patients from viewing their own treatment details etc?
-# justify why i chose this particular auth decorator
+# explain early admin auth?
 @authorise_treatment_participant
 def update_treatment(treatment_id):
     """Edit treatment details.
@@ -336,9 +324,8 @@ def update_treatment(treatment_id):
     Returns:
         JSON: Serialised and updated treatment details.
     """
-
     try:
-
+        # Fetch body of HTTP request
         body_data = request.get_json()
 
         # Create SQLAlchemy query statement:

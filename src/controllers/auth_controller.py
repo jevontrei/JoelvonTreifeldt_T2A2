@@ -132,7 +132,7 @@ def login_user(user_type):
     # which levels do i need try blocks at? both?
     # try:
 
-    # Fetch data, deserialise it, store in variable
+    # Fetch body of HTTP request
     body_data = request.get_json()
 
     # Guard clause; return error if ?

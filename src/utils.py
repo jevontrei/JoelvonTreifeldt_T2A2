@@ -6,12 +6,8 @@ from flask import jsonify
 from flask_jwt_extended import get_jwt_identity, get_jwt, get_jwt_header
 from sqlalchemy.exc import IntegrityError
 
-# delet
-import os
 
 ##############################################################
-
-# how to implement this without preventing non-admins from accessing the function?
 
 
 def authorise_as_admin(fn):
@@ -73,13 +69,10 @@ def authorise_as_log_viewer(fn):
             user_type = jwt.get("user_type")
             logged_in_id = get_jwt_identity()
 
-            ############################################
-            # Confirm this works?!:
             # Exit/authorise early if user is an admin
             is_admin = get_jwt().get("is_admin", False)
             if is_admin:
                 return fn(*args, **kwargs)
-            ############################################
 
             # Check if user is a patient or doctor
             if user_type == "patient":
@@ -156,13 +149,10 @@ def authorise_as_log_owner(fn):
             patient_id = kwargs.get("patient_id")
             logged_in_id = get_jwt_identity()
 
-            ############################################
-            # Confirm this works?!:
             # Exit/authorise early if user is an admin
             is_admin = get_jwt().get("is_admin", False)
             if is_admin:
                 return fn(*args, **kwargs)
-            ############################################
 
             # Guard clause; return error if patient_id does not match logged_in_id
             if str(patient_id) != logged_in_id:
@@ -204,13 +194,10 @@ def authorise_treatment_participant(fn):
             user_id = get_jwt_identity()
             user_type = get_jwt().get("user_type")
 
-            ############################################
-            # Confirm this works?!:
             # Exit/authorise early if user is an admin
             is_admin = get_jwt().get("is_admin", False)
             if is_admin:
                 return fn(*args, **kwargs)
-            ############################################
 
             temporary_id = kwargs.get("appt_id") or kwargs.get("treatment_id")
 

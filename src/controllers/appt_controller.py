@@ -72,7 +72,7 @@ def get_all_appointments():
 # http://localhost:5000/appointments/<int:appt_id>
 @appointments_bp.route("/<int:appt_id>")
 @jwt_required()
-# @authorise_as_admin  # how to implement this without preventing patients from viewing their own appointment details etc?
+# Authorise as either a patient or doctor involved in this treatment/appointment, with an early exit for admins
 @authorise_treatment_participant
 def get_an_appointment(appt_id):
     """Find any appointment using its unique ID. User must have a current valid JWT and be a treatment participant or an admin.
@@ -121,7 +121,7 @@ def get_an_appointment(appt_id):
 
 @appointments_bp.route("/<int:appt_id>", methods=["PUT", "PATCH"])
 @jwt_required()
-# @authorise_as_admin  # how to implement this without preventing patients from editing their own appointment details etc?
+# Authorise as either a patient or doctor involved in this treatment/appointment, with an early exit for admins
 @authorise_treatment_participant
 def update_appointment(appt_id):
     """Edit appointment details. User must have a current valid JWT and be an admin or a treatment participant.
@@ -185,7 +185,7 @@ def update_appointment(appt_id):
 
 @appointments_bp.route("/<int:appt_id>", methods=["DELETE"])
 @jwt_required()
-# @authorise_as_admin  # how to implement this without preventing patients from deleting their own appointments etc?
+# Authorise as either a patient or doctor involved in this treatment/appointment, with an early exit for admins
 @authorise_treatment_participant
 def delete_appointment(appt_id):
     """Delete any appointment. WARNING: This action will erase appointment notes. Consider saving notes before deleting.

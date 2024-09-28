@@ -22,15 +22,15 @@ doctors_bp = Blueprint(
 
 @doctors_bp.route("/")
 @jwt_required()
+# Authorise as admin since serialised doctor info includes all sensitive treatment details
+@authorise_as_admin
 def get_all_doctors():
     """Fetch details for all doctors.
 
     Returns:
         JSON: All doctor details, serialised.
     """
-
     try:
-
         # Create SQLAlchemy query statement:
         # SELECT doctors.doctor_id, doctors.name, doctors.email, doctors.password, doctors.sex, doctors.specialty, doctors.is_admin
         # FROM doctors
@@ -70,6 +70,8 @@ def get_all_doctors():
 # http://localhost:5000/doctors/<int:doctor_id>
 @doctors_bp.route("/<int:doctor_id>")
 @jwt_required()
+# Authorise as admin since serialised doctor info includes all sensitive treatment details
+@authorise_as_admin
 def get_a_doctor(doctor_id):
     """Fetch details of a particular doctor.
 
@@ -79,9 +81,7 @@ def get_a_doctor(doctor_id):
     Returns:
         JSON: Serialised details for one doctor.
     """
-
     try:
-
         # Create SQLAlchemy query statement:
         # SELECT doctors.doctor_id, doctors.name, doctors.email, doctors.password, doctors.sex, doctors.specialty, doctors.is_admin
         # FROM doctors
@@ -121,6 +121,9 @@ def get_a_doctor(doctor_id):
 # http://localhost:5000/doctors/<int:doctor_id>/appointments/
 @doctors_bp.route("/<int:doctor_id>/appointments/")
 @jwt_required()
+# This is a high-level endpoint that should be accessible to admins only
+# In future, build a doctor auth decorator with an early exit for admins
+@authorise_as_admin
 def get_doctor_appointments(doctor_id):
     """Get all appointments for a particular doctor.
 
@@ -185,7 +188,8 @@ def get_doctor_appointments(doctor_id):
 # http://localhost:5000/doctors/<int:doctor_id>/treatments/
 @doctors_bp.route("<int:doctor_id>/treatments/")
 @jwt_required()
-# justify why i chose this particular auth decorator
+# This is a high-level endpoint that should be accessible to admins only
+# In future, build a doctor auth decorator with an early exit for admins
 @authorise_as_admin
 def get_doctor_treatments(doctor_id):
     """Get all treatment details for a particular doctor
@@ -239,6 +243,9 @@ def get_doctor_treatments(doctor_id):
 # http://localhost:5000/doctors/<int:doctor_id>
 @doctors_bp.route("/<int:doctor_id>", methods=["PUT", "PATCH"])
 @jwt_required()
+# This is a high-level endpoint that should be accessible to admins only
+# In future, build a doctor auth decorator with an early exit for admins
+@authorise_as_admin
 def update_doctor(doctor_id):
     """Edit details for a particular doctor.
 
@@ -248,10 +255,8 @@ def update_doctor(doctor_id):
     Returns:
         JSON: Updated details serialised according to the doctor schema.
     """
-
     try:
-
-        # Fetch ?
+        # Fetch body of HTTP request
         body_data = request.get_json()
 
         # Create SQLAlchemy query statement:
@@ -299,6 +304,8 @@ def update_doctor(doctor_id):
 # http://localhost:5000/doctors/<int:doctor_id>
 @doctors_bp.route("/<int:doctor_id>", methods=["DELETE"])
 @jwt_required()
+# This is a high-level endpoint that should be accessible to admins only
+# In future, build a doctor auth decorator with an early exit for admins
 @authorise_as_admin
 def delete_doctor(doctor_id):
     """Delete a doctor.
