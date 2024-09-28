@@ -17,6 +17,8 @@ patients_bp = Blueprint(
 ##################################################
 
 # http://localhost:5000/patients/
+
+
 @patients_bp.route("/")
 @jwt_required()
 # This is a high-level endpoint that should be accessible to admins only
@@ -155,7 +157,8 @@ def get_patient_appointments(patient_id):
         # Guard clause; return error if no appointments exist
         if not appointments:
             return jsonify(
-                {"error": f"No appointments found for patient {patient_id}."}  # this is being returned erroneously?! like when im logged in as an admin
+                # this is being returned erroneously?! like when im logged in as an admin
+                {"error": f"No appointments found for patient {patient_id}."}
             ), 404
 
         # Return appointment objects serialised according to the appointments schema
@@ -190,23 +193,19 @@ def get_patient_treatments(patient_id):
     Returns:
         JSON: Treatment details for the given patient.
     """
-
     try:
-
         # Create SQLAlchemy query statement:
-
         # SELECT treatments.treatment_id, treatments.start_date, treatments.end_date, treatments.patient_id, treatments.doctor_id
         # FROM treatments
         # WHERE treatments.patient_id = :patient_id_1;
-
         stmt = db.select(
             Treatment
         ).filter_by(
             patient_id=patient_id
         )  # .order_by()
 
+        # Execute statement, fetch resulting values
         treatments = db.session.scalars(stmt).fetchall()
-
         # Guard clause; return error if no treatments exist
         if not treatments:
             return jsonify(
