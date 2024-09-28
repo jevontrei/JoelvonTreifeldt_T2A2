@@ -22,8 +22,6 @@ doctors_bp = Blueprint(
 ##################################################
 
 # http://localhost:5000/doctors/
-
-
 @doctors_bp.route("/")
 @jwt_required()
 # Authorise as admin since serialised doctor info includes all sensitive treatment details

@@ -46,10 +46,8 @@ Table of Contents
       - [main.py](#mainpy)
       - [appt\_controller.py](#appt_controllerpy)
       - [auth\_controller.py](#auth_controllerpy)
-      - [cli\_controller.py](#cli_controllerpy)
       - [doctor\_controller.py](#doctor_controllerpy)
       - [patient\_controller.py](#patient_controllerpy)
-        - [Example JSON response](#example-json-response)
       - [patient\_log\_controller.py](#patient_log_controllerpy)
       - [treatment\_controller.py](#treatment_controllerpy)
 - [Design Requirements](#design-requirements)
@@ -170,7 +168,11 @@ Link to public GitHub repository: https://github.com/jevontrei/JoelvonTreifeldt_
 
 #### GitHub Commit Screenshots
 
-![GitHug commit screenshot](./docs/github_commits/github10.png)
+![GitHub commit screenshot](./docs/github_commits)
+![GitHub commit screenshot](./docs/github_commits/github10.png)
+![GitHub commit screenshot](./docs/github_commits/github9.png)
+![GitHub commit screenshot](./docs/github_commits/github8.png)
+![GitHub commit screenshot](./docs/github_commits/github7.png)
 
 ...
 
@@ -439,7 +441,7 @@ Route: `http://localhost:5000/`
 - Expected failure response: N/A
 - Expected response: 200; JSON
 
-![](./docs/insomnia/ins%20welcome.png)
+![Insomnia screenshot](./docs/insomnia/ins%20welcome.png)
 
 ---
 
@@ -449,7 +451,7 @@ Route: `http://localhost:5000/appointments/`
 
 - HTTP verb: `GET`
 - Required: JWT, admin auth header
-- Expected failure response:
+- Expected failure response 403:
 
 ```py
 {
@@ -457,9 +459,9 @@ Route: `http://localhost:5000/appointments/`
 }
 ```
 
-- Expected response: 200; JSON
+- Expected response 200: JSON
 
-![](./docs/insomnia/ins%20appt%20get%20all.png)
+![Insomnia screenshot](./docs/insomnia/ins%20appt%20get%20all.png)
 
 ---
 
@@ -475,7 +477,7 @@ Route: `http://localhost:5000/appointments/<int:appt_id>`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/ins%20appt%20get%20x.png)
+![Insomnia screenshot](./docs/insomnia/ins%20appt%20get%20x.png)
 
 ---
 
@@ -491,7 +493,7 @@ Route: `http://localhost:5000/appointments/<int:appt_id>`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/ins%20appt%20patch.png)
+![Insomnia screenshot](./docs/insomnia/ins%20appt%20patch.png)
 
 ---
 
@@ -507,7 +509,7 @@ Route: `http://localhost:5000/appointments/<int:appt_id>`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/ins%20appt%20del.png)
+![Insomnia screenshot](./docs/insomnia/ins%20appt%20del.png)
 
 ---
 
@@ -525,7 +527,7 @@ Route: `http://localhost:5000/auth/register/<user_type>`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/ins%20reg%20doc.png)
+![Insomnia screenshot](./docs/insomnia/ins%20reg%20doc.png)
 
 ---
 
@@ -541,59 +543,7 @@ Route: `http://localhost:5000/auth/login/<user_type>`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
-
----
-
-#### cli_controller.py
-
-do i unclude these here?
-
-Route: `?`
-
-- HTTP verb: `?`
-- Required: ?
-- Expected failure response:
-
-```py
-?
-```
-
-- Expected response: ?;
-
-![](./docs/insomnia/)
-
----
-
-Route: `?`
-
-- HTTP verb: `?`
-- Required: ?
-- Expected failure response:
-
-```py
-?
-```
-
-- Expected response: ?;
-
-![](./docs/insomnia/)
-
----
-
-Route: `?`
-
-- HTTP verb: `?`
-- Required: ?
-- Expected failure response:
-
-```py
-?
-```
-
-- Expected response: ?;
-
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20login%20pat.png)
 
 ---
 
@@ -601,8 +551,8 @@ Route: `?`
 
 Route: `http://localhost:5000/doctors/`
 
-- HTTP verb: `?`
-- Required: ?
+- HTTP verb: `GET`
+- Required: JWT/admin
 - Expected failure response:
 
 ```py
@@ -611,14 +561,14 @@ Route: `http://localhost:5000/doctors/`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20doc%20get%20all.png)
 
 ---
 
 Route: `http://localhost:5000/doctors/<int:doctor_id>`
 
-- HTTP verb: `?`
-- Required: ?
+- HTTP verb: `GET`
+- Required: `doctor_id` in URL; JWT/admin
 - Expected failure response:
 
 ```py
@@ -627,13 +577,13 @@ Route: `http://localhost:5000/doctors/<int:doctor_id>`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20doc%20get%20x.png)
 
 ---
 
 Route: `http://localhost:5000/doctors/<int:doctor_id>/appointments/`
 
-- HTTP verb: `?`
+- HTTP verb: `GET`
 - Required: ?
 - Expected failure response:
 
@@ -643,13 +593,13 @@ Route: `http://localhost:5000/doctors/<int:doctor_id>/appointments/`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20doc%20appt%20get.png)
 
 ---
 
 Route: `http://localhost:5000/doctors/<int:doctor_id>/treatments/`
 
-- HTTP verb: `?`
+- HTTP verb: `GET`
 - Required: ?
 - Expected failure response:
 
@@ -659,23 +609,23 @@ Route: `http://localhost:5000/doctors/<int:doctor_id>/treatments/`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20doc%20treat%20get.png)
 
 ---
 
 Route: `http://localhost:5000/doctors/<int:doctor_id>`
 
-- HTTP verb: `?`
+- HTTP verb: `PUT, PATCH`
 - Required: ?
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20doc%20patch.png)
 
 ---
 
 Route: `http://localhost:5000/doctors/<int:doctor_id>`
 
-- HTTP verb: `?`
+- HTTP verb: `DELETE`
 - Required: ?
 - Expected failure response:
 
@@ -685,7 +635,7 @@ Route: `http://localhost:5000/doctors/<int:doctor_id>`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20doc%20del.png)
 
 ---
 
@@ -693,32 +643,23 @@ Route: `http://localhost:5000/doctors/<int:doctor_id>`
 
 Route: `http://localhost:5000/patients/`
 
-- HTTP verb: `?`
+- HTTP verb: `GET`
 - Required: ?
-- Expected failure response:
+- Expected failure response: ...? Will respond with 404 Not Found if patient ID does not exist
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200: JSON
 
-- HTTP verb: `GET`
-- Required body data: N/A
-- Required header data: ?
-- Response: should include... JSON? SHOW EXAMPLE? HTTP STATUS CODE 200? Will respond with 404 Not Found if patient ID does not exist
-
-##### Example JSON response
-
-HTTP status code: 200 OK
-
-![ins pat get all](./docs/insomnia/ins%20pat%20get%20all.png)
+![Insomnia screenshot](./docs/insomnia/ins%20pat%20get%20all.png)
 
 ---
 
 Route: `http://localhost:5000/patients/<int:patient_id>`
 
-- HTTP verb: `?`
+- HTTP verb: `GET?`
 - Required: ?
 - Expected failure response:
 
@@ -728,23 +669,13 @@ Route: `http://localhost:5000/patients/<int:patient_id>`
 
 - Expected response: ?; JSON
 
-- HTTP verb: `GET`
-- Required: ?
-- Expected failure response:
-
-```py
-?
-```
-
-- Expected response: ?; JSON
-
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20pat%20get%20x.png)
 
 ---
 
 Route: `http://localhost:5000/patients/<int:patient_id>/appointments/`
 
-- HTTP verb: `?`
+- HTTP verb: `GET`
 - Required: ?
 - Expected failure response:
 
@@ -754,13 +685,13 @@ Route: `http://localhost:5000/patients/<int:patient_id>/appointments/`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20pat%20appt%20get.png)
 
 ---
 
 Route: `http://localhost:5000/patients/<int:patient_id>/treatments/`
 
-- HTTP verb: `?`
+- HTTP verb: `GET`
 - Required: ?
 - Expected failure response:
 
@@ -770,13 +701,13 @@ Route: `http://localhost:5000/patients/<int:patient_id>/treatments/`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20pat%20treat%20get%20all.png)
 
 ---
 
 Route: `http://localhost:5000/patients/<int:patient_id>`
 
-- HTTP verb: `?`
+- HTTP verb: `PUT, PATCH`
 - Required: ?
 - Expected failure response:
 
@@ -786,13 +717,13 @@ Route: `http://localhost:5000/patients/<int:patient_id>`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20pat%20patch.png)
 
 ---
 
 Route: `http://localhost:5000/patients/<int:patient_id>`
 
-- HTTP verb: `?`
+- HTTP verb: `DELETE`
 - Required: ?
 - Expected failure response:
 
@@ -802,7 +733,7 @@ Route: `http://localhost:5000/patients/<int:patient_id>`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20pat%20del.png)
 
 ---
 
@@ -810,7 +741,7 @@ Route: `http://localhost:5000/patients/<int:patient_id>`
 
 Route: `http://localhost:5000/patients/<int:patient_id>/logs/`
 
-- HTTP verb: `?`
+- HTTP verb: `POST`
 - Required: ?
 - Expected failure response:
 
@@ -820,13 +751,13 @@ Route: `http://localhost:5000/patients/<int:patient_id>/logs/`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20pat%20log%20post.png)
 
 ---
 
 Route: `http://localhost:5000/patients/<int:patient_id>/logs/`
 
-- HTTP verb: `?`
+- HTTP verb: `GET`
 - Required: ?
 - Expected failure response:
 
@@ -836,13 +767,13 @@ Route: `http://localhost:5000/patients/<int:patient_id>/logs/`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20pat%20log%20get%20all.png)
 
 ---
 
 Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
 
-- HTTP verb: `?`
+- HTTP verb: `GET`
 - Required: ?
 - Expected failure response:
 
@@ -852,13 +783,13 @@ Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20pat%20log%20get%20x.png)
 
 ---
 
 Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
 
-- HTTP verb: `?`
+- HTTP verb: `PUT, PATCH`
 - Required: ?
 - Expected failure response:
 
@@ -868,13 +799,13 @@ Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20pat%20log%20patch.png)
 
 ---
 
 Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
 
-- HTTP verb: `?`
+- HTTP verb: `DELETE`
 - Required: ?
 - Expected failure response:
 
@@ -884,7 +815,7 @@ Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20pat%20log%20del.png)
 
 ---
 
@@ -892,7 +823,7 @@ Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
 
 Route: `# http://localhost:5000/treatments/`
 
-- HTTP verb: `?`
+- HTTP verb: `POST`
 - Required: ?
 - Expected failure response:
 
@@ -902,13 +833,13 @@ Route: `# http://localhost:5000/treatments/`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20treat%20post.png)
 
 ---
 
 Route: `http://localhost:5000/treatments/<int:treatment_id>/appointments/`
 
-- HTTP verb: `?`
+- HTTP verb: `POST`
 - Required: ?
 - Expected failure response:
 
@@ -918,13 +849,13 @@ Route: `http://localhost:5000/treatments/<int:treatment_id>/appointments/`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20treat%20appt%20post.png)
 
 ---
 
 Route: `http://localhost:5000/treatments/<int:treatment_id>/appointments/`
 
-- HTTP verb: `?`
+- HTTP verb: `GET`
 - Required: ?
 - Expected failure response:
 
@@ -934,13 +865,13 @@ Route: `http://localhost:5000/treatments/<int:treatment_id>/appointments/`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20treat%20appt%20get%20all.png)
 
 ---
 
 Route: `http://localhost:5000/treatments/`
 
-- HTTP verb: `?`
+- HTTP verb: `GET`
 - Required: ?
 - Expected failure response:
 
@@ -950,13 +881,13 @@ Route: `http://localhost:5000/treatments/`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20treat%20get%20all.png)
 
 ---
 
 Route: `http://localhost:5000/treatments/<int:treatment_id>`
 
-- HTTP verb: `?`
+- HTTP verb: `GET`
 - Required: ?
 - Expected failure response:
 
@@ -966,13 +897,13 @@ Route: `http://localhost:5000/treatments/<int:treatment_id>`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20treat%20get%20x.png)
 
 ---
 
 Route: `http://localhost:5000/treatments/<int:treatment_id>`
 
-- HTTP verb: `?`
+- HTTP verb: `PUT, PATCH`
 - Required: ?
 - Expected failure response:
 
@@ -982,13 +913,13 @@ Route: `http://localhost:5000/treatments/<int:treatment_id>`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
+![Insomnia screenshot](./docs/insomnia/ins%20treat%20patch.png)
 
 ---
 
 Route: `http://localhost:5000/treatments/<int:treatment_id>`
 
-- HTTP verb: `?`
+- HTTP verb: `DELETE`
 - Required: ?
 - Expected failure response:
 
@@ -998,9 +929,7 @@ Route: `http://localhost:5000/treatments/<int:treatment_id>`
 
 - Expected response: ?; JSON
 
-![](./docs/insomnia/)
-
----
+![Insomnia screenshot](./docs/insomnia/ins%20treat%20del.png)
 
 ---
 
