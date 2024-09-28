@@ -3,7 +3,7 @@
 Joel von Treifeldt
 Student no. 15517
 
-# doctor and patient emails must be unique within one type of model, but a doctor can duplicate themselves as a patient with the same email no worries. BUT! that will cause confusion with logging in. how do you know what someone is trying to log in as? use roles?
+
 
 Note:
 
@@ -13,9 +13,10 @@ Note:
 Table of Contents
 
 - [Title](#title)
-- [doctor and patient emails must be unique within one type of model, but a doctor can duplicate themselves as a patient with the same email no worries. BUT! that will cause confusion with logging in. how do you know what someone is trying to log in as? use roles?](#doctor-and-patient-emails-must-be-unique-within-one-type-of-model-but-a-doctor-can-duplicate-themselves-as-a-patient-with-the-same-email-no-worries-but-that-will-cause-confusion-with-logging-in-how-do-you-know-what-someone-is-trying-to-log-in-as-use-roles)
     - [R0 - Setup](#r0---setup)
     - [R1 - Explain the problem that this app will solve, and explain how this app solves or addresses the problem.](#r1---explain-the-problem-that-this-app-will-solve-and-explain-how-this-app-solves-or-addresses-the-problem)
+      - [Problem](#problem)
+      - [Solution](#solution)
     - [R2 - Describe the way tasks are allocated and tracked in your project.](#r2---describe-the-way-tasks-are-allocated-and-tracked-in-your-project)
       - [Trello Board Screenshots](#trello-board-screenshots)
         - [September 5th](#september-5th)
@@ -28,7 +29,7 @@ Table of Contents
         - [September 22nd](#september-22nd)
         - [September 28th](#september-28th)
         - [September 29th](#september-29th)
-      - [GitHub Commit Screenshots](#github-commit-screenshots)
+      - [GitHub Commit Screens](#github-commit-screens)
     - [R3 - List and explain the third-party services, packages and dependencies used in this app.](#r3---list-and-explain-the-third-party-services-packages-and-dependencies-used-in-this-app)
     - [R4 - Explain the benefits and drawbacks of this app’s underlying database system.](#r4---explain-the-benefits-and-drawbacks-of-this-apps-underlying-database-system)
     - [R5 - Explain the features, purpose and functionalities of the object-relational mapping system (ORM) used in this app.](#r5---explain-the-features-purpose-and-functionalities-of-the-object-relational-mapping-system-orm-used-in-this-app)
@@ -79,16 +80,24 @@ pip install -r requirements.txt
 6 to >5 pts HD
 Provides a DETAILED explanation about the problem being solved by the developed application AND about how the app addresses the problem, and DOES use any objective references or statistics to support their answer. -->
 
-Medical tracker / planner? smooth and user-friendly interface between patients and doctors
+#### Problem
 
-hopefully an improvement on My Health Record, the Australian ... with a focus on helping the patient / giving them more agency
+Patients who have complex or long-term health issues may have many appointments with many health professionals over a long period of time. They may find it difficult to use their precious medical appointment time wisely, especially if financial difficulty is involved. If a patient has five years of relevant details, they may forget important details or get flustered during a short or costly appointment. It may also be difficult for the doctor to get a bird's-eye view of the whole health context, including mental health. My Health Record, the Australian digital platform for recording such details, has faced challenges and low usage due to concerns about data security, cumbersome functionality and user experience, and a lack of awareness about the program. My Health Record also lacks the functionality for patients to participate meaningfully and submit their own detailed health content to their profile. Overall, patient agency and participation could be vastly improved.
 
-By tracking patients, doctors, treatment relationships, appointments, and patient logs,
+- https://www.afr.com/policy/health-and-education/my-health-record-struggles-to-be-useful-for-patients-20221129-p5c218#:~:text=%E2%80%9COne%20of%20the%20constant%20areas,look%20up%20their%20pathology%20results.
+- https://www.cremornemedical.com.au/news-articles/my-health-record-pros-and-cons/
+- https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9977020/
 
-Things to add in future versions:
+#### Solution
 
-- Medications
-- Past medications
+The current goal is to maximise patient agency with a medical tracker application. This backend project will focus on patient participation through custom content in the form of health logs. Future versions should focus heavily on information security concerns. A smooth and user-friendly interface between patients and doctors is imperative, due to the user experience issues surrounding My Health Record. Future versions should develop a minimalist and accessible front end.
+
+This API app is a living shared document/database accessible by both patient and doctors. Patients track any and all details in a log, which authorised doctors can view at any time. Authorised doctors cannot edit the logs but can view them. Future versions should allow doctors to make log comments. By tracking patients, doctors, treatment relationships, appointments, and patient logs,
+
+Features to add in future versions:
+
+- Medications and the prescribing doctor, including past medications
+- Test results / pathology reports
 - Diagnoses
 
 ### R2 - Describe the way tasks are allocated and tracked in your project.
@@ -166,7 +175,9 @@ Link to public GitHub repository: https://github.com/jevontrei/JoelvonTreifeldt_
 
 ...
 
-#### GitHub Commit Screenshots
+#### GitHub Commit Screens
+
+these are out of order:
 
 ![GitHub commit screenshot](./docs/github_commits)
 ![GitHub commit screenshot](./docs/github_commits/github10.png)
@@ -317,7 +328,12 @@ Meets CR, and includes information about the queries that could be used to acces
 6 to >5 pts HD
 Meets D, and includes appropriate code examples supporting the descriptions. -->
 
+
+
 **AFTER CODING begins**
+
+
+doctor and patient emails must be unique within one type of model, but a doctor can duplicate themselves as a patient with the same email no worries. BUT! that will cause confusion with logging in. how do you know what someone is trying to log in as? use roles? In future, create separate login endpoints for each user type.
 
 #### Patient model
 
@@ -437,8 +453,6 @@ All endpoints are outlined below, with routes, verbs, required body/header data,
 Route: `http://localhost:5000/`
 
 - HTTP verb: `GET`
-- Required: N/A
-- Expected failure response: N/A
 - Expected response: 200; JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20welcome.png)
@@ -450,7 +464,7 @@ Route: `http://localhost:5000/`
 Route: `http://localhost:5000/appointments/`
 
 - HTTP verb: `GET`
-- Required: JWT, admin auth header
+- Required header: JWT, admin auth
 - Expected failure response 403:
 
 ```py
@@ -468,14 +482,14 @@ Route: `http://localhost:5000/appointments/`
 Route: `http://localhost:5000/appointments/<int:appt_id>`
 
 - HTTP verb: `GET`
-- Required: JWT, treatment participant incl admin auth header
+- Required header: JWT, treatment participant incl admin auth
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20appt%20get%20x.png)
 
@@ -484,14 +498,15 @@ Route: `http://localhost:5000/appointments/<int:appt_id>`
 Route: `http://localhost:5000/appointments/<int:appt_id>`
 
 - HTTP verb: `PUT, PATCH`
-- Required: JWT, treatment participant incl admin auth header; updated details body
+- Required header: JWT, treatment participant incl admin auth
+- Required body: updated details
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20appt%20patch.png)
 
@@ -500,14 +515,14 @@ Route: `http://localhost:5000/appointments/<int:appt_id>`
 Route: `http://localhost:5000/appointments/<int:appt_id>`
 
 - HTTP verb: `DEL`
-- Required: JWT, treatment participant incl admin auth header
+- Required header: JWT, treatment participant incl admin auth
   Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20appt%20del.png)
 
@@ -518,14 +533,14 @@ Route: `http://localhost:5000/appointments/<int:appt_id>`
 Route: `http://localhost:5000/auth/register/<user_type>`
 
 - HTTP verb: `POST`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20reg%20doc.png)
 
@@ -534,14 +549,14 @@ Route: `http://localhost:5000/auth/register/<user_type>`
 Route: `http://localhost:5000/auth/login/<user_type>`
 
 - HTTP verb: `POST`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20login%20pat.png)
 
@@ -552,14 +567,14 @@ Route: `http://localhost:5000/auth/login/<user_type>`
 Route: `http://localhost:5000/doctors/`
 
 - HTTP verb: `GET`
-- Required: JWT/admin
+- Required header: JWT/admin
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20doc%20get%20all.png)
 
@@ -568,14 +583,14 @@ Route: `http://localhost:5000/doctors/`
 Route: `http://localhost:5000/doctors/<int:doctor_id>`
 
 - HTTP verb: `GET`
-- Required: `doctor_id` in URL; JWT/admin
+- Required header: JWT/admin
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20doc%20get%20x.png)
 
@@ -584,14 +599,14 @@ Route: `http://localhost:5000/doctors/<int:doctor_id>`
 Route: `http://localhost:5000/doctors/<int:doctor_id>/appointments/`
 
 - HTTP verb: `GET`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20doc%20appt%20get.png)
 
@@ -600,14 +615,14 @@ Route: `http://localhost:5000/doctors/<int:doctor_id>/appointments/`
 Route: `http://localhost:5000/doctors/<int:doctor_id>/treatments/`
 
 - HTTP verb: `GET`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20doc%20treat%20get.png)
 
@@ -616,8 +631,8 @@ Route: `http://localhost:5000/doctors/<int:doctor_id>/treatments/`
 Route: `http://localhost:5000/doctors/<int:doctor_id>`
 
 - HTTP verb: `PUT, PATCH`
-- Required: ?
-- Expected response: ?; JSON
+- Required ?: ?
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20doc%20patch.png)
 
@@ -626,14 +641,14 @@ Route: `http://localhost:5000/doctors/<int:doctor_id>`
 Route: `http://localhost:5000/doctors/<int:doctor_id>`
 
 - HTTP verb: `DELETE`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20doc%20del.png)
 
@@ -644,7 +659,7 @@ Route: `http://localhost:5000/doctors/<int:doctor_id>`
 Route: `http://localhost:5000/patients/`
 
 - HTTP verb: `GET`
-- Required: ?
+- Required ?: ?
 - Expected failure response: ...? Will respond with 404 Not Found if patient ID does not exist
 
 ```py
@@ -660,14 +675,14 @@ Route: `http://localhost:5000/patients/`
 Route: `http://localhost:5000/patients/<int:patient_id>`
 
 - HTTP verb: `GET?`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20get%20x.png)
 
@@ -676,14 +691,14 @@ Route: `http://localhost:5000/patients/<int:patient_id>`
 Route: `http://localhost:5000/patients/<int:patient_id>/appointments/`
 
 - HTTP verb: `GET`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20appt%20get.png)
 
@@ -692,14 +707,14 @@ Route: `http://localhost:5000/patients/<int:patient_id>/appointments/`
 Route: `http://localhost:5000/patients/<int:patient_id>/treatments/`
 
 - HTTP verb: `GET`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20treat%20get%20all.png)
 
@@ -708,14 +723,14 @@ Route: `http://localhost:5000/patients/<int:patient_id>/treatments/`
 Route: `http://localhost:5000/patients/<int:patient_id>`
 
 - HTTP verb: `PUT, PATCH`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20patch.png)
 
@@ -724,14 +739,14 @@ Route: `http://localhost:5000/patients/<int:patient_id>`
 Route: `http://localhost:5000/patients/<int:patient_id>`
 
 - HTTP verb: `DELETE`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20del.png)
 
@@ -742,14 +757,14 @@ Route: `http://localhost:5000/patients/<int:patient_id>`
 Route: `http://localhost:5000/patients/<int:patient_id>/logs/`
 
 - HTTP verb: `POST`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20log%20post.png)
 
@@ -758,14 +773,14 @@ Route: `http://localhost:5000/patients/<int:patient_id>/logs/`
 Route: `http://localhost:5000/patients/<int:patient_id>/logs/`
 
 - HTTP verb: `GET`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20log%20get%20all.png)
 
@@ -774,14 +789,14 @@ Route: `http://localhost:5000/patients/<int:patient_id>/logs/`
 Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
 
 - HTTP verb: `GET`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20log%20get%20x.png)
 
@@ -790,14 +805,14 @@ Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
 Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
 
 - HTTP verb: `PUT, PATCH`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20log%20patch.png)
 
@@ -806,14 +821,14 @@ Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
 Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
 
 - HTTP verb: `DELETE`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20log%20del.png)
 
@@ -824,14 +839,14 @@ Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
 Route: `# http://localhost:5000/treatments/`
 
 - HTTP verb: `POST`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20treat%20post.png)
 
@@ -840,14 +855,14 @@ Route: `# http://localhost:5000/treatments/`
 Route: `http://localhost:5000/treatments/<int:treatment_id>/appointments/`
 
 - HTTP verb: `POST`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20treat%20appt%20post.png)
 
@@ -856,14 +871,14 @@ Route: `http://localhost:5000/treatments/<int:treatment_id>/appointments/`
 Route: `http://localhost:5000/treatments/<int:treatment_id>/appointments/`
 
 - HTTP verb: `GET`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20treat%20appt%20get%20all.png)
 
@@ -872,14 +887,14 @@ Route: `http://localhost:5000/treatments/<int:treatment_id>/appointments/`
 Route: `http://localhost:5000/treatments/`
 
 - HTTP verb: `GET`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20treat%20get%20all.png)
 
@@ -888,14 +903,14 @@ Route: `http://localhost:5000/treatments/`
 Route: `http://localhost:5000/treatments/<int:treatment_id>`
 
 - HTTP verb: `GET`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20treat%20get%20x.png)
 
@@ -904,14 +919,14 @@ Route: `http://localhost:5000/treatments/<int:treatment_id>`
 Route: `http://localhost:5000/treatments/<int:treatment_id>`
 
 - HTTP verb: `PUT, PATCH`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20treat%20patch.png)
 
@@ -920,14 +935,14 @@ Route: `http://localhost:5000/treatments/<int:treatment_id>`
 Route: `http://localhost:5000/treatments/<int:treatment_id>`
 
 - HTTP verb: `DELETE`
-- Required: ?
+- Required ?: ?
 - Expected failure response:
 
 ```py
 ?
 ```
 
-- Expected response: ?; JSON
+- Expected response 200?: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20treat%20del.png)
 
