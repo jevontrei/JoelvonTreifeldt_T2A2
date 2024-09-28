@@ -36,6 +36,7 @@ def create_log(patient_id):
         tuple: New patient's details, serialised (JSON); a 201 HTTP response status code.
     """
     try:
+        #########################################################################
         # Turn this into a decorator if it gets used in multiple places in future
         # Get the JWT
         jwt = get_jwt()
@@ -45,22 +46,22 @@ def create_log(patient_id):
                 {"error": "Only patients can create logs."}
             ), 403
         # Guard clause; return error if logged in patient does not match patient_id
-        # THIS IS BROKEN?! FIX IT AND ADD SCREENSHOT TO README under 'ins pat log post'
-        if get_jwt_identity() != patient_id:
+        if get_jwt_identity() != str(patient_id):
             return jsonify(
-                {"error": "Logged in patient does not match patient_id."}
+                {"error": f"Logged in patient {get_jwt_identity()} does not match patient_id {patient_id}."}
             ), 403
+        #########################################################################
 
         # Fetch body of HTTP request
         body_data = request.get_json()
 
-        # remember to validate input!
+        # remember to validate input!?
         # Define new instance of Log class
         log = Log(
             date=body_data.get("date") or date.today(),
             notes=body_data.get("notes"),
 
-            # validate this!
+            # validate this!?
             # change this to match create_app()... change route, incl in Insomnia
             patient_id=patient_id
         )
