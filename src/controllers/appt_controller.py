@@ -1,12 +1,12 @@
 # Internal imports
 from init import db
-from models import Appointment, appointment_schema, appointments_schema, Treatment
+from models import Appointment, appointment_schema, appointments_schema#, Treatment
 from utils import authorise_as_admin, authorise_treatment_participant
 
 # External imports
 from flask import request, jsonify, Blueprint
 from flask_jwt_extended import jwt_required
-from sqlalchemy.exc import IntegrityError
+# from sqlalchemy.exc import IntegrityError
 
 ##################################################
 

@@ -33,16 +33,20 @@ Student no. 15517
       - [Source/s](#sources-1)
   - [R5 - Explain the features, purpose and functionalities of the object-relational mapping system (ORM) used in this app.](#r5---explain-the-features-purpose-and-functionalities-of-the-object-relational-mapping-system-orm-used-in-this-app)
   - [R6 - Design an entity relationship diagram (ERD) for this app’s database, and explain how the relations between the diagrammed models will aid the database design. This should focus on the database design BEFORE coding has begun, eg. during the project planning or design phase.](#r6---design-an-entity-relationship-diagram-erd-for-this-apps-database-and-explain-how-the-relations-between-the-diagrammed-models-will-aid-the-database-design-this-should-focus-on-the-database-design-before-coding-has-begun-eg-during-the-project-planning-or-design-phase)
-      - [September 11th: Original ERD](#september-11th-original-erd)
+    - [Entities](#entities)
+    - [Relationships](#relationships)
+    - [Alternative Normalisation](#alternative-normalisation)
+    - [ERD Legend: Crow's Foot Notation](#erd-legend-crows-foot-notation)
+    - [September 11th: Original ERD](#september-11th-original-erd)
   - [R7 - Explain the implemented models and their relationships, including how the relationships aid the database implementation. This should focus on the database implementation AFTER coding has begun, eg. during the project development phase.](#r7---explain-the-implemented-models-and-their-relationships-including-how-the-relationships-aid-the-database-implementation-this-should-focus-on-the-database-implementation-after-coding-has-begun-eg-during-the-project-development-phase)
       - [September 27th: Final ERD](#september-27th-final-erd)
-      - [Patient model](#patient-model)
-      - [Doctor model](#doctor-model)
-      - [Treatment model (join table)](#treatment-model-join-table)
-      - [Appointment model](#appointment-model)
-      - [Log model](#log-model)
+      - [Patient model and controller](#patient-model-and-controller)
+      - [Doctor model and controller](#doctor-model-and-controller)
+      - [Treatment model (join table) and controller](#treatment-model-join-table-and-controller)
+      - [Appointment model and controller](#appointment-model-and-controller)
+      - [Log model and controller](#log-model-and-controller)
       - [Relationships: move R6 answers here](#relationships-move-r6-answers-here)
-      - [utils?](#utils)
+      - [utils.py](#utilspy)
   - [R8 - Explain how to use this application’s API endpoints.](#r8---explain-how-to-use-this-applications-api-endpoints)
       - [TALK ABOUT RESTful AND HOW I MOVED some ROUTES TO BE UNDER OTHER resources... like patients/x/treatments/ etc, while general treatment stuff is still under /treatments/... mention nested resources](#talk-about-restful-and-how-i-moved-some-routes-to-be-under-other-resources-like-patientsxtreatments-etc-while-general-treatment-stuff-is-still-under-treatments-mention-nested-resources)
       - [header data = auth / bearer token?](#header-data--auth--bearer-token)
@@ -358,32 +362,48 @@ Meets CR, and the ERD includes a legend/key of the notation and styles matching 
 12 to >10 pts HD
 Meets D, and the explanation includes comparisons to how AT LEAST ONE model or relations would look in other levels of normalisation than the one shown in the ERD. -->
 
-**_BEFORE CODING begins_**
+Before coding began, the initial planning process involved brainstorming the main entities and relationships involved in a patient's experience with healthcare professionls.
 
-**_PLAN_** for normalised data/relations!!!!!!
+All relations are in first normal form (1NF). The cells in all tables are atomic (they contain maximum one value), they all have unique primary keys, and there are no entirely duplicate columns or rows within a table. All relations are in second normal form (2NF). Each cell within a table depends on its PK. All relations are in third normal form (3NF). None of the non-key cells depend on each other.
 
----
+The originally proposed ERD, shown below with crow's foot notation, contained the following entities and relationships.
 
-Before coding began, the initial planning process involved brainstorming the main entities and relationships involved in a patient's experience with healthcare professionls. The originally proposed ERD, shown below, contained the following entities and relationships:
+https://www.freecodecamp.org/news/database-normalization-1nf-2nf-3nf-table-examples/
 
-**Entities**
+### Entities
 
-- Patient
-  - Normalisation?
-- Log
-  - Normalisation?
-- Doctor
-  - Normalisation?
-- Auth (join table): to establish trust and relationships between patient and doctor
-  - Normalisation?
-- Appointment (join table)
-  - Normalisation?
-- Medication
-  - Normalisation?
-- Prescription (join table)
-  - Normalisation?
+**Patient**
 
-**Relationships**
+- Normalisation: 3NF. Patient model contains no redundant auth details, as they are stored in a separate join table. Similarly, no log details are stored here, as they have a dedicated entity. The same applies for medications, prescriptions, doctors and appointments.
+
+**Log**
+
+- Normalisation: 3NF. There are no patient details in the log beyond the FK, because the FK is sufficient.
+
+**Doctor**
+
+- Normalisation: 3NF. No patient, auth or appointment details reside within the doctors table. These are all normalised away into their own entities.
+
+**Auth (join table)**
+
+- Purpose: to establish a trustworthy relationships between patient and doctor.
+- Normalisation: 3NF.
+
+**Appointment (join table)**
+
+- Purpose: to plan and track meetings between patients and healthcare professionals, which depend on permission according to the Auth table.
+- Normalisation: 3NF. Only FKs for patients and doctors are included. All other non-key attributes are purely internal and independent of each other.
+
+**Medication**
+
+- Normalisation: 3NF. All patient and prescription data is separately stored in their respective tables. Medication attributes (name, type) do not depend on each other.
+
+**Prescription** (join table)
+
+- Purpose: to plan and track the medications prescribed to specific patients by specific doctors.
+- Normalisation: 3NF. Independently contains information for patients taking medication without redundancy. Only FKs, date and dosage are included.
+
+### Relationships
 
 - Patient-Doctor (many to many) via the Auth join table AND Appointment join table.
   - Implemented as Patient-Auth (one to many) and Doctor-Auth (one to many).
@@ -396,11 +416,22 @@ Note: Mandatory/optional ordinality not yet implemented, and many-to-many crow's
 
 During discussion with teaching staff, it was suggested that the Appointments utilise the Auth FK instead of both Patient and Doctor FKs. This was an attempt to reduce redundancy. Appointments were kept separate from Auth, because in the real world doctor may require authorisation to view a patient's log without having had an appointment with them, e.g. if an authorised doctor is seeking a second opinion. Therefore, the Auth table is used to verify/permit any event associated with sensitive information involving a patient and/or a doctor. It was also suggested that a start date and end date be added to Auth entities, to maximise control and privacy for the patient.
 
-**Alternative Versions**
+### Alternative Normalisation
 
-To compare possibilities, it is worth noting that the Patient and Doctor models share some features. This may indicate redundancy. The creation of a User class (which Patient and Doctor inherit from) would support a more normalised dataset. Patient and Doctor share attributes such as name, email, password, sex, is_admin. These could more efficiently be defined in and inherited from the parent User class.
+To compare normalisation possibilities, it is worth noting that the Patient and Doctor models share some features. This may indicate redundancy. The creation of a User class (which Patient and Doctor inherit from) would support a highly normalised and optimised dataset. Patient and Doctor share attributes such as name, email, password, sex, is_admin. These could more efficiently be defined in and inherited from a parent User class, as follows:
 
-**ERD Legend: Crow's Foot Notation**
+- User(user_id, name, email, password, sex, is_admin)
+- Patient(User), including dob
+- Doctor(User), including specialty
+
+Furthermore, the following tables could be defined to improve normalisation:
+
+- Status and Place (to reduce Appointments table redundancy)
+- Specialty (to reduce Doctors table redundancy)
+
+---
+
+### ERD Legend: Crow's Foot Notation
 
 - The 3-pronged side on the left indicates "many"
 - The 1-pronged side on the right indicates "one"
@@ -410,7 +441,7 @@ To compare possibilities, it is worth noting that the Patient and Doctor models 
 
 ---
 
-#### September 11th: Original ERD
+### September 11th: Original ERD
 
 ![ERD](./docs/ERD/ERD%202024.9.11.png)
 
@@ -434,7 +465,7 @@ Meets D, and includes appropriate code examples supporting the descriptions. -->
 
 **AFTER CODING begins**
 
-comments were removed
+comments table were removed
 
 The ERD evolved significantly over the course of development, as requirements and complexities arose. The Medication table was removed, along with its Prescription join table. This was done for simplicity, and to focus on the basics of the API as a proof of concept and first attempt. The Auth table was renamed to Treatment, ...
 
@@ -459,25 +490,6 @@ Relationships:
 
 ---
 
-<!--
-#### September 151th
-
-![ERD](./docs/ERD/ERD%202024.9.15.png)
-
----
-
-#### September 20th
-
-![ERD](./docs/ERD/ERD%202024.9.20.png)
-
----
-
-#### September 21st
-
-![ERD](./docs/ERD/ERD%202024.9.21.png)
-
---- -->
-
 #### September 27th: Final ERD
 
 ![ERD](./docs/ERD/ERD%202024.9.27.png)
@@ -490,46 +502,76 @@ Relationships:
 
 ---
 
-#### Patient model
+#### Patient model and controller
 
-Patients ...
+The Patient model tracks information about patients and is directly related to Logs and Treatments.
 
-<!-- UPDATE THIS CODE: -->
+The following code demonstrates a model definition:
 
 ```py
+
 class Patient(db.Model):
     __tablename__ = "patients"
 
-    id = db.Column(db.Integer, primary_key=True)
+    # Attributes/columns
+    patient_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
-    password = db.Column(db.String, nullable=False)
+    password = db.Column(db.String(100), nullable=False)
     dob = db.Column(db.Date, nullable=False)
     sex = db.Column(db.String(15))
     is_admin = db.Column(db.Boolean, default=False)
 
-    logs = db.relationship(
-        "Log", back_populates="patient", cascade="all, delete")
-
-    # one-to-many
-    # check if this makes sense as cascade?! i think it does bc this is the parent?
-    treatments = db.relationship(
-        "Treatment", back_populates="patient", cascade="all, delete")
+    # One-to-many relationships from the patient's (parent) perspective
+    logs = db.relationship("Log", back_populates="patient", cascade="all, delete")
+    treatments = db.relationship("Treatment", back_populates="patient", cascade="all, delete")
 ```
 
-should i include schemas here?
+<!-- should i include schemas here? -->
 
-#### Doctor model
+#### Doctor model and controller
 
-Doctors ...
+The Doctor model contains basic information about healthcare professionals, and may include GPs, surgeons, optometrists, psychologists, dentists, etc.
+
+The `get_doctor_appointments()` function example below demonstrates how the relationships between entities may be utilised to perform tasks effectively. Ultimately, the appointment details are desired, but the only available information is the doctor's ID. Therefore, since doctors and appointments are only related via the treatments table (in a de facto one-to-many relationship), an inner join allows all appointments for a particular doctor to be fetched.
 
 ```py
-.
+@doctors_bp.route("/<int:doctor_id>/appointments/")
+@jwt_required()
+@authorise_as_admin
+def get_doctor_appointments(doctor_id):
+    ...
+        # Create SQLAlchemy query statement:
+        # SELECT *
+        # FROM appointments
+        # JOIN treatments
+        # ON treatments.treatment_id = appointments.treatment_id
+        # WHERE treatments.doctor_id = :doctor_id_1
+        # ORDER BY appointments.date, appointments.time;
+        stmt = db.select(
+            Appointment
+        ).join(
+            Treatment
+        ).filter(
+            Treatment.doctor_id == doctor_id
+        ).order_by(
+            Appointment.date, Appointment.time
+        )
+
+        appointments = db.session.scalars(stmt).fetchall()
+
+        if not appointments:
+            return jsonify(
+                {"error": f"No appointments found for doctor {doctor_id}."}
+            ), 404
+
+        return appointments_schema.dump(appointments)
+    ...
 ```
 
-#### Treatment model (join table)
+#### Treatment model (join table) and controller
 
-    # This relationship allows us to view a treatment's appts... bi-directionally but no need for a line starting with appt_id = ... bc it's not actually a column in the treatments table, and bc treatments is the parent. this is just to establish the two-way connection
+<!-- This relationship allows us to view a treatment's appts... bi-directionally but no need for a line starting with appt_id = ... bc it's not actually a column in the treatments table, and bc treatments is the parent. this is just to establish the two-way connection -->
 
 Treatments were initially represented using `db.Table()` with FK attributes only. However, to facilitate the inclusion of other attributes (start date, end date), it was converted to a full entity using `db.model()` along with a schema.
 
@@ -537,9 +579,9 @@ Treatments were initially represented using `db.Table()` with FK attributes only
 .
 ```
 
-#### Appointment model
+#### Appointment model and controller
 
-deleting a treatment cascade-deletes all child appointments. This is not recommended, and an admin
+Deleting a treatment cascade-deletes all child appointments. This is not recommended, and an admin should
 
 Appointments ...
 
@@ -547,7 +589,7 @@ Appointments ...
 .
 ```
 
-#### Log model
+#### Log model and controller
 
 Logs ...
 
@@ -565,17 +607,15 @@ The relationships ...
 
 `cascade`
 
-#### utils?
+#### utils.py
 
-The following decorator function demonstrates SQL-style querying with an outer join ...
+The elegant utility of a relational database is exemplified when separate but related data is desired, but only limited data is available to search with. For example, a function may take advantage of the relationship (many-to-one) between appointments and treatments. The `@authorise_treatment_participant` decorator function demonstrates this. If the decorator receives an `appt_id` keyword argument instead of a `treatment_id` one, then it will perform a SQL-style query with a left outer join. The join allows the treatment details to be fetched with only an appointment PK. This then is used to fetch the patient and doctor FKs from the treatment. Otherwise, if the keyword argument is a `treatment_id`, then a more standard SQLAlchemy query is executed.
 
 ```py
 def authorise_treatment_participant(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-
         ...
-
             if kwargs.get("appt_id"):
                 appt_id = temporary_id
 
@@ -608,9 +648,7 @@ def authorise_treatment_participant(fn):
 
             patient_id = treatment.patient_id
             doctor_id = treatment.doctor_id
-
         ...
-
     return wrapper
 ```
 
@@ -656,7 +694,7 @@ All endpoints are outlined below, with routes, verbs, required body/header data,
 
 #### main.py
 
-Route: `http://localhost:5000/`
+Route to view welcome message: `http://localhost:5000/`
 
 - HTTP verb: `GET`
 - Expected response: 200; JSON
@@ -667,11 +705,11 @@ Route: `http://localhost:5000/`
 
 #### appt_controller.py
 
-Route: `http://localhost:5000/appointments/`
+Route to get all appointments: `http://localhost:5000/appointments/`
 
 - HTTP verb: `GET`
 - Required header: JWT, admin auth
-- Expected failure response 403:
+- Example failure response 403:
 
 ```py
 {
@@ -685,50 +723,56 @@ Route: `http://localhost:5000/appointments/`
 
 ---
 
-Route: `http://localhost:5000/appointments/<int:appt_id>`
+Route to get an appointment: `http://localhost:5000/appointments/<int:appt_id>`
 
 - HTTP verb: `GET`
 - Required header: JWT, treatment participant incl admin auth
-- Expected failure response:
+- Example failure response:
 
 ```py
-?
+{
+	"error": "Only authorised patients and admins can access this resource."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20appt%20get%20x.png)
 
 ---
 
-Route: `http://localhost:5000/appointments/<int:appt_id>`
+Route to update an appointment: `http://localhost:5000/appointments/<int:appt_id>`
 
 - HTTP verb: `PUT, PATCH`
 - Required header: JWT, treatment participant incl admin auth
 - Required body: updated details
-- Expected failure response:
+- Example failure response:
 
 ```py
-?
+{
+	"error": "Only authorised patients and admins can access this resource."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20appt%20patch.png)
 
 ---
 
-Route: `http://localhost:5000/appointments/<int:appt_id>`
+Route to delete an appointment: `http://localhost:5000/appointments/<int:appt_id>`
 
 - HTTP verb: `DEL`
 - Required header: JWT, treatment participant incl admin auth
-  Expected failure response:
+- Example failure response 404:
 
 ```py
-?
+{
+	"error": "Treatment not found."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20appt%20del.png)
 
@@ -736,33 +780,37 @@ Route: `http://localhost:5000/appointments/<int:appt_id>`
 
 #### auth_controller.py
 
-Route: `http://localhost:5000/auth/register/<user_type>`
+Route to create new user: `http://localhost:5000/auth/register/<user_type>`
 
 - HTTP verb: `POST`
-- Required ?: ?
-- Expected failure response:
+- Required body: JSON
+- Example failure response:
 
 ```py
-?
+{
+    "error": "Email address must be unique."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 201: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20reg%20doc.png)
 
 ---
 
-Route: `http://localhost:5000/auth/login/<user_type>`
+Route to login user: `http://localhost:5000/auth/login/<user_type>`
 
 - HTTP verb: `POST`
-- Required ?: ?
-- Expected failure response:
+- Required body: JSON
+- Example failure response:
 
 ```py
-?
+{
+    "error": "Email and password required."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20login%20pat.png)
 
@@ -770,91 +818,101 @@ Route: `http://localhost:5000/auth/login/<user_type>`
 
 #### doctor_controller.py
 
-Route: `http://localhost:5000/doctors/`
+Route to get all doctors: `http://localhost:5000/doctors/`
 
 - HTTP verb: `GET`
-- Required header: JWT/admin
-- Expected failure response:
+- Required header: JWT, admin auth
+- Example failure response 404:
 
 ```py
-?
+{
+    "error": "No doctors found."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20doc%20get%20all.png)
 
 ---
 
-Route: `http://localhost:5000/doctors/<int:doctor_id>`
+Route to get a doctor: `http://localhost:5000/doctors/<int:doctor_id>`
 
 - HTTP verb: `GET`
-- Required header: JWT/admin
-- Expected failure response:
+- Required header: JWT, admin auth
+- Example failure response 403:
 
 ```py
-?
+{
+    "error": "Only admins can perform this action."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20doc%20get%20x.png)
 
 ---
 
-Route: `http://localhost:5000/doctors/<int:doctor_id>/appointments/`
+Route to get a doctor's appointments: `http://localhost:5000/doctors/<int:doctor_id>/appointments/`
 
 - HTTP verb: `GET`
-- Required ?: ?
-- Expected failure response:
+- Required header: JWT, admin auth
+- Example failure response 404:
 
 ```py
-?
+{
+    "error": f"No appointments found for doctor {doctor_id}."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20doc%20appt%20get.png)
 
 ---
 
-Route: `http://localhost:5000/doctors/<int:doctor_id>/treatments/`
+Route to get a doctor's treatments: `http://localhost:5000/doctors/<int:doctor_id>/treatments/`
 
 - HTTP verb: `GET`
-- Required ?: ?
-- Expected failure response:
+- Required header: JWT, admin auth
+- Example failure response 403:
 
 ```py
-?
+{
+    "error": "Only admins can perform this action."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20doc%20treat%20get.png)
 
 ---
 
-Route: `http://localhost:5000/doctors/<int:doctor_id>`
+Route to edit a doctor: `http://localhost:5000/doctors/<int:doctor_id>`
 
 - HTTP verb: `PUT, PATCH`
-- Required ?: ?
-- Expected response 200?: JSON
+- Required header: JWT, admin auth
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20doc%20patch.png)
 
 ---
 
-Route: `http://localhost:5000/doctors/<int:doctor_id>`
+Route to delete a doctor: `http://localhost:5000/doctors/<int:doctor_id>`
 
 - HTTP verb: `DELETE`
-- Required ?: ?
-- Expected failure response:
+- Required header: JWT, admin auth
+- Example failure response 403:
 
 ```py
-?
+{
+    "error": "Only admins can perform this action."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20doc%20del.png)
 
@@ -862,14 +920,16 @@ Route: `http://localhost:5000/doctors/<int:doctor_id>`
 
 #### patient_controller.py
 
-Route: `http://localhost:5000/patients/`
+Route to get all patients: `http://localhost:5000/patients/`
 
 - HTTP verb: `GET`
-- Required ?: ?
-- Expected failure response: ...? Will respond with 404 Not Found if patient ID does not exist
+- Required header: JWT, admin auth
+- Example failure response: 404
 
 ```py
-?
+{
+    "error": "No patients found."
+}
 ```
 
 - Expected response 200: JSON
@@ -878,14 +938,16 @@ Route: `http://localhost:5000/patients/`
 
 ---
 
-Route: `http://localhost:5000/patients/<int:patient_id>`
+Route to get a patient: `http://localhost:5000/patients/<int:patient_id>`
 
-- HTTP verb: `GET?`
-- Required ?: ?
-- Expected failure response:
+- HTTP verb: `GET`
+- Required header: JWT, admin auth
+- Example failure response 403:
 
 ```py
-?
+{
+    "error": "Only admins can perform this action."
+}
 ```
 
 - Expected response 200?: JSON
@@ -894,65 +956,73 @@ Route: `http://localhost:5000/patients/<int:patient_id>`
 
 ---
 
-Route: `http://localhost:5000/patients/<int:patient_id>/appointments/`
+Route to get a patient's appointments: `http://localhost:5000/patients/<int:patient_id>/appointments/`
 
 - HTTP verb: `GET`
-- Required ?: ?
-- Expected failure response:
+- Required header: JWT, admin auth
+- Example failure response 404:
 
 ```py
-?
+{
+    "error": f"No appointments found for patient {patient_id}."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20appt%20get.png)
 
 ---
 
-Route: `http://localhost:5000/patients/<int:patient_id>/treatments/`
+Route to get a patient's treatments: `http://localhost:5000/patients/<int:patient_id>/treatments/`
 
 - HTTP verb: `GET`
-- Required ?: ?
-- Expected failure response:
+- Required header: JWT, admin auth
+- Example failure response 404:
 
 ```py
-?
+{
+    "error": f"No treatments found for patient {patient_id}."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20treat%20get%20all.png)
 
 ---
 
-Route: `http://localhost:5000/patients/<int:patient_id>`
+Route to edit a patient: `http://localhost:5000/patients/<int:patient_id>`
 
 - HTTP verb: `PUT, PATCH`
-- Required ?: ?
-- Expected failure response:
+- Required header: JWT, admin auth
+- Example failure response 404:
 
 ```py
-?
+{
+    "error": f"Patient {patient_id} not found."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20patch.png)
 
 ---
 
-Route: `http://localhost:5000/patients/<int:patient_id>`
+Route to delete a patient: `http://localhost:5000/patients/<int:patient_id>`
 
 - HTTP verb: `DELETE`
-- Required ?: ?
-- Expected failure response:
+- Required header: JWT, admin auth
+- Example failure response 404:
 
 ```py
-?
+{
+    "error": f"Patient {patient_id} not found."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20del.png)
 
@@ -960,81 +1030,93 @@ Route: `http://localhost:5000/patients/<int:patient_id>`
 
 #### patient_log_controller.py
 
-Route: `http://localhost:5000/patients/<int:patient_id>/logs/`
+Route to create a patient log: `http://localhost:5000/patients/<int:patient_id>/logs/`
 
 - HTTP verb: `POST`
-- Required ?: ?
-- Expected failure response:
+- Required header: JWT, admin auth
+- Required body: JSON
+- Example failure response 404:
 
 ```py
-?
+{
+    "error": f"Patient {patient_id} not found."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 201: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20log%20post.png)
 
 ---
 
-Route: `http://localhost:5000/patients/<int:patient_id>/logs/`
+Route to get a patient's logs: `http://localhost:5000/patients/<int:patient_id>/logs/`
 
 - HTTP verb: `GET`
-- Required ?: ?
-- Expected failure response:
+- Required header: JWT, admin auth
+- Example failure response 404:
 
 ```py
-?
+{
+    "error": f"Patient {patient_id} not found, or they have no logs."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20log%20get%20all.png)
 
 ---
 
-Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
+Route to get a log: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
 
 - HTTP verb: `GET`
-- Required ?: ?
-- Expected failure response:
+- Required header: JWT, admin auth
+- Example failure response 404:
 
 ```py
-?
+{
+    "error": f"Patient {patient_id} or log {log_id} not found."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20log%20get%20x.png)
 
 ---
 
-Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
+Route to edit a patient log: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
 
 - HTTP verb: `PUT, PATCH`
-- Required ?: ?
-- Expected failure response:
+- Required header: JWT, admin auth, log owner auth
+- Required body: JSON
+- Example failure response 404:
 
 ```py
-?
+{
+    "error": f"Patient {patient_id} or log {log_id} not found."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20log%20patch.png)
 
 ---
 
-Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
+Route to delete a patient log: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
 
 - HTTP verb: `DELETE`
-- Required ?: ?
-- Expected failure response:
+- Required header: JWT, admin auth, log owner auth
+- Example failure response 404:
 
 ```py
-?
+{
+    "error": f"Patient {patient_id} or log {log_id} not found."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20log%20del.png)
 
@@ -1042,112 +1124,129 @@ Route: `http://localhost:5000/patients/<int:patient_id>/logs/<int:log_id>`
 
 #### treatment_controller.py
 
-Route: `# http://localhost:5000/treatments/`
+Route to create a treatment: `http://localhost:5000/treatments/`
 
 - HTTP verb: `POST`
-- Required ?: ?
-- Expected failure response:
+- Required header: JWT, admin auth
+- Required body: JSON
+- Example failure response:
 
 ```py
-?
+{
+    "error": f"The {field} is missing or invalid (e.g. empty string)."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 201: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20treat%20post.png)
 
 ---
 
-Route: `http://localhost:5000/treatments/<int:treatment_id>/appointments/`
+Route to create an appointment: `http://localhost:5000/treatments/<int:treatment_id>/appointments/`
 
 - HTTP verb: `POST`
-- Required ?: ?
-- Expected failure response:
+- Required header: JWT, admin auth, treatment participant auth
+- Required body: JSON
+- Example failure response 404:
 
 ```py
-?
+{
+    "error": f"Treatment ID {treatment_id} not found.""
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 201: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20treat%20appt%20post.png)
 
 ---
 
-Route: `http://localhost:5000/treatments/<int:treatment_id>/appointments/`
+Route to get a treatment's appointments: `http://localhost:5000/treatments/<int:treatment_id>/appointments/`
 
 - HTTP verb: `GET`
-- Required ?: ?
-- Expected failure response:
+- Required header: JWT, admin auth, treatment participant auth
+- Example failure response 404:
 
 ```py
-?
+{
+    "error": f"No appointments found for treatment {treatment_id}."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20treat%20appt%20get%20all.png)
 
 ---
 
-Route: `http://localhost:5000/treatments/`
+Route to get all treatments: `http://localhost:5000/treatments/`
 
 - HTTP verb: `GET`
-- Required ?: ?
-- Expected failure response:
+- Required header: JWT, admin auth
+- Example failure response 404:
 
 ```py
-?
+{
+    "error": "No treatments found."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20treat%20get%20all.png)
 
 ---
 
-Route: `http://localhost:5000/treatments/<int:treatment_id>`
+Route to get a treatment: `http://localhost:5000/treatments/<int:treatment_id>`
 
 - HTTP verb: `GET`
-- Required ?: ?
-- Expected failure response:
+- Required header: JWT, admin auth, treatment participant auth
+- Example failure response 404:
 
 ```py
-?
+{
+    "error": f"Treatment {treatment_id} not found."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20treat%20get%20x.png)
 
 ---
 
-Route: `http://localhost:5000/treatments/<int:treatment_id>`
+Route to edit a treatment: `http://localhost:5000/treatments/<int:treatment_id>`
 
 - HTTP verb: `PUT, PATCH`
-- Required ?: ?
-- Expected failure response:
+- Required header: JWT, admin auth, treatment participant auth
+- Required body: JSON
+- Example failure response 404:
 
 ```py
-?
+{
+    "error": f"Treatment {treatment_id} not found."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20treat%20patch.png)
 
 ---
 
-Route: `http://localhost:5000/treatments/<int:treatment_id>`
+Route to delete a treatment: `http://localhost:5000/treatments/<int:treatment_id>`
 
 - HTTP verb: `DELETE`
-- Required ?: ?
-- Expected failure response:
+- Required header: JWT, admin auth, treatment participant auth
+- Example failure response 404:
 
 ```py
-?
+{
+    "error": f"Treatment {treatment_id} not found."
+}
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20treat%20del.png)

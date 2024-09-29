@@ -71,6 +71,7 @@ def get_all_patients():
 @jwt_required()
 # This is a high-level endpoint that should be accessible to admins only
 # In future, build a patient auth decorator with an early exit for admins
+# Doctors can simply view patient logs instead
 @authorise_as_admin
 def get_a_patient(patient_id):
     """Get a particular patient's details.
