@@ -207,23 +207,19 @@ In addition, a GitHub remote repository was used for version history and source 
 
 ##### September 29th
 
-![Trello screenshot](./docs/trello)
-
-...
+![Trello screenshot](./docs/trello/Screenshot%202024-09-29%20at%2019.03.30.png)
 
 ---
 
 #### GitHub Commit Screens
 
-these are out of order:
-
-![GitHub commit screenshot](./docs/github_commits)
-![GitHub commit screenshot](./docs/github_commits/github10.png)
-![GitHub commit screenshot](./docs/github_commits/github9.png)
-![GitHub commit screenshot](./docs/github_commits/github8.png)
+![GitHub commit screenshot](./docs/github_commits/github4.png)
+![GitHub commit screenshot](./docs/github_commits/github5.png)
+![GitHub commit screenshot](./docs/github_commits/github6.png)
 ![GitHub commit screenshot](./docs/github_commits/github7.png)
-
-...
+![GitHub commit screenshot](./docs/github_commits/github8.png)
+![GitHub commit screenshot](./docs/github_commits/github9.png)
+![GitHub commit screenshot](./docs/github_commits/github10.png)
 
 ---
 
@@ -621,7 +617,7 @@ patient = db.relationship("Patient", back_populates="treatments")
 doctor = db.relationship("Doctor", back_populates="treatments")
 
 # One-to-many relationship from the treatment's perspective (parent)
-appointments = db.relationship("Appointment", back_populates="treatment", cascade="all, delete") 
+appointments = db.relationship("Appointment", back_populates="treatment", cascade="all, delete")
 ```
 
 Here, `db.ForeignKey()` defines the column in the child entity (Treatment), while `db.relationship()` (also defined on the other side in the parent model) establishes a two-way relationship for validation and querying purposes. The `back_populates` attribute refers to the current model, ensuring that changes are reflected in both models, and the `cascade` attribute is used to delete all child appointments when a treatment is deleted. Similarly, `ondelete="CASCADE"` establishes delete-cascading in the FK definition.
