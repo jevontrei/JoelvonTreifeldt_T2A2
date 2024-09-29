@@ -1,7 +1,7 @@
 from init import db, bcrypt
 from models import Patient, Doctor, Treatment, Appointment, Log
 
-from flask import Blueprint, jsonify
+from flask import Blueprint
 
 ##################################################
 
@@ -13,30 +13,15 @@ db_commands = Blueprint(
 
 ##################################################
 
-# FIX ERROR HANDLING FOR all CLI CONTROLLERS
 
 @db_commands.cli.command("drop")
 def drop_tables():
     """Drop all tables.
     """
-    # try:
-    # Delete all tables from the database (even if FK constraints are present? how to do this?)
+    # Delete all tables from the database
     db.drop_all()
 
     print("Tables dropped.")
-
-    # bad practice to return JSON for cli controller error? print instead?
-
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
-
-    # except Exception as e:
-    #     return jsonify(
-    #         {"error": f"Unexpected error: {e}."}
-    #     ), 500
 
 
 ##################################################
@@ -46,24 +31,9 @@ def create_tables():
     """Create all tables.
     """
 
-    # try:
-
     db.create_all()
 
     print("Tables created.")
-
-    # bad practice to return JSON for cli controller error? print instead?
-
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
-
-    # except Exception as e:
-    #     return jsonify(
-    #         {"error": f"Unexpected error: {e}."}
-    #     ), 500
 
 
 ##################################################
@@ -72,8 +42,6 @@ def create_tables():
 def seed_tables():
     """Seed tables with details for patients, doctors, treatments, logs and appointments.
     """
-
-    # try:
 
     # Seed patients
     patients = [
@@ -208,7 +176,6 @@ def seed_tables():
             place="Frog's Hollow Medical Centre",
             cost="100",
             status="Completed",
-            # should change these so that i'm querying treatment for a particular patient and doctor combo?
             treatment_id=treatments[0].treatment_id
         ),
         Appointment(
@@ -281,6 +248,7 @@ def seed_tables():
     logs = [
         Log(
             date="2024-09-16",
+            time="12:00",
             notes="API-induced headache",
             patient_id=1
         ),
@@ -292,6 +260,7 @@ def seed_tables():
         Log(
             date="1111-11-11",
             notes="death; a while now; severe",
+            time="01:00",
             patient_id=2
         ),
         Log(
@@ -322,16 +291,3 @@ def seed_tables():
 
     # Print success message
     print("Tables seeded.")
-    
-    # bad practice to return JSON for cli controller error? print instead?
-
-    # # In case ... ?
-    # # except ? as e:
-    # #     return jsonify(
-    # #         {"error": "?"}
-    # #     ), ?00
-
-    # except Exception as e:
-    #     return jsonify(
-    #         {"error": f"Unexpected error: {e}."}
-    #     ), 500

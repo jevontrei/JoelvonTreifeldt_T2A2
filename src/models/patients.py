@@ -1,9 +1,8 @@
 from init import db, ma
-from models.treatments import TreatmentSchema
+# from models.treatments import TreatmentSchema
 
 from marshmallow import fields
-from marshmallow.validate import Length#, Regexp
-
+from marshmallow.validate import Length
 
 class Patient(db.Model):
     __tablename__ = "patients"
@@ -12,7 +11,6 @@ class Patient(db.Model):
     patient_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
-    # do i need password min/max length? or will the hashing make that freak out?
     password = db.Column(db.String(100), nullable=False)
     dob = db.Column(db.Date, nullable=False)
     sex = db.Column(db.String(15))
@@ -28,6 +26,7 @@ class PatientSchema(ma.Schema):
     name = fields.String(validate=Length(max=100))
     sex = fields.String(validate=Length(max=15))
     password = fields.String(validate=Length(min=8, max=100), load_only=True)
+    is_admin = fields.Boolean()
     
     email = fields.Email(
         required=True, 
@@ -37,13 +36,13 @@ class PatientSchema(ma.Schema):
 
     # Define nested field; each serialised patient output will have a sub-dictionary describing treatment details
     treatments = fields.Nested(
-        TreatmentSchema, 
-        many=True, 
-        exclude=("patient_id")  # Excluding patient_id prevents circular references
+        "TreatmentSchema",  # This is in quotes to avoid circular references
+        many=True,
+        # Excluding patient_id prevents circular references
+        exclude=("patient_id",)
     )
     
     class Meta:
-        # do i need a guard clause / error handling for all this validation?
         # Tell Marshmallow what to serialise / how to unpack the patient object / how to do indexing
         fields = (
             "patient_id", 

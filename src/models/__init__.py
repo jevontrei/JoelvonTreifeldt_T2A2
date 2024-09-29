@@ -1,5 +1,5 @@
-# check this is not redundant. no need to import models and schemas? just log_schema and logs_schema etc?
-from models.doctors import Doctor, DoctorSchema, doctor_schema, doctors_schema
+# Some are grayed out, but they are necessary
+from models.doctors import doctor_schema, doctors_schema, Doctor, DoctorSchema
 from models.patients import patient_schema, patients_schema, Patient, PatientSchema
 from models.logs import log_schema, logs_schema, Log, LogSchema
 from models.appointments import appointment_schema, appointments_schema, Appointment, AppointmentSchema

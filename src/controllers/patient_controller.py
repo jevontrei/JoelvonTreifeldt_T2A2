@@ -41,6 +41,7 @@ def get_all_patients():
             Patient.name
         )
 
+        # Execute statement, fetch resulting values
         patients = db.session.scalars(stmt).fetchall()
 
         # Guard clause; return error if no patients exist
@@ -51,12 +52,6 @@ def get_all_patients():
 
         # Return patient objects serialised according to the patients schema
         return patients_schema.dump(patients)
-
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(
@@ -105,12 +100,6 @@ def get_a_patient(patient_id):
         # Return patient object serialised according to the patient schema
         return patient_schema.dump(patient)
 
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
-
     except Exception as e:
         return jsonify(
             {"error": f"Unexpected error: {e}."}
@@ -158,18 +147,11 @@ def get_patient_appointments(patient_id):
         # Guard clause; return error if no appointments exist
         if not appointments:
             return jsonify(
-                # this is being returned erroneously?! like when im logged in as an admin
                 {"error": f"No appointments found for patient {patient_id}."}
             ), 404
 
         # Return appointment objects serialised according to the appointments schema
         return appointments_schema.dump(appointments)
-
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(
@@ -215,12 +197,6 @@ def get_patient_treatments(patient_id):
 
         # Return treatment objects serialised according to the treatments schema
         return treatments_schema.dump(treatments)
-
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(
@@ -270,24 +246,16 @@ def update_patient(patient_id):
 
         patient.name = body_data.get("name") or patient.name
         patient.email = body_data.get("email") or patient.email
-        # use pop() instead?  # .pop() increases secruity by removing password
         patient.password = body_data.get("password") or patient.password
         patient.dob = body_data.get("dob") or patient.dob
         patient.sex = body_data.get("sex") or patient.sex
         patient.is_admin = body_data.get("is_admin") or patient.is_admin
-        # logs and doctors? no, do this through logs and treatments, respectively?
 
         # Commit changes to database
         db.session.commit()
 
         # Return updated patient object serialised according to the patient schema
         return patient_schema.dump(patient)
-
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(
@@ -343,16 +311,9 @@ def delete_patient(patient_id):
             {"message": f"Patient {patient_id} deleted."}
         )
 
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(
             {"error": f"Unexpected error: {e}."}
         ), 500
 
-
-# check all @jwt_required everywhere to check if i authd as admin or whatever... i keep missing some?!

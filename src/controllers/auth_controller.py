@@ -8,11 +8,10 @@
 from datetime import timedelta
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
-from marshmallow.exceptions import ValidationError
+# from marshmallow.exceptions import ValidationError
 
 from init import db, bcrypt
 from models import Patient, PatientSchema, patient_schema, Doctor, DoctorSchema, doctor_schema
-
 
 from sqlalchemy.exc import IntegrityError, DataError
 from psycopg2 import errorcodes
@@ -29,6 +28,8 @@ auth_bp = Blueprint(
 ###########################################################################
 
 # http://localhost:5000/auth/register/<user_type>
+
+
 @auth_bp.route("/register/<user_type>", methods=["POST"])
 def register_user(user_type):
     """Create a new patient or doctor user.
@@ -39,7 +40,7 @@ def register_user(user_type):
     Returns:
         Tuple: All registration details, serialised according to patient or doctor schema (JSON); a 201 HTTP response status code.
     """
-    
+
     # Guard clause; escape function early if user type is invalid
     if user_type not in ["patient", "doctor"]:
         return jsonify(
@@ -59,7 +60,8 @@ def register_user(user_type):
             schema = doctor_schema
 
         # Guard clause; return error if no password provided
-        password = body_data.pop("password")  # .pop() increases secruity by removing password 
+        # .pop() increases secruity by removing password
+        password = body_data.pop("password")
         if not password:
             return jsonify(
                 {"error": "Password required."}
@@ -76,15 +78,13 @@ def register_user(user_type):
         # Return user object serialised according to the corresponding schema
         return schema.dump(user), 201
 
-    # Don't need ValidationError because it's globally handled in main.py (but is the message specific enough? check)
-
     # In case the date entered has invalid format, e.g. "2024-0101"
     except DataError as e:
         return jsonify(
             {"error": "Invalid date formatting."}
         ), 400
-        
-    # If the email address (or ___?) is missing or already taken
+
+    # If the email address (or other attribute) is missing or already taken
     except IntegrityError as e:
         if e.orig.pgcode == errorcodes.NOT_NULL_VIOLATION:
             return jsonify(
@@ -95,12 +95,6 @@ def register_user(user_type):
             return jsonify(
                 {"error": "Email address must be unique."}
             ), 400
-            
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(
@@ -109,8 +103,6 @@ def register_user(user_type):
 
 
 ###########################################################################
-
-# doctor and patient emails must be unique within one type of model, but a doctor can duplicate themselves as a patient with the same email no worries. BUT! that will cause confusion with logging in. how do you know what someone is trying to log in as? use roles?
 
 # http://localhost:5000/auth/login/<user_type>
 
@@ -126,23 +118,20 @@ def login_user(user_type):
         JSON: All login details, serialised according to the corresponding schema.
     """
 
-    
-    # which levels do i need try blocks at? both?
-    # try:
-
     # Fetch body of HTTP request
     body_data = request.get_json()
 
-    # Guard clause; return error if ?
+    # Guard clause; return error if user type is invalid
     if user_type not in ["patient", "doctor"]:
         return jsonify(
             {"error": f"User type '{user_type}' not valid. URL must include '/auth/login/patient' or '/auth/login/doctor'."}
         ), 400
 
     email = body_data.get("email")
-    password = body_data.pop("password")  # .pop() increases secruity by removing password 
+    # .pop() increases secruity by removing password
+    password = body_data.pop("password")
 
-    # Guard clause; return error if ?
+    # Guard clause; return error if email or password missing
     if not email or not password:
         return jsonify(
             {"error": "Email and password required."}
@@ -151,7 +140,7 @@ def login_user(user_type):
     try:
         if user_type == "patient":
             # Create SQLAlchemy query statement:
-            # SELECT patients.patient_id, patients.name, patients.email, patients.password, patients.dob, patients.sex, patients.is_admin
+            # SELECT *
             # FROM patients
             # WHERE patients.email = :email_1;
             stmt = db.select(
@@ -163,12 +152,12 @@ def login_user(user_type):
             # Connect to database session, execute statement, store resulting value
             user = db.session.scalar(stmt)
             user_id = user.patient_id
-            schema = patient_schema
+            # schema = patient_schema
 
         elif user_type == "doctor":
             # Create SQLAlchemy query statement:
-            # SELECT doctors.doctor_id, doctors.name, doctors.email, doctors.password, doctors.sex, doctors.specialty, doctors.is_admin 
-            # FROM doctors 
+            # SELECT *
+            # FROM doctors
             # WHERE doctors.email = :email_1;
             stmt = db.select(
                 Doctor
@@ -179,41 +168,20 @@ def login_user(user_type):
             # Connect to database session, execute statement, store resulting value
             user = db.session.scalar(stmt)
             user_id = user.doctor_id
-            schema = doctor_schema
-            
-    # is this relevant here?
-    # except IntegrityError as e:
-    #     ?
-    
+            # schema = doctor_schema
+
     # Return error if user doesn't exist
     except AttributeError as e:
         return jsonify(
             {"error": "Email address not found. Please register user or initialise database."}
         ), 404
 
-    # ^^ which one to use here? the below guard clause doesn't actually catch logins with unrecognised email addresses vv
-
-    # Guard clause; return error if user doesn't exist
-    # if not user:
-    #     return jsonify(
-        # {"error": f"User account '{email}' not found. Please register user or initialise database."}
-        # ), 404
-        
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
-
-    # move this out/down?
-
     except Exception as e:
         return jsonify(
             {"error": f"Unexpected error: {e}."}
         ), 500
 
-    # is 'password' a keyword for this function? will this give me issues?:
-    # Guard clause; return error if password doesn't match stored hash?
+    # Guard clause; return error if password doesn't match stored hash
     if not bcrypt.check_password_hash(user.password, password):
         return jsonify(
             {"error": "Invalid password."}
@@ -239,14 +207,3 @@ def login_user(user_type):
             "token": token
         }
     )
-    
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
-
-    # except Exception as e:
-    #     return jsonify(
-    #         {"error": f"Unexpected error: {e}."}
-    #     ), 500

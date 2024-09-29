@@ -43,7 +43,7 @@ def get_all_doctors():
             Doctor.name
         )
 
-        # ... ? fetchall() prevents returning an empty list/dict
+        # Execute statement, fetch resulting values
         doctors = db.session.scalars(stmt).fetchall()
 
         # Guard clause; return error if no doctors exist
@@ -54,12 +54,6 @@ def get_all_doctors():
 
         # Return doctor objects serialised according to the doctors schema
         return doctors_schema.dump(doctors)
-
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(
@@ -105,12 +99,6 @@ def get_a_doctor(doctor_id):
 
         # # Return doctor object serialised according to the doctor schema
         return doctor_schema.dump(doctor)
-
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(
@@ -173,12 +161,6 @@ def get_doctor_appointments(doctor_id):
             {"error": str(e)}
         ), 404
 
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
-
     except Exception as e:
         return jsonify(
             {"error": f"Unexpected error: {e}."}
@@ -217,6 +199,7 @@ def get_doctor_treatments(doctor_id):
             Treatment.start_date
         )
 
+        # Execute statement, fetch resulting values
         treatments = db.session.scalars(stmt).fetchall()
 
         # Guard clause; return error if no treatments exist
@@ -227,12 +210,6 @@ def get_doctor_treatments(doctor_id):
 
         # Return treatment objects serialised according to the treatments schema
         return treatments_schema.dump(treatments)
-
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(
@@ -276,12 +253,9 @@ def update_doctor(doctor_id):
                 {"error": f"Doctor {doctor_id} not found."}
             ), 404
 
-        # can i do this more efficiently with kwargs?
         doctor.name = body_data.get("name") or doctor.name
         doctor.email = body_data.get("email") or doctor.email
-        # use pop() instead?  # .pop() increases secruity by removing password
         doctor.password = body_data.get("password") or doctor.password
-        # patients and appointments? no, do this through treatments and appointments, respectively?
 
         # Commit changes to database
         db.session.commit()
@@ -289,11 +263,6 @@ def update_doctor(doctor_id):
         # Return updated doctor object serialised according to the doctor schema
         return doctor_schema.dump(doctor)
 
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(
@@ -345,12 +314,6 @@ def delete_doctor(doctor_id):
         return jsonify(
             {"message": f"Doctor {doctor_id} deleted."}
         )
-
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(

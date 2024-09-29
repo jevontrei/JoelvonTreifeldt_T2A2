@@ -263,8 +263,6 @@ The DBMS PostgreSQL was chosen primarily because it is based on SQL and the rela
 
 Compared to other alternatives such as MySQL, PostgreSQL may perform slower for certain tasks. The level of knowledge required may also present challenges in contrast to lightweight options such as SQLite.
 
-<!-- add more detail? -->
-
 #### Source
 
 - DigitalOcean. (2022, December 12). _ACID Compliance_. https://docs.digitalocean.com/glossary/acid/
@@ -537,7 +535,7 @@ class PatientSchema(ma.Schema):
     treatments = fields.Nested(
         TreatmentSchema,
         many=True,
-        exclude=("patient_id")
+        exclude=("patient_id",)
     )
 
     class Meta:
@@ -948,7 +946,7 @@ Route to get a patient: `http://localhost:5000/patients/<int:patient_id>`
 }
 ```
 
-- Expected response 200?: JSON
+- Expected response 200: JSON
 
 ![Insomnia screenshot](./docs/insomnia/ins%20pat%20get%20x.png)
 

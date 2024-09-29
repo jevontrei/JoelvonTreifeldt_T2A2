@@ -1,10 +1,11 @@
-from models import Patient, Doctor, Log, Treatment, Appointment  # , log_schema
+from models import Treatment, Appointment#, Patient, Doctor, Log
 from init import db
 
 import functools
 from flask import jsonify
-from flask_jwt_extended import get_jwt_identity, get_jwt, get_jwt_header
-from sqlalchemy.exc import IntegrityError
+from flask_jwt_extended import get_jwt_identity, get_jwt
+
+# from sqlalchemy.exc import IntegrityError
 
 
 ##############################################################
@@ -86,7 +87,7 @@ def authorise_as_log_viewer(fn):
 
             elif user_type == "doctor":
                 # doctor_id must be associated with the log's patient_id through the Treatments table
-                # PROBLEM: Doctor should not be able to see log if the treatment end date has passed?! Implement this.
+                # TO-DO:: Doctor should not be able to see log if the treatment end date has passed. Implement this.
 
                 # Create SQLAlchemy query statement:
                 # SELECT *
@@ -110,12 +111,6 @@ def authorise_as_log_viewer(fn):
 
                 # Allow function to execute
                 return fn(*args, **kwargs)
-
-        # In case ... ?
-        # except ? as e:
-        #     return jsonify(
-        #         {"error": "?"}
-        #     ), ?00
 
         except Exception as e:
             return jsonify(
@@ -141,7 +136,7 @@ def authorise_as_log_owner(fn):
     def wrapper(*args, **kwargs):
         try:
             # Fetch patient_id, current user type and ID
-            jwt = get_jwt()
+            # jwt = get_jwt()
             patient_id = kwargs.get("patient_id")
             logged_in_id = get_jwt_identity()
 
@@ -156,12 +151,6 @@ def authorise_as_log_owner(fn):
 
             # Allow function to execute
             return fn(*args, **kwargs)
-
-        # In case ... ?
-        # except ? as e:
-        #     return jsonify(
-        #         {"error": "?"}
-        #     ), ?00
 
         except Exception as e:
             return jsonify(
@@ -253,28 +242,15 @@ def authorise_treatment_participant(fn):
             # Allow function to execute
             return fn(*args, **kwargs)
 
-        # In case ... ?
-        # except ? as e:
+        # except IntegrityError as e:
         #     return jsonify(
-        #         {"error": "?"}
-        #     ), ?00
+        #         {"error": f"Integrity error because ...: {e}."}
+        #     )  # , ?00
 
-        # # delet this?
-        except IntegrityError as e:
+        except Exception as e:
             return jsonify(
-                {"error": f"?: {e}."}
-            )  # , ?00
-
-        # # delet this?
-        # except AttributeError as e:
-        #     return jsonify(
-        #         {"error": f"?: {e}."}
-        #     )#, ?00
-
-        # except Exception as e:
-        #     return jsonify(
-        #         {"error": f"Unexpected error: {e}."}
-        #     ), 500
+                {"error": f"Unexpected error: {e}."}
+            ), 500
 
     # Return wrapper function
     return wrapper

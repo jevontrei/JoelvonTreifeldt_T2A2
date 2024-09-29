@@ -30,7 +30,9 @@ class Appointment(db.Model):
 
 
 class AppointmentSchema(ma.Schema):
+    
     # Validation
+    
     place = fields.String(
         validate=Length(max=50)
     )
@@ -44,6 +46,7 @@ class AppointmentSchema(ma.Schema):
     )
 
     class Meta:
+        # Tell Marshmallow what to serialise
         fields = (
             "appt_id",
             "date",

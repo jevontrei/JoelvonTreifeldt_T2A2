@@ -9,7 +9,7 @@ from psycopg2 import errorcodes
 
 #####################################################
 
-# TO DO: verify that end date is AFTER start date?! do that in schema?
+# TO DO: verify that end date is AFTER start date
 
 #####################################################
 
@@ -23,6 +23,8 @@ treatments_bp = Blueprint(
 #####################################################
 
 # http://localhost:5000/treatments/
+
+
 @treatments_bp.route("/", methods=["POST"])
 @jwt_required()
 # Must authorise as admin, otherwise any person could create a treatment relationship and view any patient's private logs
@@ -38,7 +40,7 @@ def create_treatment():
         tuple: New serialised treatment details (JSON); a 201 HTTP response status code.
     """
     try:
-        # need something to check if patient_id and doctor_id exist? --> ForeignKeyViolation
+        # TO-DO: need something to check if patient_id and doctor_id exist --> ForeignKeyViolation
 
         # Fetch body of HTTP request
         body_data = request.get_json()
@@ -53,7 +55,6 @@ def create_treatment():
         # Remember to validate input! Especially FKs
         # Define new instance of Treatment class
         treatment = Treatment(
-            # Interesting... this works with both int and str input. Why?
             patient_id=body_data.get("patient_id"),
             doctor_id=body_data.get("doctor_id"),
             start_date=body_data.get("start_date"),
@@ -88,9 +89,11 @@ def create_treatment():
 
 ##################################################
 
-# weird identical duplicates are allowed to happen... fix this?!
+# TO-DO: identical duplicates are allowed to happen... fix this
 
 # http://localhost:5000/treatments/<int:treatment_id>/appointments/
+
+
 @treatments_bp.route("/<int:treatment_id>/appointments/", methods=["POST"])
 @jwt_required()
 # Authorise either patients or their doctors to create appointments, with an early exit for admins
@@ -109,7 +112,7 @@ def create_appointment(treatment_id):
         body_data = request.get_json()
 
         # remember to validate input!
-        
+
         # Define new instance of Appointment class
         appointment = Appointment(
             date=body_data.get("date"),
@@ -127,17 +130,11 @@ def create_appointment(treatment_id):
         # Return appointment object serialised according to the appointment schema
         return appointment_schema.dump(appointment), 201
 
-    # In case the ?
+    # In case the treatment ID does not exist
     except IntegrityError as e:
         return jsonify(
             {"error": f"Treatment ID {treatment_id} not found."}
         ), 404
-
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(
@@ -174,6 +171,7 @@ def get_treatment_appointments(treatment_id):
             Appointment.date, Appointment.time
         )
 
+        # Execute statement, fetch resulting values
         appointments = db.session.scalars(stmt).fetchall()
 
         # Guard clause; return error if no appointments exist
@@ -184,12 +182,6 @@ def get_treatment_appointments(treatment_id):
 
         # Return appointment objects serialised according to the appointments schema
         return appointments_schema.dump(appointments)
-
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(
@@ -221,7 +213,7 @@ def get_all_treatments():
             Treatment.start_date
         )
 
-        # Execute statement, store in an iterable object(?)
+        # Execute statement, fetch all resulting values
         treatments = db.session.scalars(stmt).fetchall()
 
         # Guard clause; return error if no treatments exist
@@ -232,12 +224,6 @@ def get_all_treatments():
 
         # Return treatment objects serialised according to the treatments schema
         return treatments_schema.dump(treatments)
-
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(
@@ -284,12 +270,6 @@ def get_a_treatment(treatment_id):
         # Return treatment object serialised according to the treatment schema
         return treatment_schema.dump(treatment)
 
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
-
     except Exception as e:
         return jsonify(
             {"error": f"Unexpected error: {e}."}
@@ -335,7 +315,6 @@ def update_treatment(treatment_id):
                 {"error": f"Treatment {treatment_id} not found."}
             ), 404
 
-        # can i do this more efficiently with kwargs?
         treatment.patient_id = body_data.get(
             "patient_id") or treatment.patient_id
         treatment.doctor_id = body_data.get("doctor_id") or treatment.doctor_id
@@ -348,12 +327,6 @@ def update_treatment(treatment_id):
 
         # Return updated treatment object serialised according to the treatment schema
         return treatment_schema.dump(treatment)
-
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(
@@ -408,11 +381,6 @@ def delete_treatment(treatment_id):
             {"message": f"Treatment {treatment_id} deleted."}
         )
 
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(

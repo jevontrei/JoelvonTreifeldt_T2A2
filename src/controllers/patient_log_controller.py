@@ -1,8 +1,7 @@
 from sqlalchemy.exc import IntegrityError
 from init import db
 from models import Log, log_schema, logs_schema
-# , authorise_treatment_participant?
-from utils import authorise_as_log_viewer, authorise_as_log_owner, authorise_as_admin
+from utils import authorise_as_log_viewer, authorise_as_log_owner
 
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt
@@ -53,14 +52,12 @@ def create_log(patient_id):
         # Fetch body of HTTP request
         body_data = request.get_json()
 
-        # remember to validate input!?
+        # TO-DO: remember to validate input
         # Define new instance of Log class
         log = Log(
             date=body_data.get("date") or date.today(),
             notes=body_data.get("notes"),
-
-            # validate this!?
-            # change this to match create_app()... change route, incl in Insomnia
+            # TO-DO: validate this
             patient_id=patient_id
         )
 
@@ -71,17 +68,12 @@ def create_log(patient_id):
         # Return log object serialised according to the log schema
         return log_schema.dump(log), 201
 
-    # In case the ?
+    # In case the patient does not exist
     except IntegrityError as e:
         return jsonify(
             {"error": f"Patient ID {patient_id} not found."}
         ), 404
 
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(
@@ -121,7 +113,7 @@ def get_patient_logs(patient_id):
             Log.date
         )
 
-        # Execute statement, fetch all resulting values(?)
+        # Execute statement, fetch all resulting values
         logs = db.session.scalars(stmt).fetchall()
 
         # Guard clause; return error if no logs exist
@@ -132,12 +124,6 @@ def get_patient_logs(patient_id):
 
         # Return log objects serialised according to the logs schema
         return logs_schema.dump(logs)
-
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(
@@ -190,12 +176,6 @@ def get_a_log(patient_id, log_id):
         # Return log object serialised according to the log schema
         return log_schema.dump(log)
 
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
-
     except Exception as e:
         return jsonify(
             {"error": f"Unexpected error: {e}."}
@@ -244,22 +224,15 @@ def update_log(patient_id, log_id):
                 {"error": f"Patient {patient_id} or log {log_id} not found."}
             ), 404
 
-        # ?
+        # Update log details if provided
         log.date = body_data.get("date") or log.date
         log.notes = body_data.get("notes") or log.notes
-        # Do it for FK too? No. A log is not realistically going to change patients.
 
         # Commit changes to database
         db.session.commit()
 
         # Return updated log object serialised according to the log schema
         return log_schema.dump(log)
-
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(
@@ -315,12 +288,6 @@ def delete_log(patient_id, log_id):
         return jsonify(
             {"message": f"Log {log_id} deleted."}
         )
-
-    # In case ... ?
-    # except ? as e:
-    #     return jsonify(
-    #         {"error": "?"}
-    #     ), ?00
 
     except Exception as e:
         return jsonify(

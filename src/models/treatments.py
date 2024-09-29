@@ -20,17 +20,21 @@ class Treatment(db.Model):
     # One-to-many relationship from the treatment's perspective (parent)
     appointments = db.relationship("Appointment", back_populates="treatment", cascade="all, delete")  # Cascade; deleting a treatment deletes all child appointments; but this should be improved; patient should retain history. Treatments should not be deleted, and if they are, an admin should dump the raw appointment data into the patient's log as an archive before deleting
 
-# TO DO: verify that end date is AFTER start date?! do that in schema?
+# TO DO: verify that end date is AFTER start date
 
 class TreatmentSchema(ma.Schema):
     # Validation
+    start_date = fields.Date(required=True)
     
-    # remember to constrain each entry to be unique... right now you can create 100+ different identical treatment entries?!
-    # remember to validate that end date, if it exists, is on or after start date?!:
+    patient_id = fields.Integer(required=True)
+    doctor_id = fields.Integer(required=True)
+    
+    # TO-DO: remember to constrain each entry to be unique... right now you can create 100+ different identical treatment entries
+    # TO-DO: remember to validate that end date, if it exists, is on or after start date
 
     class Meta:
+        # Tell Marshmallow what to serialise
         fields = (
-            # this should have patient, not patient_id etc?
             "treatment_id", 
             "patient_id", 
             "doctor_id", 

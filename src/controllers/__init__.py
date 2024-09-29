@@ -1,4 +1,3 @@
-# check this is not redundant. just import blueprints?
 from controllers.appt_controller import appointments_bp
 from controllers.auth_controller import auth_bp
 from controllers.cli_controller import db_commands
