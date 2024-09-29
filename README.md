@@ -33,9 +33,9 @@ Student no. 15517
       - [Source/s](#sources-1)
   - [R5 - Explain the features, purpose and functionalities of the object-relational mapping system (ORM) used in this app.](#r5---explain-the-features-purpose-and-functionalities-of-the-object-relational-mapping-system-orm-used-in-this-app)
   - [R6 - Design an entity relationship diagram (ERD) for this app’s database, and explain how the relations between the diagrammed models will aid the database design. This should focus on the database design BEFORE coding has begun, eg. during the project planning or design phase.](#r6---design-an-entity-relationship-diagram-erd-for-this-apps-database-and-explain-how-the-relations-between-the-diagrammed-models-will-aid-the-database-design-this-should-focus-on-the-database-design-before-coding-has-begun-eg-during-the-project-planning-or-design-phase)
-      - [September 11th](#september-11th)
+      - [September 11th: Original ERD](#september-11th-original-erd)
   - [R7 - Explain the implemented models and their relationships, including how the relationships aid the database implementation. This should focus on the database implementation AFTER coding has begun, eg. during the project development phase.](#r7---explain-the-implemented-models-and-their-relationships-including-how-the-relationships-aid-the-database-implementation-this-should-focus-on-the-database-implementation-after-coding-has-begun-eg-during-the-project-development-phase)
-      - [September 27th](#september-27th)
+      - [September 27th: Final ERD](#september-27th-final-erd)
       - [Patient model](#patient-model)
       - [Doctor model](#doctor-model)
       - [Treatment model (join table)](#treatment-model-join-table)
@@ -61,7 +61,6 @@ Student no. 15517
 - Style guide: PEP-8
 
 ---
-
 
 ## R0 - Setup
 
@@ -121,7 +120,6 @@ Features to add in future versions:
 
 ---
 
-
 ## R2 - Describe the way tasks are allocated and tracked in your project.
 
 <!-- CMP1001-2.3: DESCRIBES the way tasks are planned and tracked in the project.
@@ -141,18 +139,13 @@ Throughout this project, a Trello Kanban board was used to plan tasks and track 
 
 ---
 
-
 Link to public GitHub repository: https://github.com/jevontrei/JoelvonTreifeldt_T2A2
 
 In addition, a GitHub remote repository was used for version history and source control. Dozens of commits were made throughout the development process, and GitHub also facilitated branching and merging/pulling of features. See screenshots below.
 
 ---
 
-
 #### Trello Board Screenshots
-
-
-
 
 ##### September 5th
 
@@ -162,14 +155,12 @@ In addition, a GitHub remote repository was used for version history and source 
 
 ---
 
-
 ##### September 12th
 
 ![Trello screenshot](./docs/trello/Screenshot%202024-09-12%20at%2012.05.59.png)
 ![Trello screenshot](./docs/trello/Screenshot%202024-09-12%20at%2012.06.04.png)
 
 ---
-
 
 ##### September 15th
 
@@ -180,7 +171,6 @@ In addition, a GitHub remote repository was used for version history and source 
 
 ---
 
-
 ##### September 16th
 
 ![Trello screenshot](./docs/trello/Screenshot%202024-09-16%20at%2013.23.44.png)
@@ -189,7 +179,6 @@ In addition, a GitHub remote repository was used for version history and source 
 
 ---
 
-
 ##### September 19th
 
 ![Trello screenshot](./docs/trello/Screenshot%202024-09-19%20at%2022.27.44.png)
@@ -197,14 +186,12 @@ In addition, a GitHub remote repository was used for version history and source 
 
 ---
 
-
 ##### September 20th
 
 ![Trello screenshot](./docs/trello/Screenshot%202024-09-20%20at%2013.02.32.png)
 ![Trello screenshot](./docs/trello/Screenshot%202024-09-20%20at%2013.06.55.png)
 
 ---
-
 
 ##### September 21st
 
@@ -214,20 +201,17 @@ In addition, a GitHub remote repository was used for version history and source 
 
 ---
 
-
 ##### September 22nd
 
 ![Trello screenshot](./docs/trello/Screenshot%202024-09-22%20at%2013.29.14.png)
 
 ---
 
-
 ##### September 28th
 
 ![Trello screenshot](./docs/trello/Screenshot%202024-09-28%20at%2020.44.10.png)
 
 ---
-
 
 ##### September 29th
 
@@ -236,7 +220,6 @@ In addition, a GitHub remote repository was used for version history and source 
 ...
 
 ---
-
 
 #### GitHub Commit Screens
 
@@ -251,7 +234,6 @@ these are out of order:
 ...
 
 ---
-
 
 ## R3 - List and explain the third-party services, packages and dependencies used in this app.
 
@@ -270,7 +252,6 @@ The description provided is DETAILED, and the description details ALL of the ser
 - Python-dotenv: for loading sensitive environment variables into the Flask app
 
 ---
-
 
 ## R4 - Explain the benefits and drawbacks of this app’s underlying database system.
 
@@ -297,7 +278,6 @@ Compared to other alternatives such as MySQL, PostgreSQL may perform slower for 
 - https://docs.digitalocean.com/glossary/acid/
 
 ---
-
 
 ## R5 - Explain the features, purpose and functionalities of the object-relational mapping system (ORM) used in this app.
 
@@ -363,7 +343,6 @@ def get_patient_treatments(patient_id):
 
 ---
 
-
 ## R6 - Design an entity relationship diagram (ERD) for this app’s database, and explain how the relations between the diagrammed models will aid the database design. This should focus on the database design BEFORE coding has begun, eg. during the project planning or design phase.
 
 <!-- 12 points! -->
@@ -383,22 +362,55 @@ Meets D, and the explanation includes comparisons to how AT LEAST ONE model or r
 
 **_PLAN_** for normalised data/relations!!!!!!
 
-TALK ABOUT MY O.G. ERD and the auth table
+---
 
-Maybe a User class (which Patient and Doctor inherit from) would be more normalised
+Before coding began, the initial planning process involved brainstorming the main entities and relationships involved in a patient's experience with healthcare professionls. The originally proposed ERD, shown below, contained the following entities and relationships:
 
-The entities are:
+**Entities**
+
 - Patient
-- .
+  - Normalisation?
+- Log
+  - Normalisation?
+- Doctor
+  - Normalisation?
+- Auth (join table): to establish trust and relationships between patient and doctor
+  - Normalisation?
+- Appointment (join table)
+  - Normalisation?
+- Medication
+  - Normalisation?
+- Prescription (join table)
+  - Normalisation?
 
-The relations are as follows:
+**Relationships**
 
-- Patient-Doctor (many to many) via the Treatments join table.
-  - Implemented as Patient-Treatment (one-mandatory to many-optional) and Doctor-Treatment (one-mandatory to many-optional).
-- Patient-Log (one-mandatory to many-optional)
-- Treatment-Appointment (one-mandatory to many-optional)
+- Patient-Doctor (many to many) via the Auth join table AND Appointment join table.
+  - Implemented as Patient-Auth (one to many) and Doctor-Auth (one to many).
+  - Implemented as Patient-Appointment (one to many) and Doctor-Appointment (one to many).
+- Patient-Log (one to many)
+- Patient-Medication (many to many) via the Prescription join table
+  - Implemented as Patient-Prescription (one to many) and Medication-Prescription (one to many).
 
-#### September 11th
+Note: Mandatory/optional ordinality not yet implemented, and many-to-many crow's foot notation is backwards in the ERD.
+
+During discussion with teaching staff, it was suggested that the Appointments utilise the Auth FK instead of both Patient and Doctor FKs. This was an attempt to reduce redundancy. Appointments were kept separate from Auth, because in the real world doctor may require authorisation to view a patient's log without having had an appointment with them, e.g. if an authorised doctor is seeking a second opinion. Therefore, the Auth table is used to verify/permit any event associated with sensitive information involving a patient and/or a doctor. It was also suggested that a start date and end date be added to Auth entities, to maximise control and privacy for the patient.
+
+**Alternative Versions**
+
+To compare possibilities, it is worth noting that the Patient and Doctor models share some features. This may indicate redundancy. The creation of a User class (which Patient and Doctor inherit from) would support a more normalised dataset. Patient and Doctor share attributes such as name, email, password, sex, is_admin. These could more efficiently be defined in and inherited from the parent User class.
+
+**ERD Legend: Crow's Foot Notation**
+
+- The 3-pronged side on the left indicates "many"
+- The 1-pronged side on the right indicates "one"
+- Therefore this indicates a many-to-one relationship
+
+![Crow's Foot Notation Legend](./docs/ERD/legend1.png)
+
+---
+
+#### September 11th: Original ERD
 
 ![ERD](./docs/ERD/ERD%202024.9.11.png)
 
@@ -422,13 +434,28 @@ Meets D, and includes appropriate code examples supporting the descriptions. -->
 
 **AFTER CODING begins**
 
-The ERD evolved significantly over the course of development
+comments were removed
 
-TALK ABOUT MY ERD CHANGING EVOLVING
+The ERD evolved significantly over the course of development, as requirements and complexities arose. The Medication table was removed, along with its Prescription join table. This was done for simplicity, and to focus on the basics of the API as a proof of concept and first attempt. The Auth table was renamed to Treatment, ...
 
-TALK ABOUT MY latest ERD and the renaming of auth to treatment
+Appointments evolved from being a join table between Patients and Doctors to being a child entity of the Treatments.
 
-doctor and patient emails must be unique within one type of model, but a doctor can duplicate themselves as a patient with the same email no worries. BUT! that will cause confusion with logging in. how do you know what someone is trying to log in as? use roles? In future, create separate login endpoints for each user type.
+... doctor and patient emails must be unique within one type of model, but a doctor can duplicate themselves as a patient with the same email no worries. BUT! that will cause confusion with logging in. how do you know what someone is trying to log in as? use roles? In future, create separate login endpoints for each user type.
+
+Entities:
+
+- Patient
+  - Log
+- Doctor
+  - Treatment (join table)
+    - Appointment
+
+Relationships:
+
+- Patient-Doctor (many to many) via the Auth join table.
+  - Implemented as Patient-Treatment (one-mandatory to many-optional) and Doctor-Treatment (one-mandatory to many-optional).
+- Patient-Log (one-mandatory to many-optional)
+- Treatment-Appointment (one-mandatory to many-optional)
 
 ---
 
@@ -451,7 +478,7 @@ doctor and patient emails must be unique within one type of model, but a doctor 
 
 --- -->
 
-#### September 27th
+#### September 27th: Final ERD
 
 ![ERD](./docs/ERD/ERD%202024.9.27.png)
 
