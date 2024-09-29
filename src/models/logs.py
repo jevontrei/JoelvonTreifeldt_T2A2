@@ -23,6 +23,7 @@ class Log(db.Model):
 
 
 class LogSchema(ma.Schema):
+    # Validation
     notes = fields.String(validate=Length(max=1000))
     class Meta:
         fields = (

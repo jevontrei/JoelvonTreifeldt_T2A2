@@ -30,6 +30,7 @@ class Appointment(db.Model):
 
 
 class AppointmentSchema(ma.Schema):
+    # Validation
     place = fields.String(
         validate=Length(max=50)
     )

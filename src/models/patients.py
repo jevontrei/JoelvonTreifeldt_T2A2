@@ -39,7 +39,7 @@ class PatientSchema(ma.Schema):
     treatments = fields.Nested(
         TreatmentSchema, 
         many=True, 
-        exclude=("patient_id",)  # Excluding patient_id prevents circular references
+        exclude=("patient_id")  # Excluding patient_id prevents circular references
     )
     
     class Meta:

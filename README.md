@@ -30,26 +30,28 @@ Student no. 15517
   - [R4 - Explain the benefits and drawbacks of this app’s underlying database system.](#r4---explain-the-benefits-and-drawbacks-of-this-apps-underlying-database-system)
       - [Advantages](#advantages)
       - [Disdvantages](#disdvantages)
-      - [Source/s](#sources-1)
+      - [Source](#source)
   - [R5 - Explain the features, purpose and functionalities of the object-relational mapping system (ORM) used in this app.](#r5---explain-the-features-purpose-and-functionalities-of-the-object-relational-mapping-system-orm-used-in-this-app)
   - [R6 - Design an entity relationship diagram (ERD) for this app’s database, and explain how the relations between the diagrammed models will aid the database design. This should focus on the database design BEFORE coding has begun, eg. during the project planning or design phase.](#r6---design-an-entity-relationship-diagram-erd-for-this-apps-database-and-explain-how-the-relations-between-the-diagrammed-models-will-aid-the-database-design-this-should-focus-on-the-database-design-before-coding-has-begun-eg-during-the-project-planning-or-design-phase)
+      - [Source](#source-1)
     - [Entities](#entities)
     - [Relationships](#relationships)
     - [Alternative Normalisation](#alternative-normalisation)
     - [ERD Legend: Crow's Foot Notation](#erd-legend-crows-foot-notation)
     - [September 11th: Original ERD](#september-11th-original-erd)
   - [R7 - Explain the implemented models and their relationships, including how the relationships aid the database implementation. This should focus on the database implementation AFTER coding has begun, eg. during the project development phase.](#r7---explain-the-implemented-models-and-their-relationships-including-how-the-relationships-aid-the-database-implementation-this-should-focus-on-the-database-implementation-after-coding-has-begun-eg-during-the-project-development-phase)
-      - [September 27th: Final ERD](#september-27th-final-erd)
+    - [Entities:](#entities-1)
+    - [Relationships:](#relationships-1)
+    - [ERD Legend: Crow's Foot Notation](#erd-legend-crows-foot-notation-1)
+    - [September 27th: Final ERD](#september-27th-final-erd)
       - [Patient model and controller](#patient-model-and-controller)
       - [Doctor model and controller](#doctor-model-and-controller)
       - [Treatment model (join table) and controller](#treatment-model-join-table-and-controller)
       - [Appointment model and controller](#appointment-model-and-controller)
       - [Log model and controller](#log-model-and-controller)
-      - [Relationships: move R6 answers here](#relationships-move-r6-answers-here)
-      - [utils.py](#utilspy)
+    - [Relationships](#relationships-2)
+    - [utils.py](#utilspy)
   - [R8 - Explain how to use this application’s API endpoints.](#r8---explain-how-to-use-this-applications-api-endpoints)
-      - [TALK ABOUT RESTful AND HOW I MOVED some ROUTES TO BE UNDER OTHER resources... like patients/x/treatments/ etc, while general treatment stuff is still under /treatments/... mention nested resources](#talk-about-restful-and-how-i-moved-some-routes-to-be-under-other-resources-like-patientsxtreatments-etc-while-general-treatment-stuff-is-still-under-treatments-mention-nested-resources)
-      - [header data = auth / bearer token?](#header-data--auth--bearer-token)
       - [main.py](#mainpy)
       - [appt\_controller.py](#appt_controllerpy)
       - [auth\_controller.py](#auth_controllerpy)
@@ -68,23 +70,15 @@ Student no. 15517
 
 ## R0 - Setup
 
-Ensure Python 3.x is installed and in use. This project was developed with Python 3.11.7.
-
-Create virtual environment: `python3 -m venv venv`.
-
-Activate virtual environment: `source venv/bin/activate`.
-
-Install dependencies: `pip install -r requirements.txt`.
-
-Create custom environment variables for sensitive information in a `.env` file in the root directory: `DATABASE_URI` and `JWT_SECRET_KEY`.
-
-Run `psql` and ensure that a database exists with a name that matches that mentioned in `DATABASE_URI`. Assign any necessary user privileges.
-
-Ensure database is reset and initialised by running `flask db drop`, `flask db create` and `flask db seed`.
-
-Run `flask run` or `flask run --debug` to run the WSGI development server.
-
-Note: all seeded user passwords in this project are set to "password" for development purposes.
+- Ensure Python 3.x is installed and in use. This project was developed with Python 3.11.7.
+- Create virtual environment: `python3 -m venv venv`.
+- Activate virtual environment: `source venv/bin/activate`.
+- Install dependencies: `pip install -r requirements.txt`.
+- Create custom environment variables for sensitive information in a `.env` file in the root directory: `DATABASE_URI` and `JWT_SECRET_KEY`.
+- Run `psql` and ensure that a database exists with a name that matches that mentioned in `DATABASE_URI`. Assign any necessary user privileges.
+- Ensure database is reset and initialised by running `flask db drop`, `flask db create` and `flask db seed`.
+- Run `flask run` or `flask run --debug` to run the WSGI development server.
+- Note: all seeded user passwords in this project are set to "password" for development purposes.
 
 ---
 
@@ -107,20 +101,14 @@ This API app is a living shared document/database accessible by both patient and
 Features to add in future versions:
 
 - Medications and the prescribing doctor, including past medications
-- Test results / pathology reports
-- Diagnoses
+- Test results / pathology reports for Patients
+- Diagnoses for Patients
+- Doctor comments on Logs
 
 ##### Sources
 
-- https://www.afr.com/policy/health-and-education/my-health-record-struggles-to-be-useful-for-patients-20221129-p5c218#:~:text=%E2%80%9COne%20of%20the%20constant%20areas,look%20up%20their%20pathology%20results.
-- https://www.cremornemedical.com.au/news-articles/my-health-record-pros-and-cons/
-- https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9977020/
-
-? check these:
-
-- Mizen, R. (2022, November 29). My Health Record struggles to be useful for patients. Australian Financial Review. https://www.afr.com/policy/health-and-education/my-health-record-struggles-to-be-useful-for-patients-20221129-p5c218
-- Cremorne Medical Practice. (n.d.). My Health Record: Pros and cons. https://www.cremornemedical.com.au/news-articles/my-health-record-pros-and-cons/
-- Abidi, S. S. R., Abidi, S., & Abusharekh, A. (2023). The past, present and future of electronic personal health records: A perspective from Canada. International Journal of Medical Informatics, 171, 104966. https://doi.org/10.1016/j.ijmedinf.2023.104966
+- Cremorne Medical Practice. (n.d.). _My Health Record Pros and Cons_. https://www.cremornemedical.com.au/news-articles/my-health-record-pros-and-cons/
+- Holt, M., MacGibbon, J., Smith, A. K. J., Broady, T. R., Davis, M. D. M., & Newman, C. E. (2023). \_Knowledge of Australia's My Health Record and factors associated with opting out: Results from a national survey of the Australian general population and communities affected by HIV and sexually transmissible infections. PLOS digital health, 2(3), e0000200. https://doi.org/10.1371/journal.pdig.0000200
 
 ---
 
@@ -271,15 +259,15 @@ Meets D, and describes benefits AND drawbacks to a thorough level of detail. -->
 
 The DBMS PostgreSQL was chosen primarily because it is based on SQL and the relational model. A relational database is appropriate for this medical tracker app which has multiple entities related in highly specified ways. Many-to-many and one-to-many relationships are elegantly handled by PostgreSQL, which is also ACID-compliant. ACID refers to the values of atomicity (), consistency (), integrity (), and durability (). PostgreSQL is flexible and can handle very large amounts of data. Its free and open-source nature make it an accessible resource with maximised transparency, and its popularity indicates a healthy userbase and support network.
 
-For this project in particular, PostgreSQL ...
-
 #### Disdvantages
 
 Compared to other alternatives such as MySQL, PostgreSQL may perform slower for certain tasks. The level of knowledge required may also present challenges in contrast to lightweight options such as SQLite.
 
-#### Source/s
+<!-- add more detail? -->
 
-- https://docs.digitalocean.com/glossary/acid/
+#### Source
+
+- DigitalOcean. (2022, December 12). _ACID Compliance_. https://docs.digitalocean.com/glossary/acid/
 
 ---
 
@@ -368,7 +356,11 @@ All relations are in first normal form (1NF). The cells in all tables are atomic
 
 The originally proposed ERD, shown below with crow's foot notation, contained the following entities and relationships.
 
-https://www.freecodecamp.org/news/database-normalization-1nf-2nf-3nf-table-examples/
+#### Source
+
+- Chris, K. (2022, December 21). _Database Normalization – Normal Forms 1nf 2nf 3nf Table Examples_. FreeCodeCamp. https://www.freecodecamp.org/news/database-normalization-1nf-2nf-3nf-table-examples/
+
+---
 
 ### Entities
 
@@ -435,7 +427,7 @@ Furthermore, the following tables could be defined to improve normalisation:
 
 - The 3-pronged side on the left indicates "many"
 - The 1-pronged side on the right indicates "one"
-- Therefore this indicates a many-to-one relationship
+- Therefore this example indicates a many-to-one relationship
 
 ![Crow's Foot Notation Legend](./docs/ERD/legend1.png)
 
@@ -463,17 +455,13 @@ Meets CR, and includes information about the queries that could be used to acces
 6 to >5 pts HD
 Meets D, and includes appropriate code examples supporting the descriptions. -->
 
-**AFTER CODING begins**
-
-comments table were removed
-
-The ERD evolved significantly over the course of development, as requirements and complexities arose. The Medication table was removed, along with its Prescription join table. This was done for simplicity, and to focus on the basics of the API as a proof of concept and first attempt. The Auth table was renamed to Treatment, ...
+The ERD evolved significantly over the course of development, as requirements and complexities arose. The Medication table was removed, along with its Prescription join table. This was done for simplicity, and to focus on the basics of the API as a proof of concept and first attempt. The Auth table was renamed to Treatment, for clarity, as auth decorators and functions were also in use. The comments were removed from the Logs, for simplicity.
 
 Appointments evolved from being a join table between Patients and Doctors to being a child entity of the Treatments.
 
-... doctor and patient emails must be unique within one type of model, but a doctor can duplicate themselves as a patient with the same email no worries. BUT! that will cause confusion with logging in. how do you know what someone is trying to log in as? use roles? In future, create separate login endpoints for each user type.
+For future versions: doctor and patient emails must be unique within one type of model, but a doctor can duplicate themselves as a patient with the same email address. However, this may cause confusion when logging in. In future, create separate login endpoints for each user type.
 
-Entities:
+### Entities:
 
 - Patient
   - Log
@@ -481,24 +469,31 @@ Entities:
   - Treatment (join table)
     - Appointment
 
-Relationships:
+### Relationships:
 
 - Patient-Doctor (many to many) via the Auth join table.
+  - A patient can have many doctors, and vice versa.
   - Implemented as Patient-Treatment (one-mandatory to many-optional) and Doctor-Treatment (one-mandatory to many-optional).
 - Patient-Log (one-mandatory to many-optional)
+  - A patient can have many logs, and a log belongs to one patient.
 - Treatment-Appointment (one-mandatory to many-optional)
+  - A treatment can have many appointments, and an appointment belongs to one treatment.
 
 ---
 
-#### September 27th: Final ERD
+### ERD Legend: Crow's Foot Notation
+
+- The 1-pronged side on the left indicates "one", with the crossline denoting a mandatory ordinality
+- The 3-pronged side on the right indicates "many", with the circle denoting an optional ordinality
+- Therefore this example indicates a one-mandatory to many-optional relationship
+
+![Crow's Foot Notation Legend](./docs/ERD/legend2.png)
+
+---
+
+### September 27th: Final ERD
 
 ![ERD](./docs/ERD/ERD%202024.9.27.png)
-
-<!-- ---
-
-#### September ?th
-
-![ERD](./docs/ERD) -->
 
 ---
 
@@ -506,7 +501,7 @@ Relationships:
 
 The Patient model tracks information about patients and is directly related to Logs and Treatments.
 
-The following code demonstrates a model definition:
+The following code demonstrates a model and schema definition:
 
 ```py
 
@@ -525,9 +520,42 @@ class Patient(db.Model):
     # One-to-many relationships from the patient's (parent) perspective
     logs = db.relationship("Log", back_populates="patient", cascade="all, delete")
     treatments = db.relationship("Treatment", back_populates="patient", cascade="all, delete")
-```
 
-<!-- should i include schemas here? -->
+
+class PatientSchema(ma.Schema):
+    # Validation
+    name = fields.String(validate=Length(max=100))
+    sex = fields.String(validate=Length(max=15))
+    password = fields.String(validate=Length(min=8, max=100), load_only=True)
+
+    email = fields.Email(
+        required=True,
+        validate=Length(max=100),
+        default_error_messages = {"invalid": "Not a valid email address."}
+    )
+
+    treatments = fields.Nested(
+        TreatmentSchema,
+        many=True,
+        exclude=("patient_id")
+    )
+
+    class Meta:
+        fields = (
+            "patient_id",
+            "name",
+            "email",
+            "password",
+            "dob",
+            "sex",
+            "is_admin",
+            "treatments"
+        )
+
+
+patient_schema = PatientSchema(exclude=["password"])
+patients_schema = PatientSchema(many=True, exclude=["password"])
+```
 
 #### Doctor model and controller
 
@@ -571,43 +599,36 @@ def get_doctor_appointments(doctor_id):
 
 #### Treatment model (join table) and controller
 
-<!-- This relationship allows us to view a treatment's appts... bi-directionally but no need for a line starting with appt_id = ... bc it's not actually a column in the treatments table, and bc treatments is the parent. this is just to establish the two-way connection -->
-
 Treatments were initially represented using `db.Table()` with FK attributes only. However, to facilitate the inclusion of other attributes (start date, end date), it was converted to a full entity using `db.model()` along with a schema.
-
-```py
-.
-```
 
 #### Appointment model and controller
 
-Deleting a treatment cascade-deletes all child appointments. This is not recommended, and an admin should
-
-Appointments ...
-
-```py
-.
-```
+Appointments are a child entity of treatments. Deleting a treatment cascade-deletes all child appointments. This is not recommended, and an admin should approve this and save treatment/appointment data for the patient.
 
 #### Log model and controller
 
-Logs ...
+Logs are a child entity of patients. Deleting a patient will cascade-delete all logs. This is not recommended, and an admin should approve this and save log data for the patient, unless the patient wishes to opt out altogether.
+
+### Relationships
+
+The relationships between entities are the essence of this relational database. In the source code, they are primarily defined using `db.relationship()` and `db.ForeignKey()`. For example, in the Treatment model:
 
 ```py
-.
+# Foreign keys from parent tables
+patient_id = db.Column(db.Integer, db.ForeignKey("patients.patient_id", ondelete="CASCADE"), nullable=False)
+doctor_id = db.Column(db.Integer, db.ForeignKey("doctors.doctor_id", ondelete="CASCADE"), nullable=False)
+
+# Many-to-one relationships from the treatment's perspective (child)
+patient = db.relationship("Patient", back_populates="treatments")
+doctor = db.relationship("Doctor", back_populates="treatments")
+
+# One-to-many relationship from the treatment's perspective (parent)
+appointments = db.relationship("Appointment", back_populates="treatment", cascade="all, delete") 
 ```
 
-#### Relationships: move R6 answers here
+Here, `db.ForeignKey()` defines the column in the child entity (Treatment), while `db.relationship()` (also defined on the other side in the parent model) establishes a two-way relationship for validation and querying purposes. The `back_populates` attribute refers to the current model, ensuring that changes are reflected in both models, and the `cascade` attribute is used to delete all child appointments when a treatment is deleted. Similarly, `ondelete="CASCADE"` establishes delete-cascading in the FK definition.
 
-The relationships ...
-
-`db.relationship()`
-
-`back_populates`
-
-`cascade`
-
-#### utils.py
+### utils.py
 
 The elegant utility of a relational database is exemplified when separate but related data is desired, but only limited data is available to search with. For example, a function may take advantage of the relationship (many-to-one) between appointments and treatments. The `@authorise_treatment_participant` decorator function demonstrates this. If the decorator receives an `appt_id` keyword argument instead of a `treatment_id` one, then it will perform a SQL-style query with a left outer join. The join allows the treatment details to be fetched with only an appointment PK. This then is used to fetch the patient and doctor FKs from the treatment. Otherwise, if the keyword argument is a `treatment_id`, then a more standard SQLAlchemy query is executed.
 
@@ -656,29 +677,6 @@ def authorise_treatment_participant(fn):
 
 ## R8 - Explain how to use this application’s API endpoints.
 
-#### TALK ABOUT RESTful AND HOW I MOVED some ROUTES TO BE UNDER OTHER resources... like patients/x/treatments/ etc, while general treatment stuff is still under /treatments/... mention nested resources
-
-Each endpoint should be explained, including the following data for each endpoint:
-
-- HTTP verb
-- Path or route
-- Any required body or header data
-- Response / Expected response data
-- Authentication methods where applicable
-  - jwt_required()
-
-ALSO different authorisation levels:
-
-- Authorisation:
-  - authorise_as_admin
-  - authorise_as_log_viewer
-  - authorise_as_log_owner
-  - authorise_treatment_participant
-- Validation / sanitisation of input
-  - regex? no --> fields.Email() or whatever
-
-#### header data = auth / bearer token?
-
 <!-- CMP1001-1.4: IDENTIFY AND DESCRIBE the application’s API endpoints.
 
 4 to >2.99 pts P
@@ -690,7 +688,7 @@ Meets P, and includes examples of what each identified endpoint will return on s
 6 to >5 pts HD
 Meets D, applied to ALL of the application’s API endpoints. -->
 
-All endpoints are outlined below, with routes, verbs, required body/header data, and responses as applicable with screenshots.
+All endpoints are outlined below, with routes, verbs, required body/header data, and responses as applicable with screenshots. Several endpoints were moved under their parent resources, to align with RESTful design principles. E.g. appointments are nested under patients and treatments depending on context, and logs were moved under patients, instead of being represented as entirely standalone resources in the URLs and blueprints.
 
 #### main.py
 
